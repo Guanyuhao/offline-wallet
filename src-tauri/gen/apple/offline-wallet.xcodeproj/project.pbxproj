@@ -14,7 +14,6 @@
 		546680CF56E067339F17478F /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 25B4C5922F1ECC287293F9C1 /* main.mm */; };
 		8DF196A0D8F5D26A20B407C3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17F451CB9CF00E6E506A2BC5 /* Security.framework */; };
 		940999C8A5149D7837502D94 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A08132AE6B01DF508C35E931 /* MetalKit.framework */; };
-		A20B8964C047FDA64AC3B252 /* libapp.a in Resources */ = {isa = PBXBuildFile; fileRef = DC4500370C0B772EA361A2E2 /* libapp.a */; };
 		A2AA43555E435F1594C163B3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C114277EC70F516EF04A68 /* CoreGraphics.framework */; };
 		A5807FF4597095E9C9139783 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E1451C334F65544C34420E8 /* Metal.framework */; };
 		BD1FFBC38531CC7CECC4C3BA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2F28A79B01C7101EDB540CC /* Assets.xcassets */; };
@@ -276,7 +275,6 @@
 				BD1FFBC38531CC7CECC4C3BA /* Assets.xcassets in Resources */,
 				463E31CC1BDACF0C874C15EC /* LaunchScreen.storyboard in Resources */,
 				4DB4A8F696B9CDB2502916B3 /* assets in Resources */,
-				A20B8964C047FDA64AC3B252 /* libapp.a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
