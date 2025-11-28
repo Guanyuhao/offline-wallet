@@ -24,7 +24,7 @@ export const useWalletStore = defineStore('wallet', () => {
   const addresses = ref<Address[]>([]);
   const isLocked = ref<boolean>(true);
   const lastActivity = ref<number>(Date.now());
-  const selectedChain = ref<ChainType>('ETH');
+  const selectedChain = ref<ChainType>('BNB');
 
   // Computed
   const isWalletCreated = computed(() => addresses.value.length > 0);
@@ -60,31 +60,54 @@ export const useWalletStore = defineStore('wallet', () => {
   async function createWallet(phrase: string, pass: string = ''): Promise<void> {
     mnemonic.value = phrase;
     passphrase.value = pass;
+    try {
     await deriveAddressesForAllChains();
     isLocked.value = false;
     updateActivity();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to create wallet: ${errorMessage}`);
+    }
   }
 
   async function deriveAddressesForAllChains(): Promise<void> {
     const chains: ChainType[] = ['ETH', 'BTC', 'BNB', 'SOL', 'TRON'];
     const newAddresses: Address[] = [];
+    const errors: string[] = [];
     
     for (const chain of chains) {
       try {
         const result = await deriveAddressForChain(chain, 0);
+        if (result.address) {
         newAddresses.push({
           index: 0,
           address: result.address,
           path: result.path,
           chain,
         });
+        } else {
+          errors.push(`${chain}: Empty address returned`);
+        }
       } catch (error) {
-        console.error(`Failed to derive ${chain} address:`, error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error(`Failed to derive ${chain} address:`, errorMessage);
+        errors.push(`${chain}: ${errorMessage}`);
+        // 不阻止其他链的地址生成，但记录错误
       }
     }
     
     addresses.value = newAddresses;
     updateActivity();
+    
+    // 如果有错误，记录但不阻止钱包创建
+    if (errors.length > 0) {
+      console.warn('Some addresses failed to generate:', errors);
+    }
+    
+    // 确保至少有一个地址生成成功
+    if (newAddresses.length === 0) {
+      throw new Error('Failed to generate any addresses. Please check your mnemonic.');
+    }
   }
 
   async function deriveAddressForChain(chain: ChainType, index: number): Promise<{ address: string; path: string }> {

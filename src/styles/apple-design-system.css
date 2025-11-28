@@ -1,0 +1,337 @@
+/**
+ * Apple Design System - macOS Human Interface Guidelines
+ * 简洁、清爽、富含科技感的 Apple 风格设计系统
+ */
+
+:root {
+  /* ============ Apple 颜色系统 ============ */
+  
+  /* 系统蓝色（Apple Blue） */
+  --apple-blue: #007AFF;
+  --apple-blue-hover: #0051D5;
+  --apple-blue-active: #0040B3;
+  
+  /* 系统灰色 */
+  --apple-gray-1: #F5F5F7;
+  --apple-gray-2: #E5E5EA;
+  --apple-gray-3: #D1D1D6;
+  --apple-gray-4: #C7C7CC;
+  --apple-gray-5: #AEAEB2;
+  --apple-gray-6: #8E8E93;
+  
+  /* 深色模式下的灰色 */
+  --apple-gray-dark-1: #1C1C1E;
+  --apple-gray-dark-2: #2C2C2E;
+  --apple-gray-dark-3: #3A3A3C;
+  --apple-gray-dark-4: #48484A;
+  --apple-gray-dark-5: #636366;
+  --apple-gray-dark-6: #8E8E93;
+  
+  /* 文本颜色 */
+  --apple-text-primary: #000000;
+  --apple-text-secondary: #3C3C43;
+  --apple-text-tertiary: #3C3C4399;
+  --apple-text-quaternary: #3C3C434D;
+  
+  /* 背景颜色 */
+  --apple-bg-primary: #FFFFFF;
+  --apple-bg-secondary: #F2F2F7;
+  --apple-bg-tertiary: #FFFFFF;
+  
+  /* 分隔线 */
+  --apple-separator: rgba(60, 60, 67, 0.29);
+  --apple-separator-opaque: #C6C6C8;
+  
+  /* 系统语义色 */
+  --apple-red: #FF3B30;
+  --apple-orange: #FF9500;
+  --apple-yellow: #FFCC00;
+  --apple-green: #34C759;
+  --apple-mint: #00C7BE;
+  --apple-teal: #30B0C7;
+  --apple-cyan: #32ADE6;
+  --apple-blue: #007AFF;
+  --apple-indigo: #5856D6;
+  --apple-purple: #AF52DE;
+  --apple-pink: #FF2D55;
+  --apple-brown: #A2845E;
+  
+  /* 字体系统 - SF Pro */
+  --apple-font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 
+                'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --apple-font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+  
+  /* 字体大小 - Apple 标准 */
+  --apple-font-size-large-title: 34px;
+  --apple-font-size-title-1: 28px;
+  --apple-font-size-title-2: 22px;
+  --apple-font-size-title-3: 20px;
+  --apple-font-size-headline: 17px;
+  --apple-font-size-body: 17px;
+  --apple-font-size-callout: 16px;
+  --apple-font-size-subheadline: 15px;
+  --apple-font-size-footnote: 13px;
+  --apple-font-size-caption-1: 12px;
+  --apple-font-size-caption-2: 11px;
+  
+  /* 字重 */
+  --apple-font-weight-regular: 400;
+  --apple-font-weight-medium: 500;
+  --apple-font-weight-semibold: 600;
+  --apple-font-weight-bold: 700;
+  
+  /* 间距系统 - 8pt grid */
+  --apple-spacing-xs: 4px;
+  --apple-spacing-sm: 8px;
+  --apple-spacing-md: 16px;
+  --apple-spacing-lg: 24px;
+  --apple-spacing-xl: 32px;
+  --apple-spacing-2xl: 40px;
+  --apple-spacing-3xl: 48px;
+  
+  /* 圆角 */
+  --apple-radius-sm: 6px;
+  --apple-radius-md: 10px;
+  --apple-radius-lg: 14px;
+  --apple-radius-xl: 20px;
+  --apple-radius-full: 9999px;
+  
+  /* 阴影 - Apple 风格（轻微、柔和） */
+  --apple-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --apple-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --apple-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  
+  /* 过渡动画 - Apple 风格（快速、流畅） */
+  --apple-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --apple-transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --apple-transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* 模糊效果 */
+  --apple-blur: blur(20px);
+  --apple-blur-light: blur(10px);
+}
+
+/* ============ 暗色模式 ============ */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --apple-text-primary: #FFFFFF;
+    --apple-text-secondary: #EBEBF5;
+    --apple-text-tertiary: #EBEBF599;
+    --apple-text-quaternary: #EBEBF54D;
+    
+    --apple-bg-primary: #000000;
+    --apple-bg-secondary: #1C1C1E;
+    --apple-bg-tertiary: #2C2C2E;
+    
+    --apple-separator: rgba(84, 84, 88, 0.65);
+    --apple-separator-opaque: #38383A;
+  }
+}
+
+/* 强制暗色模式 */
+:root.dark {
+  --apple-text-primary: #FFFFFF;
+  --apple-text-secondary: #EBEBF5;
+  --apple-text-tertiary: #EBEBF599;
+  --apple-text-quaternary: #EBEBF54D;
+  
+  --apple-bg-primary: #000000;
+  --apple-bg-secondary: #1C1C1E;
+  --apple-bg-tertiary: #2C2C2E;
+  
+  --apple-separator: rgba(84, 84, 88, 0.65);
+  --apple-separator-opaque: #38383A;
+  
+  /* 深色模式下的灰色 */
+  --apple-gray-1: var(--apple-gray-dark-1);
+  --apple-gray-2: var(--apple-gray-dark-2);
+  --apple-gray-3: var(--apple-gray-dark-3);
+  --apple-gray-4: var(--apple-gray-dark-4);
+  --apple-gray-5: var(--apple-gray-dark-5);
+  --apple-gray-6: var(--apple-gray-dark-6);
+}
+
+/* 强制浅色模式 */
+:root.light {
+  --apple-text-primary: #000000;
+  --apple-text-secondary: #3C3C43;
+  --apple-text-tertiary: #3C3C4399;
+  --apple-text-quaternary: #3C3C434D;
+  
+  --apple-bg-primary: #FFFFFF;
+  --apple-bg-secondary: #F2F2F7;
+  --apple-bg-tertiary: #FFFFFF;
+  
+  --apple-separator: rgba(60, 60, 67, 0.29);
+  --apple-separator-opaque: #C6C6C8;
+}
+
+/* ============ Apple 风格基础样式 ============ */
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--apple-font);
+  font-size: var(--apple-font-size-body);
+  font-weight: var(--apple-font-weight-regular);
+  color: var(--apple-text-primary);
+  background: var(--apple-bg-primary);
+  line-height: 1.47059;
+  letter-spacing: -0.022em;
+}
+
+/* ============ Apple 风格按钮 ============ */
+
+.apple-btn {
+  font-family: var(--apple-font);
+  font-size: var(--apple-font-size-body);
+  font-weight: var(--apple-font-weight-medium);
+  padding: 10px 20px;
+  border-radius: var(--apple-radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--apple-transition-fast);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px; /* Apple 最小触摸目标 */
+}
+
+.apple-btn-primary {
+  background: var(--apple-blue);
+  color: white;
+}
+
+.apple-btn-primary:hover {
+  background: var(--apple-blue-hover);
+}
+
+.apple-btn-primary:active {
+  background: var(--apple-blue-active);
+  transform: scale(0.98);
+}
+
+.apple-btn-secondary {
+  background: var(--apple-bg-secondary);
+  color: var(--apple-text-primary);
+  border: 0.5px solid var(--apple-separator);
+}
+
+.apple-btn-secondary:hover {
+  background: var(--apple-gray-2);
+}
+
+/* ============ Apple 风格输入框 ============ */
+
+.apple-input {
+  font-family: var(--apple-font);
+  font-size: var(--apple-font-size-body);
+  padding: 10px 14px;
+  border-radius: var(--apple-radius-md);
+  border: 0.5px solid var(--apple-separator);
+  background: var(--apple-bg-primary);
+  color: var(--apple-text-primary);
+  transition: all var(--apple-transition-fast);
+  min-height: 44px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.apple-input:focus {
+  outline: none;
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.apple-input::placeholder {
+  color: var(--apple-text-tertiary);
+}
+
+/* ============ Apple 风格卡片 ============ */
+
+.apple-card {
+  background: var(--apple-bg-primary);
+  border-radius: var(--apple-radius-lg);
+  padding: var(--apple-spacing-lg);
+  box-shadow: var(--apple-shadow-sm);
+  border: 0.5px solid var(--apple-separator);
+}
+
+/* ============ Apple 风格分隔线 ============ */
+
+.apple-separator {
+  height: 0.5px;
+  background: var(--apple-separator);
+  margin: var(--apple-spacing-md) 0;
+}
+
+/* ============ Apple 风格列表 ============ */
+
+.apple-list {
+  background: var(--apple-bg-primary);
+  border-radius: var(--apple-radius-lg);
+  overflow: hidden;
+  border: 0.5px solid var(--apple-separator);
+}
+
+.apple-list-item {
+  padding: var(--apple-spacing-md);
+  border-bottom: 0.5px solid var(--apple-separator);
+  transition: background var(--apple-transition-fast);
+  cursor: pointer;
+}
+
+.apple-list-item:last-child {
+  border-bottom: none;
+}
+
+.apple-list-item:hover {
+  background: var(--apple-bg-secondary);
+}
+
+.apple-list-item:active {
+  background: var(--apple-gray-2);
+}
+
+/* ============ 安全输入样式 ============ */
+
+.apple-input-secure {
+  font-family: var(--apple-font-mono);
+  letter-spacing: 0.05em;
+}
+
+.apple-input-secure::placeholder {
+  font-family: var(--apple-font);
+  letter-spacing: normal;
+}
+
+/* ============ 禁用状态 ============ */
+
+.apple-btn:disabled,
+.apple-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ============ 加载状态 ============ */
+
+.apple-loading {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: apple-spin 0.6s linear infinite;
+}
+
+@keyframes apple-spin {
+  to { transform: rotate(360deg); }
+}
+

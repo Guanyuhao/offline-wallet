@@ -1,15 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { useAppMessage } from '../composables/useMessage';
 
 export type ViewType = 'welcome' | 'create' | 'import' | 'wallet' | 'settings';
 export type ThemeType = 'light' | 'dark' | 'auto';
-
-export interface ToastMessage {
-  id: string;
-  type: 'success' | 'error' | 'warning' | 'info';
-  message: string;
-  duration?: number;
-}
 
 export const useUIStore = defineStore('ui', () => {
   // State
@@ -17,7 +11,6 @@ export const useUIStore = defineStore('ui', () => {
   const theme = ref<ThemeType>('auto');
   const isLoading = ref<boolean>(false);
   const loadingMessage = ref<string>('');
-  const toasts = ref<ToastMessage[]>([]);
 
   // Actions
   function setView(view: ViewType): void {
@@ -28,16 +21,30 @@ export const useUIStore = defineStore('ui', () => {
     theme.value = newTheme;
     localStorage.setItem('app-theme', newTheme);
     applyTheme(newTheme);
+    
+    // 触发自定义事件，通知其他组件主题已变化
+    window.dispatchEvent(new CustomEvent('theme-changed', { detail: newTheme }));
   }
 
   function applyTheme(newTheme: ThemeType): void {
     const root = document.documentElement;
     
+    // 移除之前的主题类
+    root.classList.remove('dark', 'light');
+    
     if (newTheme === 'auto') {
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.classList.toggle('dark', prefersDark);
+      if (prefersDark) {
+        root.classList.add('dark');
+      } else {
+        root.classList.add('light');
+      }
+    } else if (newTheme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
     } else {
-      root.classList.toggle('dark', newTheme === 'dark');
+      root.classList.add('light');
+      root.classList.remove('dark');
     }
   }
 
@@ -51,44 +58,44 @@ export const useUIStore = defineStore('ui', () => {
     loadingMessage.value = '';
   }
 
-  function showToast(
-    message: string,
-    type: ToastMessage['type'] = 'info',
-    duration: number = 3000
-  ): void {
-    const id = Date.now().toString();
-    const toast: ToastMessage = { id, type, message, duration };
-    
-    toasts.value.push(toast);
-    
-    if (duration > 0) {
-      setTimeout(() => {
-        removeToast(id);
-      }, duration);
+  function showSuccess(message: string, duration: number = 3000): void {
+    try {
+      const messageApi = useAppMessage();
+      messageApi.success(message, { duration });
+    } catch {
+      // Message API not initialized yet, fallback to console
+      console.log('Success:', message);
     }
   }
 
-  function removeToast(id: string): void {
-    const index = toasts.value.findIndex(t => t.id === id);
-    if (index !== -1) {
-      toasts.value.splice(index, 1);
+  function showError(message: string, duration: number = 5000): void {
+    try {
+      const messageApi = useAppMessage();
+      messageApi.error(message, { duration });
+    } catch {
+      // Message API not initialized yet, fallback to console
+      console.error('Error:', message);
     }
   }
 
-  function showSuccess(message: string, duration?: number): void {
-    showToast(message, 'success', duration);
+  function showWarning(message: string, duration: number = 4000): void {
+    try {
+      const messageApi = useAppMessage();
+      messageApi.warning(message, { duration });
+    } catch {
+      // Message API not initialized yet, fallback to console
+      console.warn('Warning:', message);
+    }
   }
 
-  function showError(message: string, duration?: number): void {
-    showToast(message, 'error', duration);
-  }
-
-  function showWarning(message: string, duration?: number): void {
-    showToast(message, 'warning', duration);
-  }
-
-  function showInfo(message: string, duration?: number): void {
-    showToast(message, 'info', duration);
+  function showInfo(message: string, duration: number = 3000): void {
+    try {
+      const messageApi = useAppMessage();
+      messageApi.info(message, { duration });
+    } catch {
+      // Message API not initialized yet, fallback to console
+      console.info('Info:', message);
+    }
   }
 
   // Initialize theme on load
@@ -100,7 +107,7 @@ export const useUIStore = defineStore('ui', () => {
     applyTheme(theme.value);
     
     // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       if (theme.value === 'auto') {
         applyTheme('auto');
       }
@@ -113,15 +120,12 @@ export const useUIStore = defineStore('ui', () => {
     theme,
     isLoading,
     loadingMessage,
-    toasts,
     
     // Actions
     setView,
     setTheme,
     showLoading,
     hideLoading,
-    showToast,
-    removeToast,
     showSuccess,
     showError,
     showWarning,

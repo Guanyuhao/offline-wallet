@@ -162,7 +162,13 @@ fn generate_qrcode_cmd(data: String) -> Result<String, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+    
+    // 只在移动端初始化 barcode-scanner 插件
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    let builder = builder.plugin(tauri_plugin_barcode_scanner::init());
+    
+    builder
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             generate_mnemonic_cmd,

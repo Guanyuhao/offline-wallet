@@ -32,6 +32,20 @@ export default {
     words24: '24 Words',
     recommended: 'Recommended',
     moreSafe: 'More Secure',
+    features: {
+      offline: {
+        title: 'Fully Offline',
+        desc: 'Works without internet connection',
+      },
+      secure: {
+        title: 'Private Key Security',
+        desc: 'All operations done locally',
+      },
+      erase: {
+        title: 'Instant Erase',
+        desc: 'Sensitive data cleared immediately after signing',
+      },
+    },
   },
   backup: {
     title: 'Backup Seed Phrase',
@@ -51,6 +65,7 @@ export default {
   wallet: {
     title: 'My Wallet',
     selectChain: 'Select Blockchain',
+    selectNetwork: 'Select Network',
     myAddress: 'My Address',
     addressHint: 'Others can send funds to this address',
     showAllAddresses: 'Show All Addresses',
@@ -69,6 +84,12 @@ export default {
     qrCode: 'QR Code',
     qrCodeHint: 'Scan with phone or broadcast on online device',
     exit: 'Exit',
+    exitConfirm: {
+      title: 'Confirm Exit',
+      content: 'Exiting will clear all wallet data. Please ensure you have safely backed up your mnemonic phrase. Are you sure you want to exit?',
+      confirm: 'Confirm Exit',
+    },
+    exitSuccess: 'Wallet exited',
     advancedMode: 'Advanced Mode',
     advancedHint: 'Enable to customize Gas, Nonce, etc. Leave empty to use defaults',
     gasPrice: 'Gas Price',
@@ -86,6 +107,33 @@ export default {
     tronGasPriceHint: 'Default: 420 SUN',
     tronGasLimitHint: 'Default: 21000',
   },
+  theme: {
+    system: 'System',
+    light: 'Light',
+    dark: 'Dark',
+  },
+  settings: {
+    title: 'Settings',
+    theme: 'Theme',
+    language: 'Language',
+  },
+  menu: {
+    title: 'Menu',
+  },
+  receive: {
+    title: 'Receive',
+    accountLabel: 'Account',
+    copyAddress: 'Copy Address',
+    addressCopied: 'Address copied',
+    generateQRFailed: 'Failed to generate QR code',
+    scanQR: 'Scan QR Code',
+    yourQR: 'Your QR Code',
+    scanQRHint: 'Select an image file containing a QR code',
+    scanQRSuccess: 'Scan successful',
+    scanQRFailed: 'Scan failed, please ensure the image contains a valid QR code',
+    noQRCodeFound: 'No QR code found',
+    selectImage: 'Select Image',
+  },
   messages: {
     copied: '{label} copied',
     walletCreated: 'Wallet created successfully!',
@@ -96,5 +144,6 @@ export default {
     signFailed: 'Signing failed',
     invalidAddress: 'Invalid recipient address format',
     invalidAmount: 'Amount must be greater than 0',
+    invalidFormat: 'Invalid format',
   },
 };

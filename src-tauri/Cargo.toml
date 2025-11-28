@@ -56,3 +56,6 @@ image = "0.24"
 # Base64 编码
 base64 = "0.22"
 
+[target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
+tauri-plugin-barcode-scanner = "2"
+

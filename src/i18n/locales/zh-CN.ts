@@ -32,6 +32,20 @@ export default {
     words24: '24个词',
     recommended: '推荐',
     moreSafe: '更安全',
+    features: {
+      offline: {
+        title: '完全离线',
+        desc: '无需联网即可使用',
+      },
+      secure: {
+        title: '私钥安全',
+        desc: '所有操作在本地完成',
+      },
+      erase: {
+        title: '即时擦除',
+        desc: '签名后立即清除敏感数据',
+      },
+    },
   },
   backup: {
     title: '备份助记词',
@@ -51,6 +65,7 @@ export default {
   wallet: {
     title: '我的钱包',
     selectChain: '选择区块链',
+    selectNetwork: '网络选择',
     myAddress: '我的地址',
     addressHint: '别人可以通过这个地址给你转账',
     showAllAddresses: '显示所有地址',
@@ -69,6 +84,12 @@ export default {
     qrCode: '二维码',
     qrCodeHint: '用手机扫码或在有网络的设备上广播',
     exit: '退出',
+    exitConfirm: {
+      title: '确认退出',
+      content: '退出后将清除所有钱包数据，请确保已安全备份助记词。是否确认退出？',
+      confirm: '确认退出',
+    },
+    exitSuccess: '已退出钱包',
     advancedMode: '专业模式',
     advancedHint: '开启后可自定义 Gas、Nonce 等参数，不填则使用默认值',
     gasPrice: 'Gas Price',
@@ -86,6 +107,33 @@ export default {
     tronGasPriceHint: '默认：420 SUN',
     tronGasLimitHint: '默认：21000',
   },
+  theme: {
+    system: '跟随系统',
+    light: '浅色',
+    dark: '深色',
+  },
+  settings: {
+    title: '设置',
+    theme: '主题',
+    language: '语言',
+  },
+  menu: {
+    title: '菜单',
+  },
+  receive: {
+    title: '接收',
+    accountLabel: '账户',
+    copyAddress: '复制地址',
+    addressCopied: '地址已复制',
+    generateQRFailed: '生成二维码失败',
+    scanQR: '扫描二维码',
+    yourQR: '您的二维码',
+    scanQRHint: '选择包含二维码的图片文件',
+    scanQRSuccess: '扫描成功',
+    scanQRFailed: '扫描失败，请确保图片中包含有效的二维码',
+    noQRCodeFound: '未找到二维码',
+    selectImage: '选择图片',
+  },
   messages: {
     copied: '{label}已复制',
     walletCreated: '钱包创建成功！',
@@ -96,5 +144,6 @@ export default {
     signFailed: '签名失败',
     invalidAddress: '收款地址格式不正确',
     invalidAmount: '金额必须大于0',
+    invalidFormat: '格式不正确',
   },
 };

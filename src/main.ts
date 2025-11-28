@@ -1,8 +1,10 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
+import naive from 'naive-ui';
 import i18n from './i18n';
 import App from './App.vue';
 import './styles/global.css';
+import './styles/apple-design-system.css';
 
 try {
   const app = createApp(App);
@@ -10,6 +12,7 @@ try {
 
   app.use(pinia);
   app.use(i18n);
+  app.use(naive);
 
   app.mount('#app');
 } catch (error) {

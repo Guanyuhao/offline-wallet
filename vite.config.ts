@@ -29,4 +29,13 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**"],
     },
   },
+  build: {
+    rollupOptions: {
+      external: [
+        // 可选依赖，运行时动态导入
+        'jsqr',
+        '@tauri-apps/plugin-barcode-scanner',
+      ],
+    },
+  },
 }));

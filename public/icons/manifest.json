@@ -1,0 +1,29 @@
+{
+  "chains": {
+    "ETH": {
+      "name": "Ethereum",
+      "icon": "/icons/eth.png",
+      "color": "#627EEA"
+    },
+    "BTC": {
+      "name": "Bitcoin",
+      "icon": "/icons/btc.png",
+      "color": "#F7931A"
+    },
+    "BNB": {
+      "name": "BNB Chain",
+      "icon": "/icons/bnb.png",
+      "color": "#F3BA2F"
+    },
+    "SOL": {
+      "name": "Solana",
+      "icon": "/icons/sol.png",
+      "color": "#9945FF"
+    },
+    "TRON": {
+      "name": "Tron",
+      "icon": "/icons/tron.png",
+      "color": "#FF0018"
+    }
+  }
+}
