@@ -14,6 +14,7 @@
 		546680CF56E067339F17478F /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 25B4C5922F1ECC287293F9C1 /* main.mm */; };
 		8DF196A0D8F5D26A20B407C3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17F451CB9CF00E6E506A2BC5 /* Security.framework */; };
 		940999C8A5149D7837502D94 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A08132AE6B01DF508C35E931 /* MetalKit.framework */; };
+		A20B8964C047FDA64AC3B252 /* libapp.a in Resources */ = {isa = PBXBuildFile; fileRef = DC4500370C0B772EA361A2E2 /* libapp.a */; };
 		A2AA43555E435F1594C163B3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C114277EC70F516EF04A68 /* CoreGraphics.framework */; };
 		A5807FF4597095E9C9139783 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E1451C334F65544C34420E8 /* Metal.framework */; };
 		BD1FFBC38531CC7CECC4C3BA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2F28A79B01C7101EDB540CC /* Assets.xcassets */; };
@@ -44,6 +45,7 @@
 		BEA4EF027F325DC260B48443 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C07A2843E6AD97590052D631 /* qrcode_gen.rs */ = {isa = PBXFileReference; path = qrcode_gen.rs; sourceTree = "<group>"; };
 		DC23270035FD1669D577D3DB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		DC4500370C0B772EA361A2E2 /* libapp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libapp.a; sourceTree = "<group>"; };
 		DE9A51045D6C0C899BB7ED32 /* bnb.rs */ = {isa = PBXFileReference; path = bnb.rs; sourceTree = "<group>"; };
 		E07BDEDAFBFF3AA1BBABF04F /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		E2F28A79B01C7101EDB540CC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -110,6 +112,14 @@
 			path = crypto;
 			sourceTree = "<group>";
 		};
+		61C9B3CC394B4808CE685C57 /* arm64 */ = {
+			isa = PBXGroup;
+			children = (
+				AC38D2F9B25156E4D92BE991 /* debug */,
+			);
+			path = arm64;
+			sourceTree = "<group>";
+		};
 		6A7D6AFDF25CA95E8FDEC585 = {
 			isa = PBXGroup;
 			children = (
@@ -157,6 +167,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		AC38D2F9B25156E4D92BE991 /* debug */ = {
+			isa = PBXGroup;
+			children = (
+				DC4500370C0B772EA361A2E2 /* libapp.a */,
+			);
+			path = debug;
+			sourceTree = "<group>";
+		};
 		B40C434001584C6250B272CA /* src */ = {
 			isa = PBXGroup;
 			children = (
@@ -182,8 +200,16 @@
 		FAE04B6E908FDA7C93B1E5F1 /* Externals */ = {
 			isa = PBXGroup;
 			children = (
+				61C9B3CC394B4808CE685C57 /* arm64 */,
 			);
 			path = Externals;
+			sourceTree = "<group>";
+		};
+		"TEMP_E3EAC4F6-1CFD-4AAC-AEFC-50B8C9BD1A08" /* x86_64 */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = x86_64;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -250,6 +276,7 @@
 				BD1FFBC38531CC7CECC4C3BA /* Assets.xcassets in Resources */,
 				463E31CC1BDACF0C874C15EC /* LaunchScreen.storyboard in Resources */,
 				4DB4A8F696B9CDB2502916B3 /* assets in Resources */,
+				A20B8964C047FDA64AC3B252 /* libapp.a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,12 +342,8 @@
 				);
 				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
 				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(inherited) $(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-Wl,-force_load,$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)/libswiftCompatibility56.a",
-					"-Wl,-force_load,$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)/libswiftCompatibilityConcurrency.a",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.offlinewallet.app;
+				OTHER_LDFLAGS = "$(inherited) -Wl,-force_load,$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)/libswiftCompatibility56.a -Wl,-force_load,$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)/libswiftCompatibilityConcurrency.a";
+				PRODUCT_BUNDLE_IDENTIFIER = com.offlinewallet;
 				PRODUCT_NAME = "OfflineWallet";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -352,12 +375,8 @@
 				);
 				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
 				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(inherited) $(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-Wl,-force_load,$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)/libswiftCompatibility56.a",
-					"-Wl,-force_load,$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)/libswiftCompatibilityConcurrency.a",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.offlinewallet.app;
+				OTHER_LDFLAGS = "$(inherited) -Wl,-force_load,$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)/libswiftCompatibility56.a -Wl,-force_load,$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)/libswiftCompatibilityConcurrency.a";
+				PRODUCT_BUNDLE_IDENTIFIER = com.offlinewallet;
 				PRODUCT_NAME = "OfflineWallet";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
