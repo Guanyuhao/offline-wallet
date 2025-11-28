@@ -5,6 +5,10 @@ import { useAppMessage } from '../composables/useMessage';
 export type ViewType = 'welcome' | 'create' | 'import' | 'wallet' | 'settings';
 export type ThemeType = 'light' | 'dark' | 'auto';
 
+// 消息去重：记录最近显示的消息和时间戳
+const recentMessages = new Map<string, number>();
+const MESSAGE_DEBOUNCE_MS = 2000; // 2秒内相同消息不重复显示
+
 export const useUIStore = defineStore('ui', () => {
   // State
   const currentView = ref<ViewType>('welcome');
@@ -58,41 +62,62 @@ export const useUIStore = defineStore('ui', () => {
     loadingMessage.value = '';
   }
 
-  function showSuccess(message: string, duration: number = 3000): void {
+  // 检查消息是否应该显示（去重）
+  function shouldShowMessage(message: string): boolean {
+    const now = Date.now();
+    const lastTime = recentMessages.get(message);
+    
+    if (lastTime && (now - lastTime) < MESSAGE_DEBOUNCE_MS) {
+      return false; // 在去重时间窗口内，不显示
+    }
+    
+    recentMessages.set(message, now);
+    return true;
+  }
+
+function showSuccess(message: string, duration: number = 3000): void {
+    if (!shouldShowMessage(`success:${message}`)) return;
+    
     try {
       const messageApi = useAppMessage();
       messageApi.success(message, { duration });
-    } catch {
+    } catch (error) {
       // Message API not initialized yet, fallback to console
       console.log('Success:', message);
     }
   }
 
   function showError(message: string, duration: number = 5000): void {
+    if (!shouldShowMessage(`error:${message}`)) return;
+    
     try {
       const messageApi = useAppMessage();
       messageApi.error(message, { duration });
-    } catch {
+    } catch (error) {
       // Message API not initialized yet, fallback to console
       console.error('Error:', message);
     }
   }
 
   function showWarning(message: string, duration: number = 4000): void {
+    if (!shouldShowMessage(`warning:${message}`)) return;
+    
     try {
       const messageApi = useAppMessage();
       messageApi.warning(message, { duration });
-    } catch {
+    } catch (error) {
       // Message API not initialized yet, fallback to console
       console.warn('Warning:', message);
     }
   }
 
   function showInfo(message: string, duration: number = 3000): void {
+    if (!shouldShowMessage(`info:${message}`)) return;
+    
     try {
       const messageApi = useAppMessage();
       messageApi.info(message, { duration });
-    } catch {
+    } catch (error) {
       // Message API not initialized yet, fallback to console
       console.info('Info:', message);
     }

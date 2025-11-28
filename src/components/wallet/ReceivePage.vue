@@ -6,6 +6,7 @@ import { useWalletStore, type ChainType } from '../../stores/wallet';
 import { useUIStore } from '../../stores/ui';
 import { invoke } from '@tauri-apps/api/core';
 import { usePlatform } from '../../composables/usePlatform';
+import { getFriendlyErrorMessage, isUserCancelError } from '../../utils/errorHandler';
 import type { UploadFileInfo } from 'naive-ui';
 
 const { t } = useI18n();
@@ -132,21 +133,38 @@ async function handleFileUpload(options: { file: UploadFileInfo; fileList: Uploa
     reader.readAsDataURL(file);
   } catch (error) {
     console.error('Failed to load jsQR:', error);
-    uiStore.showError(t('receive.scanQRFailed') + ': ' + error);
+    if (!isUserCancelError(error)) {
+      const friendlyError = getFriendlyErrorMessage(error, t);
+      uiStore.showError(friendlyError || t('receive.scanQRFailed'));
+    }
     isScanning.value = false;
   }
 }
 
 // 移动端摄像头扫描（需要安装 barcode-scanner 插件）
 async function startCameraScan() {
+  // 只在移动端尝试扫描
+  if (!isMobile()) {
+    uiStore.showError(t('messages.barcodeScannerNotAvailable'));
+    return;
+  }
+
   try {
     // 动态导入 barcode-scanner（移动端需要）
     let barcodeScanner: any;
     try {
       // @ts-ignore - 动态导入
-      barcodeScanner = await import('@tauri-apps/plugin-barcode-scanner');
+      const module = await import('@tauri-apps/plugin-barcode-scanner');
+      barcodeScanner = module.default || module;
     } catch (importError: any) {
-      uiStore.showError('请先安装 barcode-scanner 插件: pnpm tauri add barcode-scanner');
+      console.error('Failed to import barcode-scanner:', importError);
+      // 使用友好的国际化提示
+      uiStore.showError(t('messages.barcodeScannerNotAvailable'));
+      return;
+    }
+    
+    if (!barcodeScanner || !barcodeScanner.scan) {
+      uiStore.showError(t('messages.barcodeScannerNotInstalled'));
       return;
     }
     
@@ -158,7 +176,14 @@ async function startCameraScan() {
     scannedResult.value = result;
     uiStore.showSuccess(t('receive.scanQRSuccess'));
   } catch (error: any) {
-    uiStore.showError(t('receive.scanQRFailed') + ': ' + (error.message || error));
+    console.error('Barcode scan error:', error);
+    // 如果用户取消扫描，不显示错误
+    if (isUserCancelError(error)) {
+      return;
+    }
+    // 友好的错误提示
+    const friendlyError = getFriendlyErrorMessage(error, t);
+    uiStore.showError(friendlyError || t('receive.scanQRFailed'));
   }
 }
 

@@ -34,13 +34,18 @@ async function handleCreate(data: { wordCount: 12 | 24; mnemonic: string }) {
     step.value = 'backup';
 }
 
+import { getFriendlyErrorMessage } from './utils/errorHandler';
+
 async function handleImport(importedMnemonic: string) {
   try {
     await walletStore.createWallet(importedMnemonic, '');
     step.value = 'wallet';
     uiStore.showSuccess(t('messages.walletImported'));
   } catch (error) {
-    uiStore.showError(String(error));
+    const friendlyError = getFriendlyErrorMessage(error, t);
+    if (friendlyError) {
+      uiStore.showError(friendlyError);
+    }
   }
 }
 
@@ -51,7 +56,10 @@ async function handleBackupFinish() {
     step.value = 'wallet';
     uiStore.showSuccess(t('messages.walletCreated'));
   } catch (error) {
-    uiStore.showError(String(error));
+    const friendlyError = getFriendlyErrorMessage(error, t);
+    if (friendlyError) {
+      uiStore.showError(friendlyError);
+    }
   } finally {
     uiStore.hideLoading();
   }
@@ -135,11 +143,13 @@ watch(() => uiStore.theme, () => {
 /* ==================== 全局样式 ==================== */
 .app {
   min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--apple-bg-primary);
   font-family: var(--apple-font);
   color: var(--apple-text-primary);
+  overflow: hidden;
 }
 
 /* ==================== 主内容区域 ==================== */
@@ -147,6 +157,8 @@ watch(() => uiStore.theme, () => {
   flex: 1;
   width: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0; /* 重要：允许 flex 子元素缩小 */
 }
 
 /* ==================== Naive UI 主题定制 ==================== */

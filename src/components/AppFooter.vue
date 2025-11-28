@@ -20,6 +20,7 @@ const { t } = useI18n();
   margin-top: auto;
   border-top: 0.5px solid var(--apple-separator);
   background: var(--apple-bg-primary);
+  flex-shrink: 0; /* 防止 footer 被压缩 */
 }
 
 .app-footer__content {

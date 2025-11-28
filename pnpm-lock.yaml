@@ -12,7 +12,7 @@ importers:
         specifier: ^2
         version: 2.9.0
       '@tauri-apps/plugin-barcode-scanner':
-        specifier: ~2.4.2
+        specifier: ~2
         version: 2.4.2
       '@tauri-apps/plugin-opener':
         specifier: ^2

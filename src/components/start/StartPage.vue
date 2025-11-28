@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { NCard, NButton, NRadioGroup, NRadio, NInput, NText, NAlert } from 'naive-ui';
 import { useWalletStore } from '../../stores/wallet';
 import { useUIStore } from '../../stores/ui';
+import { getFriendlyErrorMessage } from '../../utils/errorHandler';
 
 const { t } = useI18n();
 const walletStore = useWalletStore();
@@ -23,7 +24,10 @@ async function handleCreate() {
     const generatedMnemonic = await walletStore.generateMnemonic(wordCount.value);
     emit('create', { wordCount: wordCount.value, mnemonic: generatedMnemonic });
   } catch (error) {
-    uiStore.showError(String(error));
+    const friendlyError = getFriendlyErrorMessage(error, t);
+    if (friendlyError) {
+      uiStore.showError(friendlyError);
+    }
   } finally {
     uiStore.hideLoading();
   }
@@ -40,12 +44,18 @@ async function handleImport() {
     uiStore.showLoading();
     const isValid = await walletStore.validateMnemonic(mnemonic);
     if (!isValid) {
-      uiStore.showError(t('messages.invalidMnemonic'));
+      uiStore.showError(t('messages.invalidMnemonicShort'));
       return;
     }
     emit('import', mnemonic);
   } catch (error) {
-    uiStore.showError(String(error));
+    // 友好的错误处理
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('invalid') || errorMessage.includes('无效')) {
+      uiStore.showError(t('messages.invalidMnemonicShort'));
+    } else {
+      uiStore.showError(t('messages.unknownError'));
+    }
   } finally {
     uiStore.hideLoading();
   }

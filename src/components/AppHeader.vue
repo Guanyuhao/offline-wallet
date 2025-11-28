@@ -90,6 +90,7 @@ function toggleSettings() {
   border-bottom: 0.5px solid var(--apple-separator);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  flex-shrink: 0; /* 防止 header 被压缩 */
 }
 
 .app-header__content {
