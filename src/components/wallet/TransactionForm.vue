@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NCard, NButton, NInput, NCollapse, NCollapseItem, NText, NAlert, NForm, NFormItem, NQrCode } from 'naive-ui';
+import { NCard, NButton, NInput, NCollapse, NCollapseItem, NText, NAlert, NForm, NFormItem } from 'naive-ui';
 import { useWalletStore, type ChainType } from '../../stores/wallet';
 import { useUIStore } from '../../stores/ui';
 import { invoke } from '@tauri-apps/api/core';
 import { getFriendlyErrorMessage } from '../../utils/errorHandler';
+import QRCodeWithLogo from '../common/QRCodeWithLogo.vue';
 
 defineEmits<{
   (e: 'close'): void;
@@ -359,7 +360,7 @@ async function signTransaction() {
     
     signResult.value = result.raw_transaction;
     
-    // 生成二维码数据（QrCode 组件会自动生成）
+    // 生成二维码数据，QRCodeWithLogo 组件会调用 Rust 后端生成
     qrCodeData.value = result.raw_transaction;
     
     uiStore.showSuccess(t('messages.signSuccess'));
@@ -395,8 +396,6 @@ function resetForm() {
 <template>
   <div class="transaction-container">
     <n-card class="transaction-card">
-      <n-text depth="3" class="hint">{{ t('wallet.signHint') }}</n-text>
-      
       <n-form
         ref="formRef"
         :model="formModel"
@@ -588,16 +587,10 @@ function resetForm() {
         <div v-if="qrCodeData" class="qr-section">
           <n-text strong class="result-label">{{ t('wallet.qrCode') }}</n-text>
           <div class="qr-code-wrapper">
-            <n-qr-code
+            <QRCodeWithLogo
               :value="qrCodeData"
               :size="280"
-              :error-correction-level="'M'"
-              class="qr-code"
-            >
-              <template #icon>
-                <img src="/wallet-logo.svg" alt="Logo" class="qr-logo" />
-              </template>
-            </n-qr-code>
+            />
           </div>
           <n-text depth="3" class="hint">{{ t('wallet.qrCodeHint') }}</n-text>
         </div>
@@ -610,22 +603,16 @@ function resetForm() {
 <style scoped>
 .transaction-container {
   width: 100%;
-}
-
-.send-init {
-  text-align: center;
-  padding: var(--apple-spacing-xl) 0;
-}
-
-.send-button {
-  margin-bottom: var(--apple-spacing-md);
-  height: 48px;
-  font-size: var(--apple-font-size-body);
-  font-weight: var(--apple-font-weight-semibold);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
 }
 
 .transaction-card {
   border-radius: var(--apple-radius-lg);
+  box-shadow: none;
+  border: none;
+  background: transparent;
 }
 
 .hint {
@@ -640,7 +627,7 @@ function resetForm() {
 }
 
 .form-group {
-  margin-bottom: var(--apple-spacing-lg);
+  margin-bottom: var(--apple-spacing-md);
 }
 
 .error-text {
@@ -655,8 +642,8 @@ function resetForm() {
 }
 
 .result-section {
-  margin-top: var(--apple-spacing-xl);
-  padding-top: var(--apple-spacing-lg);
+  margin-top: var(--apple-spacing-lg);
+  padding-top: var(--apple-spacing-md);
   border-top: 0.5px solid var(--apple-separator);
 }
 
@@ -693,19 +680,6 @@ function resetForm() {
   border-radius: var(--apple-radius-lg);
   margin: var(--apple-spacing-md) auto;
   max-width: 300px;
-}
-
-.qr-code {
-  border-radius: var(--apple-radius-md);
-}
-
-.qr-logo {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  background: white;
-  border-radius: var(--apple-radius-sm);
-  padding: 8px;
 }
 </style>
 

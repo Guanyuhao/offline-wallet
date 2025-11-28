@@ -72,7 +72,7 @@ export default {
     showAllAddresses: 'Show All Addresses',
     hideAllAddresses: 'Hide All Addresses',
     send: 'Offline Send',
-    receive: 'Receive',
+    receive: 'Offline Receive',
     offlineSend: 'Offline Send',
     offlineReceive: 'Offline Receive',
     signTransaction: 'Sign Transaction',

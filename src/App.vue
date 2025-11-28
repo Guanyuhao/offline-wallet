@@ -69,7 +69,7 @@ function handleBackupCancel() {
   walletStore.clearWallet();
   mnemonic.value = '';
   step.value = 'start';
-  }
+}
 
 function handleExit() {
   walletStore.clearWallet();
@@ -80,15 +80,15 @@ function handleExit() {
 onMounted(() => {
   uiStore.initTheme();
   updateNaiveTheme();
-  
+
   // 监听主题变化事件
   window.addEventListener('theme-changed', updateNaiveTheme);
-  
+
   // 监听 DOM 变化以更新主题
   const observer = new MutationObserver(() => {
     updateNaiveTheme();
   });
-  
+
   observer.observe(document.documentElement, {
     attributes: true,
     attributeFilter: ['class']
@@ -108,36 +108,24 @@ watch(() => uiStore.theme, () => {
       <n-message-provider>
         <n-dialog-provider>
           <MessageSetup />
-  <div class="app">
-          <AppHeader :show-exit="step === 'wallet'" @exit="handleExit" />
-          
-          <main class="app-content">
-            <StartPage
-              v-if="step === 'start'"
-              @create="handleCreate"
-              @import="handleImport"
-            />
-            
-            <BackupPage
-              v-if="step === 'backup'"
-              :mnemonic="mnemonic"
-              :word-count="wordCount"
-              @finish="handleBackupFinish"
-              @cancel="handleBackupCancel"
-            />
+          <div class="app">
+            <AppHeader :show-exit="step === 'wallet'" @exit="handleExit" />
+            <main class="app-content">
+              <StartPage v-if="step === 'start'" @create="handleCreate" @import="handleImport" />
 
-            <WalletPage
-              v-if="step === 'wallet'"
-            />
-          </main>
+              <BackupPage v-if="step === 'backup'" :mnemonic="mnemonic" :word-count="wordCount"
+                @finish="handleBackupFinish" @cancel="handleBackupCancel" />
 
-          <AppFooter />
-              </div>
+              <WalletPage v-if="step === 'wallet'" />
+            </main>
+
+            <AppFooter />
+          </div>
         </n-dialog-provider>
       </n-message-provider>
     </n-loading-bar-provider>
   </n-config-provider>
-              </template>
+</template>
 
 <style>
 /* ==================== 全局样式 ==================== */
@@ -150,15 +138,19 @@ watch(() => uiStore.theme, () => {
   font-family: var(--apple-font);
   color: var(--apple-text-primary);
   overflow: hidden;
-  padding-top: 64px; /* Header 固定高度（桌面端） */
-  padding-bottom: 64px; /* Footer 固定高度（桌面端） */
+  padding-top: 64px;
+  /* Header 固定高度（桌面端） */
+  padding-bottom: 64px;
+  /* Footer 固定高度（桌面端） */
 }
 
 /* 移动端适配 */
 @media (max-width: 640px) {
   .app {
-    padding-top: 56px; /* Header 固定高度（移动端） */
-    padding-bottom: 56px; /* Footer 固定高度（移动端） */
+    padding-top: 56px;
+    /* Header 固定高度（移动端） */
+    padding-bottom: 56px;
+    /* Footer 固定高度（移动端） */
   }
 }
 
@@ -168,8 +160,10 @@ watch(() => uiStore.theme, () => {
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  min-height: 0; /* 重要：允许 flex 子元素缩小 */
-  -webkit-overflow-scrolling: touch; /* iOS 平滑滚动 */
+  min-height: 0;
+  /* 重要：允许 flex 子元素缩小 */
+  -webkit-overflow-scrolling: touch;
+  /* iOS 平滑滚动 */
 }
 
 /* ==================== Naive UI 主题定制 ==================== */
@@ -181,21 +175,21 @@ watch(() => uiStore.theme, () => {
   --n-color-warning: var(--apple-orange);
   --n-color-info: var(--apple-blue);
   --n-color-success: var(--apple-green);
-  
+
   --n-border-radius: var(--apple-radius-md);
   --n-font-size: var(--apple-font-size-body);
   --n-font-family: var(--apple-font);
-  
+
   --n-color-text: var(--apple-text-primary);
   --n-color-text-secondary: var(--apple-text-secondary);
   --n-color-text-tertiary: var(--apple-text-tertiary);
-  
+
   --n-color-hover: var(--apple-bg-secondary);
   --n-color-pressed: var(--apple-gray-2);
-  
+
   --n-border-color: var(--apple-separator);
   --n-color-card: var(--apple-bg-primary);
-  
+
   --n-transition-duration: var(--apple-transition-fast);
 }
 
@@ -217,7 +211,7 @@ watch(() => uiStore.theme, () => {
   --n-color-text-tertiary: var(--apple-text-tertiary);
   --n-color-card: var(--apple-bg-primary);
   --n-color-hover: var(--apple-bg-secondary);
-  }
+}
 
 /* 强制浅色模式 */
 :root.light {
@@ -234,13 +228,14 @@ watch(() => uiStore.theme, () => {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
-  }
+}
 
-.app > * {
+.app>* {
   animation: fadeIn var(--apple-transition-base) ease-out;
 }
 </style>

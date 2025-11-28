@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { NCard, NButton, NText, NCollapse, NCollapseItem, NSkeleton, NDrawer, NDrawerContent, NTag } from 'naive-ui';
+import { NCard, NButton, NText, NCollapse, NCollapseItem, NSkeleton, NDrawer, NDrawerContent } from 'naive-ui';
 import { ChevronDownOutline } from '@vicons/ionicons5';
 import { NIcon } from 'naive-ui';
 import { useWalletStore, type ChainType } from '../../stores/wallet';
@@ -52,7 +52,7 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
         <n-text depth="3" class="chain-label">{{ t('wallet.selectNetwork') }}</n-text>
         <n-icon :component="ChevronDownOutline" :size="16" class="chain-arrow" />
       </div>
-      <n-tag v-if="currentChain" type="info" size="small" class="current-chain-tag">
+      <div v-if="currentChain" class="current-chain-tag">
         <img
           v-if="currentChain.icon"
           :src="currentChain.icon"
@@ -60,7 +60,7 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
           class="chain-tag-icon"
         />
         <span class="chain-tag-text">{{ currentChain.symbol }}</span>
-      </n-tag>
+      </div>
     </div>
 
     <div class="address-display">
@@ -170,11 +170,13 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
   box-shadow: var(--apple-shadow-sm);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 0.5px solid var(--apple-separator);
+  background: var(--apple-bg-primary);
 }
 
 .address-card:hover {
   box-shadow: var(--apple-shadow-md);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  border-color: var(--apple-blue);
 }
 
 .chain-selector-header {
@@ -218,23 +220,34 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
 .current-chain-tag {
   display: inline-flex;
   align-items: center;
-  gap: var(--apple-spacing-xs);
-  padding: var(--apple-spacing-xs) var(--apple-spacing-sm);
-  border-radius: var(--apple-radius-sm);
+  gap: var(--apple-spacing-sm);
+  padding: var(--apple-spacing-sm) var(--apple-spacing-md);
+  border-radius: var(--apple-radius-md);
   font-weight: var(--apple-font-weight-medium);
+  background: var(--apple-bg-secondary);
+  border: 0.5px solid var(--apple-separator);
+  transition: all 0.2s ease;
+}
+
+.current-chain-tag:hover {
+  background: var(--apple-bg-tertiary);
+  border-color: var(--apple-blue);
+  transform: translateY(-1px);
+  box-shadow: var(--apple-shadow-sm);
 }
 
 .chain-tag-icon {
-  width: 16px;
-  height: 16px;
-  border-radius: var(--apple-radius-xs);
+  width: 20px;
+  height: 20px;
+  border-radius: var(--apple-radius-sm);
   object-fit: contain;
   flex-shrink: 0;
 }
 
 .chain-tag-text {
-  font-size: var(--apple-font-size-caption-1);
+  font-size: var(--apple-font-size-body);
   font-weight: var(--apple-font-weight-semibold);
+  color: var(--apple-text-primary);
 }
 
 .network-drawer {

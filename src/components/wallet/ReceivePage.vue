@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NCard, NButton, NText, NSkeleton, NTabs, NTabPane, NUpload, NUploadDragger, NInput, NQrCode } from 'naive-ui';
-import { useWalletStore, type ChainType } from '../../stores/wallet';
+import { NCard, NButton, NText, NSkeleton, NTabs, NTabPane, NUpload, NUploadDragger, NInput } from 'naive-ui';
+import { useWalletStore } from '../../stores/wallet';
 import { useUIStore } from '../../stores/ui';
 import { usePlatform } from '../../composables/usePlatform';
 import { getFriendlyErrorMessage, isUserCancelError } from '../../utils/errorHandler';
 import AddressEllipsis from '../common/AddressEllipsis.vue';
+import QRCodeWithLogo from '../common/QRCodeWithLogo.vue';
 import type { UploadFileInfo } from 'naive-ui';
 
 defineEmits<{
@@ -24,29 +25,14 @@ const isLoadingQR = ref(false);
 const scannedResult = ref('');
 const isScanning = ref(false);
 
-const chains = [
-  { value: 'ETH' as ChainType, name: 'Ethereum', symbol: 'ETH' },
-  { value: 'BTC' as ChainType, name: 'Bitcoin', symbol: 'BTC' },
-  { value: 'BNB' as ChainType, name: 'BNB Chain', symbol: 'BNB' },
-  { value: 'SOL' as ChainType, name: 'Solana', symbol: 'SOL' },
-  { value: 'TRON' as ChainType, name: 'Tron', symbol: 'TRX' },
-];
-
-function getChainDisplayName(chain: ChainType): string {
-  const chainInfo = chains.find(c => c.value === chain);
-  if (chain === 'BNB') return 'BNB Smart Chain';
-  return chainInfo?.name || chain;
-}
-
 const currentAddress = computed(() => walletStore.primaryAddress);
-const currentChainName = computed(() => getChainDisplayName(walletStore.selectedChain));
 
 async function generateQRCode() {
   if (!currentAddress.value) return;
   
   isLoadingQR.value = true;
   try {
-    // 直接使用地址作为二维码数据，QrCode 组件会自动生成
+    // 使用地址作为二维码数据，QRCodeWithLogo 组件会调用 Rust 后端生成
     qrCodeData.value = currentAddress.value;
   } catch (error) {
     uiStore.showError(t('receive.generateQRFailed') + ': ' + error);
@@ -213,11 +199,6 @@ watch(() => activeTab.value, (newTab) => {
 <template>
   <div class="receive-page">
     <n-card class="receive-card">
-      <div class="receive-header">
-        <n-text strong class="receive-title">{{ t('receive.title') }}</n-text>
-        <n-text depth="3" class="network-name">{{ currentChainName }}</n-text>
-      </div>
-
       <n-tabs v-model:value="activeTab" type="segment" class="receive-tabs">
         <!-- 扫描二维码标签页 -->
         <n-tab-pane name="scanQR" :tab="t('receive.scanQR')">
@@ -290,16 +271,10 @@ watch(() => activeTab.value, (newTab) => {
               />
             </div>
             <div v-else-if="qrCodeData" class="qr-code-wrapper">
-              <n-qr-code
+              <QRCodeWithLogo
                 :value="qrCodeData"
                 :size="280"
-                :error-correction-level="'M'"
-                class="qr-code"
-              >
-                <template #icon>
-                  <img src="/wallet-logo.svg" alt="Logo" class="qr-logo" />
-                </template>
-              </n-qr-code>
+              />
             </div>
           </div>
 
@@ -347,30 +322,22 @@ watch(() => activeTab.value, (newTab) => {
 <style scoped>
 .receive-page {
   width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
 }
 
 .receive-card {
   border-radius: var(--apple-radius-lg);
-  padding: var(--apple-spacing-xl);
+  padding: 0;
+  box-shadow: none;
+  border: none;
+  background: transparent;
 }
 
 .receive-header {
   text-align: center;
-  margin-bottom: var(--apple-spacing-lg);
-}
-
-.receive-title {
-  display: block;
-  font-size: var(--apple-font-size-title-2);
-  font-weight: var(--apple-font-weight-semibold);
-  margin-bottom: var(--apple-spacing-xs);
-  color: var(--apple-text-primary);
-}
-
-.network-name {
-  display: block;
-  font-size: var(--apple-font-size-subheadline);
-  margin-top: var(--apple-spacing-xs);
+  margin-bottom: var(--apple-spacing-md);
 }
 
 .receive-tabs {
@@ -378,7 +345,7 @@ watch(() => activeTab.value, (newTab) => {
 }
 
 :deep(.n-tabs-nav) {
-  margin-bottom: var(--apple-spacing-lg);
+  margin-bottom: var(--apple-spacing-md);
 }
 
 .scan-section {
@@ -431,8 +398,8 @@ watch(() => activeTab.value, (newTab) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: var(--apple-spacing-xl) 0;
-  min-height: 300px;
+  margin: var(--apple-spacing-lg) 0;
+  min-height: 280px;
 }
 
 .qr-skeleton {

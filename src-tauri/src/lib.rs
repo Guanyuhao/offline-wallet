@@ -158,6 +158,12 @@ fn generate_qrcode_cmd(data: String) -> Result<String, String> {
     generate_qrcode_base64(&data)
 }
 
+/// 生成带 logo 的二维码（返回 Base64 编码的 PNG）
+#[tauri::command]
+fn generate_qrcode_with_logo_cmd(data: String, logo_path: Option<String>) -> Result<String, String> {
+    generate_qrcode_with_logo(&data, logo_path.as_deref())
+}
+
 // ==================== 应用入口 ====================
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -186,6 +192,7 @@ pub fn run() {
             sign_tron_transaction_cmd,
             validate_address_cmd,
             generate_qrcode_cmd,
+            generate_qrcode_with_logo_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

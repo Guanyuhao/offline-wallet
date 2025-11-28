@@ -72,7 +72,7 @@ export default {
     showAllAddresses: '显示所有地址',
     hideAllAddresses: '隐藏所有地址',
     send: '离线发送',
-    receive: '接收',
+    receive: '离线接收',
     offlineSend: '离线发送',
     offlineReceive: '离线接收',
     signTransaction: '签名交易',

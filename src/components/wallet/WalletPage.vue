@@ -1,35 +1,57 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NCard, NDrawer, NDrawerContent } from 'naive-ui';
+import { NButton, NDrawer, NDrawerContent, NText } from 'naive-ui';
 import { CloseOutline } from '@vicons/ionicons5';
-import { NIcon, NText } from 'naive-ui';
+import { NIcon } from 'naive-ui';
+import { useWalletStore, type ChainType } from '../../stores/wallet';
 import AddressDisplay from './AddressDisplay.vue';
 import TransactionForm from './TransactionForm.vue';
 import ReceivePage from './ReceivePage.vue';
 
 const { t } = useI18n();
+const walletStore = useWalletStore();
 const showSendDrawer = ref(false);
 const showReceiveDrawer = ref(false);
+
+const chains = [
+  { value: 'BTC' as ChainType, name: 'Bitcoin', symbol: 'BTC' },
+  { value: 'ETH' as ChainType, name: 'Ethereum', symbol: 'ETH' },
+  { value: 'BNB' as ChainType, name: 'BNB Smart Chain', symbol: 'BNB' },
+  { value: 'SOL' as ChainType, name: 'Solana', symbol: 'SOL' },
+  { value: 'TRON' as ChainType, name: 'Tron', symbol: 'TRX' },
+];
+
+function getChainDisplayName(chain: ChainType): string {
+  const chainInfo = chains.find(c => c.value === chain);
+  if (chain === 'BNB') return 'BNB Smart Chain';
+  return chainInfo?.name || chain;
+}
+
+const currentChainName = computed(() => getChainDisplayName(walletStore.selectedChain));
 </script>
 
 <template>
   <div class="wallet-page">
-    <!-- 顶部操作卡片：离线发送和接收 -->
+    <!-- 顶部操作按钮：离线发送和接收 -->
     <div class="wallet-actions">
-      <n-card class="action-card" @click="showSendDrawer = true">
-        <div class="action-card-content">
-          <n-text strong class="action-card-title">{{ t('wallet.send') }}</n-text>
-          <n-text depth="3" class="action-card-subtitle">{{ t('wallet.offlineSend') }}</n-text>
-        </div>
-      </n-card>
+      <n-button
+        type="primary"
+        size="medium"
+        class="action-button"
+        @click="showSendDrawer = true"
+      >
+        {{ t('wallet.send') }}
+      </n-button>
       
-      <n-card class="action-card" @click="showReceiveDrawer = true">
-        <div class="action-card-content">
-          <n-text strong class="action-card-title">{{ t('wallet.receive') }}</n-text>
-          <n-text depth="3" class="action-card-subtitle">{{ t('wallet.offlineReceive') }}</n-text>
-        </div>
-      </n-card>
+      <n-button
+        type="default"
+        size="medium"
+        class="action-button"
+        @click="showReceiveDrawer = true"
+      >
+        {{ t('wallet.receive') }}
+      </n-button>
     </div>
     
     <!-- 地址显示区域 -->
@@ -46,15 +68,19 @@ const showReceiveDrawer = ref(false);
       <n-drawer-content>
         <template #header>
           <div class="drawer-header">
-            <span class="drawer-title">{{ t('wallet.send') }}</span>
+            <div class="drawer-title-section">
+              <n-text strong class="drawer-title">{{ t('wallet.send') }}</n-text>
+              <n-text depth="3" class="drawer-subtitle">{{ currentChainName }}</n-text>
+            </div>
             <n-button
               quaternary
               circle
               size="large"
+              class="drawer-close-btn"
               @click="showSendDrawer = false"
             >
               <template #icon>
-                <n-icon :component="CloseOutline" :size="24" />
+                <n-icon :component="CloseOutline" :size="20" />
               </template>
             </n-button>
           </div>
@@ -63,7 +89,7 @@ const showReceiveDrawer = ref(false);
       </n-drawer-content>
     </n-drawer>
 
-    <!-- 接收 Drawer -->
+    <!-- 离线接收 Drawer -->
     <n-drawer
       v-model:show="showReceiveDrawer"
       :width="'100%'"
@@ -74,15 +100,19 @@ const showReceiveDrawer = ref(false);
       <n-drawer-content>
         <template #header>
           <div class="drawer-header">
-            <span class="drawer-title">{{ t('wallet.receive') }}</span>
+            <div class="drawer-title-section">
+              <n-text strong class="drawer-title">{{ t('wallet.receive') }}</n-text>
+              <n-text depth="3" class="drawer-subtitle">{{ currentChainName }}</n-text>
+            </div>
             <n-button
               quaternary
               circle
               size="large"
+              class="drawer-close-btn"
               @click="showReceiveDrawer = false"
             >
               <template #icon>
-                <n-icon :component="CloseOutline" :size="24" />
+                <n-icon :component="CloseOutline" :size="20" />
               </template>
             </n-button>
           </div>
@@ -105,6 +135,18 @@ const showReceiveDrawer = ref(false);
   /* 确保内容可以正常滚动 */
   min-height: 0;
   flex: 1;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .wallet-actions {
@@ -114,41 +156,23 @@ const showReceiveDrawer = ref(false);
   margin-bottom: var(--apple-spacing-md);
 }
 
-.action-card {
-  cursor: pointer;
-  border-radius: var(--apple-radius-lg);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 0.5px solid var(--apple-separator);
-  padding: var(--apple-spacing-md);
-  min-height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.action-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--apple-shadow-md);
-  border-color: var(--apple-blue);
-}
-
-.action-card-content {
-  text-align: center;
-  width: 100%;
-}
-
-.action-card-title {
-  display: block;
+.action-button {
+  height: 48px;
   font-size: var(--apple-font-size-body);
   font-weight: var(--apple-font-weight-semibold);
-  margin-bottom: var(--apple-spacing-xs);
-  color: var(--apple-text-primary);
+  border-radius: var(--apple-radius-lg);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.action-card-subtitle {
-  display: block;
-  font-size: var(--apple-font-size-caption-1);
-  color: var(--apple-text-secondary);
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .drawer-header {
@@ -156,13 +180,52 @@ const showReceiveDrawer = ref(false);
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 0 var(--apple-spacing-sm);
+  padding: var(--apple-spacing-sm) var(--apple-spacing-md);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  min-height: 56px;
+}
+
+.drawer-title-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  flex: 1;
 }
 
 .drawer-title {
   font-size: var(--apple-font-size-title-3);
   font-weight: var(--apple-font-weight-semibold);
   color: var(--apple-text-primary);
+  line-height: 1.2;
+}
+
+.drawer-subtitle {
+  font-size: var(--apple-font-size-caption-1);
+  color: var(--apple-text-secondary);
+  line-height: 1.2;
+}
+
+.drawer-close-btn {
+  min-width: 36px;
+  min-height: 36px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.drawer-close-btn:hover {
+  background: var(--apple-bg-secondary);
+  transform: scale(1.1);
+}
+
+.drawer-close-btn:active {
+  transform: scale(0.95);
 }
 
 /* 全屏 Drawer 样式 */
@@ -175,12 +238,38 @@ const showReceiveDrawer = ref(false);
   height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--apple-bg-primary);
 }
 
 :deep(.fullscreen-drawer .n-drawer-body-content-wrapper) {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  padding: var(--apple-spacing-md);
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--apple-bg-primary);
+}
+
+:deep(.fullscreen-drawer .n-drawer-body) {
+  padding: 0;
+  background: var(--apple-bg-primary);
+}
+
+:deep(.fullscreen-drawer .n-drawer-mask) {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 桌面端最大宽度限制 */
+@media (min-width: 768px) {
+  :deep(.fullscreen-drawer .n-drawer) {
+    max-width: 600px !important;
+  }
+  
+  :deep(.fullscreen-drawer .n-drawer-content) {
+    max-width: 600px;
+    margin: 0 auto;
+  }
 }
 
 /* 响应式优化 */
