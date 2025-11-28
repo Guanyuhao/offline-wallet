@@ -3951,6 +3951,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "offline-wallet"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "bip39",
+ "bitcoin",
+ "bs58",
+ "ed25519-dalek",
+ "ethers",
+ "hex",
+ "image 0.24.9",
+ "k256",
+ "qrcode",
+ "rand 0.8.5",
+ "secp256k1",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "sha3",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-barcode-scanner",
+ "tauri-plugin-opener",
+ "tiny-hderive",
+ "tiny-keccak",
+ "zeroize",
+]
+
+[[package]]
 name = "once_cell"
 version = "1.21.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5922,35 +5951,6 @@ dependencies = [
  "webview2-com",
  "window-vibrancy",
  "windows",
-]
-
-[[package]]
-name = "tauri-app"
-version = "0.1.0"
-dependencies = [
- "base64 0.22.1",
- "bip39",
- "bitcoin",
- "bs58",
- "ed25519-dalek",
- "ethers",
- "hex",
- "image 0.24.9",
- "k256",
- "qrcode",
- "rand 0.8.5",
- "secp256k1",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "sha3",
- "tauri",
- "tauri-build",
- "tauri-plugin-barcode-scanner",
- "tauri-plugin-opener",
- "tiny-hderive",
- "tiny-keccak",
- "zeroize",
 ]
 
 [[package]]
