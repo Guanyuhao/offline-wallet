@@ -49,12 +49,9 @@ async function handleImport() {
     }
     emit('import', mnemonic);
   } catch (error) {
-    // 友好的错误处理
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    if (errorMessage.includes('invalid') || errorMessage.includes('无效')) {
-      uiStore.showError(t('messages.invalidMnemonicShort'));
-    } else {
-      uiStore.showError(t('messages.unknownError'));
+    const friendlyError = getFriendlyErrorMessage(error, t);
+    if (friendlyError) {
+      uiStore.showError(friendlyError);
     }
   } finally {
     uiStore.hideLoading();

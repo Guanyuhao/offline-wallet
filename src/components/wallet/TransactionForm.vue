@@ -15,8 +15,6 @@ const { t } = useI18n();
 const walletStore = useWalletStore();
 const uiStore = useUIStore();
 
-const toAddress = ref('');
-const amount = ref('');
 const signResult = ref('');
 const qrCodeData = ref('');
 const showAdvanced = ref(false);
@@ -220,33 +218,19 @@ function getAmountHint(): string {
 }
 
 async function signTransaction() {
+  try {
+    // Form 验证
+    await formRef.value?.validate();
+  } catch (error) {
+    // 验证失败，Form 组件会自动显示错误信息
+    return;
+  }
+
   const chain = walletStore.selectedChain;
   
   // 安全验证：清理输入
-  const address = sanitizeInput(toAddress.value);
-  const amountStr = sanitizeInput(amount.value);
-  
-  if (!address) {
-    uiStore.showError(t('wallet.toAddress') + ' ' + t('common.required'));
-    return;
-  }
-  
-  if (!amountStr) {
-    uiStore.showError(t('wallet.amount') + ' ' + t('common.required'));
-    return;
-  }
-  
-  // 格式验证
-  if (!validateAddressFormat(address, chain)) {
-    uiStore.showError(t('messages.invalidAddress'));
-    return;
-  }
-  
-  if (!validateAmount(amountStr)) {
-    uiStore.showError(t('messages.invalidAmount'));
-    return;
-  }
-  
+  const address = sanitizeInput(formModel.value.toAddress);
+  const amountStr = sanitizeInput(formModel.value.amount);
   const amountNum = parseFloat(amountStr);
   
   try {

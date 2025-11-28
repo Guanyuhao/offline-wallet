@@ -73,6 +73,8 @@ export default {
     hideAllAddresses: '隐藏所有地址',
     send: '离线发送',
     receive: '接收',
+    offlineSend: '离线发送',
+    offlineReceive: '离线接收',
     signTransaction: '签名交易',
     signHint: '签名后，需要在有网络的设备上广播交易',
     toAddress: '收款地址',

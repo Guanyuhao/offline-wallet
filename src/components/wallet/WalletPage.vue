@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NButton, NDrawer, NDrawerContent } from 'naive-ui';
+import { NCard, NDrawer, NDrawerContent } from 'naive-ui';
 import { CloseOutline } from '@vicons/ionicons5';
-import { NIcon } from 'naive-ui';
-import ChainSelector from './ChainSelector.vue';
+import { NIcon, NText } from 'naive-ui';
 import AddressDisplay from './AddressDisplay.vue';
 import TransactionForm from './TransactionForm.vue';
 import ReceivePage from './ReceivePage.vue';
@@ -16,34 +15,25 @@ const showReceiveDrawer = ref(false);
 
 <template>
   <div class="wallet-page">
-    <!-- 顶部区域：网络选择和地址显示 -->
-    <div class="wallet-header">
-      <ChainSelector />
-      <AddressDisplay />
+    <!-- 顶部操作卡片：离线发送和接收 -->
+    <div class="wallet-actions">
+      <n-card class="action-card" @click="showSendDrawer = true">
+        <div class="action-card-content">
+          <n-text strong class="action-card-title">{{ t('wallet.send') }}</n-text>
+          <n-text depth="3" class="action-card-subtitle">{{ t('wallet.offlineSend') }}</n-text>
+        </div>
+      </n-card>
+      
+      <n-card class="action-card" @click="showReceiveDrawer = true">
+        <div class="action-card-content">
+          <n-text strong class="action-card-title">{{ t('wallet.receive') }}</n-text>
+          <n-text depth="3" class="action-card-subtitle">{{ t('wallet.offlineReceive') }}</n-text>
+        </div>
+      </n-card>
     </div>
     
-    <!-- 操作按钮区域 -->
-    <div class="wallet-actions">
-      <n-button
-        type="primary"
-        size="large"
-        block
-        class="action-button"
-        @click="showSendDrawer = true"
-      >
-        {{ t('wallet.send') }}
-      </n-button>
-      
-      <n-button
-        type="default"
-        size="large"
-        block
-        class="action-button"
-        @click="showReceiveDrawer = true"
-      >
-        {{ t('wallet.receive') }}
-      </n-button>
-    </div>
+    <!-- 地址显示区域 -->
+    <AddressDisplay />
 
     <!-- 离线发送 Drawer -->
     <n-drawer
@@ -117,23 +107,48 @@ const showReceiveDrawer = ref(false);
   flex: 1;
 }
 
-.wallet-header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--apple-spacing-md);
-}
-
 .wallet-actions {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--apple-spacing-md);
+  margin-bottom: var(--apple-spacing-md);
 }
 
-.action-button {
-  height: 56px;
+.action-card {
+  cursor: pointer;
+  border-radius: var(--apple-radius-lg);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 0.5px solid var(--apple-separator);
+  padding: var(--apple-spacing-md);
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--apple-shadow-md);
+  border-color: var(--apple-blue);
+}
+
+.action-card-content {
+  text-align: center;
+  width: 100%;
+}
+
+.action-card-title {
+  display: block;
   font-size: var(--apple-font-size-body);
   font-weight: var(--apple-font-weight-semibold);
-  border-radius: var(--apple-radius-lg);
+  margin-bottom: var(--apple-spacing-xs);
+  color: var(--apple-text-primary);
+}
+
+.action-card-subtitle {
+  display: block;
+  font-size: var(--apple-font-size-caption-1);
+  color: var(--apple-text-secondary);
 }
 
 .drawer-header {

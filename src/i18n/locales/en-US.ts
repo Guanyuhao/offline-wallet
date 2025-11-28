@@ -73,6 +73,8 @@ export default {
     hideAllAddresses: 'Hide All Addresses',
     send: 'Offline Send',
     receive: 'Receive',
+    offlineSend: 'Offline Send',
+    offlineReceive: 'Offline Receive',
     signTransaction: 'Sign Transaction',
     signHint: 'After signing, broadcast the transaction on a device with internet',
     toAddress: 'Recipient Address',

@@ -28,13 +28,13 @@ const updateNaiveTheme = () => {
   isDarkMode.value = root.classList.contains('dark');
 };
 
+import { getFriendlyErrorMessage } from './utils/errorHandler';
+
 async function handleCreate(data: { wordCount: 12 | 24; mnemonic: string }) {
   wordCount.value = data.wordCount;
   mnemonic.value = data.mnemonic;
-    step.value = 'backup';
+  step.value = 'backup';
 }
-
-import { getFriendlyErrorMessage } from './utils/errorHandler';
 
 async function handleImport(importedMnemonic: string) {
   try {
