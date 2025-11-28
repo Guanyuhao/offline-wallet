@@ -17,13 +17,18 @@ const { t } = useI18n();
 
 <style scoped>
 .app-footer {
-  margin-top: auto;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   border-top: 0.5px solid var(--apple-separator);
   background: var(--apple-bg-primary);
   flex-shrink: 0; /* 防止 footer 被压缩 */
   min-height: 64px; /* 与 header 保持一致 */
   display: flex;
   align-items: center;
+  width: 100%;
+  z-index: 1000;
 }
 
 .app-footer__content {

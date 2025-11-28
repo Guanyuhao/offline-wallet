@@ -1,6 +1,5 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import naive from 'naive-ui';
 import i18n from './i18n';
 import App from './App.vue';
 import './styles/global.css';
@@ -12,7 +11,7 @@ try {
 
   app.use(pinia);
   app.use(i18n);
-  app.use(naive);
+  // Naive UI 使用按需导入，不需要全局注册
 
   app.mount('#app');
 } catch (error) {

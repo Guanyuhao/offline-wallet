@@ -1,22 +1,24 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NCard, NButton, NInput, NCollapse, NCollapseItem, NText, NAlert, NImage } from 'naive-ui';
+import { NCard, NButton, NInput, NCollapse, NCollapseItem, NText, NAlert, NForm, NFormItem, NQrCode } from 'naive-ui';
 import { useWalletStore, type ChainType } from '../../stores/wallet';
 import { useUIStore } from '../../stores/ui';
 import { invoke } from '@tauri-apps/api/core';
+import { getFriendlyErrorMessage } from '../../utils/errorHandler';
+
+defineEmits<{
+  (e: 'close'): void;
+}>();
 
 const { t } = useI18n();
 const walletStore = useWalletStore();
 const uiStore = useUIStore();
 
-const showForm = ref(false);
 const toAddress = ref('');
 const amount = ref('');
 const signResult = ref('');
-const qrCode = ref('');
-const addressValid = ref(true);
-const addressError = ref('');
+const qrCodeData = ref('');
 const showAdvanced = ref(false);
 const expandedNames = computed({
   get: () => showAdvanced.value ? ['advanced'] : [],
@@ -25,7 +27,118 @@ const expandedNames = computed({
   }
 });
 
-const advancedOptions = ref({
+const formRef = ref();
+const formRules = computed(() => {
+  const chain = walletStore.selectedChain;
+  const rules: any = {
+    toAddress: [
+      {
+        required: true,
+        message: t('wallet.toAddress') + ' ' + t('common.required'),
+        trigger: ['input', 'blur']
+      },
+      {
+        validator: async (_rule: any, value: string) => {
+          if (!value) return true;
+          const sanitized = sanitizeInput(value);
+          if (!validateAddressFormat(sanitized, chain)) {
+            throw new Error(t('messages.invalidAddress'));
+          }
+          // 后端验证
+          try {
+            const isValid = await invoke<boolean>('validate_address_cmd', {
+              chain: chain,
+              address: sanitized,
+            });
+            if (!isValid) {
+              throw new Error(t('messages.invalidAddress'));
+            }
+          } catch (error) {
+            throw new Error(getFriendlyErrorMessage(error, t));
+          }
+        },
+        trigger: ['input', 'blur']
+      }
+    ],
+    amount: [
+      {
+        required: true,
+        message: t('wallet.amount') + ' ' + t('common.required'),
+        trigger: ['input', 'blur']
+      },
+      {
+        validator: (_rule: any, value: string) => {
+          if (!value) return true;
+          const sanitized = sanitizeInput(value);
+          if (!validateAmount(sanitized)) {
+            throw new Error(t('messages.invalidAmount'));
+          }
+        },
+        trigger: ['input', 'blur']
+      }
+    ]
+  };
+
+  // 高级模式验证规则
+  if (showAdvanced.value) {
+    if (chain === 'ETH' || chain === 'BNB') {
+      rules.gasPrice = [
+        {
+          validator: (_rule: any, value: string) => {
+            if (!value || !value.trim()) return true;
+            const sanitized = sanitizeInput(value.trim());
+            if (!/^\d+$/.test(sanitized)) {
+              throw new Error(t('messages.invalidFormat'));
+            }
+          },
+          trigger: ['input', 'blur']
+        }
+      ];
+      rules.gasLimit = [
+        {
+          validator: (_rule: any, value: string) => {
+            if (!value || !value.trim()) return true;
+            const sanitized = sanitizeInput(value.trim());
+            if (!/^\d+$/.test(sanitized)) {
+              throw new Error(t('messages.invalidFormat'));
+            }
+          },
+          trigger: ['input', 'blur']
+        }
+      ];
+      rules.nonce = [
+        {
+          validator: (_rule: any, value: string) => {
+            if (!value || !value.trim()) return true;
+            const sanitized = sanitizeInput(value.trim());
+            if (!/^\d+$/.test(sanitized)) {
+              throw new Error(t('messages.invalidFormat'));
+            }
+          },
+          trigger: ['input', 'blur']
+        }
+      ];
+      rules.data = [
+        {
+          validator: (_rule: any, value: string) => {
+            if (!value || !value.trim()) return true;
+            const sanitized = sanitizeInput(value.trim());
+            if (!validateHexData(sanitized)) {
+              throw new Error(t('messages.invalidFormat'));
+            }
+          },
+          trigger: ['input', 'blur']
+        }
+      ];
+    }
+  }
+
+  return rules;
+});
+
+const formModel = ref({
+  toAddress: '',
+  amount: '',
   gasPrice: '20000000000',
   gasLimit: '21000',
   nonce: '0',
@@ -65,47 +178,13 @@ function validateHexData(data: string): boolean {
   return /^0x[a-fA-F0-9]*$/.test(sanitized);
 }
 
-// 实时验证地址
-async function validateAddressInput() {
-  const address = sanitizeInput(toAddress.value);
-  if (!address) {
-    addressValid.value = true;
-    addressError.value = '';
-    return;
-  }
-
-  // 格式验证
-  if (!validateAddressFormat(address, walletStore.selectedChain)) {
-    addressValid.value = false;
-    addressError.value = t('messages.invalidAddress');
-    return;
-  }
-
-  // 后端验证
-  try {
-    const isValid = await invoke<boolean>('validate_address_cmd', {
-      chain: walletStore.selectedChain,
-      address: address,
-    });
-    addressValid.value = isValid;
-    if (!isValid) {
-      addressError.value = t('messages.invalidAddress');
-    } else {
-      addressError.value = '';
-    }
-  } catch (error) {
-    addressValid.value = false;
-    addressError.value = String(error);
-  }
-}
 
 watch(() => walletStore.selectedChain, () => {
-  toAddress.value = '';
-  amount.value = '';
-  addressValid.value = true;
-  addressError.value = '';
+  formModel.value.toAddress = '';
+  formModel.value.amount = '';
   signResult.value = '';
-  qrCode.value = '';
+  qrCodeData.value = '';
+  formRef.value?.restoreValidation();
 });
 
 function getAmountUnit(): string {
@@ -170,46 +249,24 @@ async function signTransaction() {
   
   const amountNum = parseFloat(amountStr);
   
-  // 高级选项验证
-  if (showAdvanced.value) {
-    if (chain === 'ETH' || chain === 'BNB') {
-      if (advancedOptions.value.data && !validateHexData(advancedOptions.value.data)) {
-        uiStore.showError(t('wallet.data') + ' ' + t('messages.invalidFormat'));
-        return;
-      }
-    }
-  }
-
   try {
     uiStore.showLoading(t('common.loading'));
-    
-    // 双重验证地址
-    const isValidAddress = await invoke<boolean>('validate_address_cmd', {
-      chain: chain,
-      address: address,
-    });
-    
-    if (!isValidAddress) {
-      uiStore.showError(t('messages.invalidAddress'));
-      addressValid.value = false;
-      return;
-    }
     
     let result: { raw_transaction: string; transaction_hash: string };
     
     if (chain === 'ETH' || chain === 'BNB') {
       const valueInWei = (amountNum * 1e18).toString();
-      const gasPrice = showAdvanced.value && advancedOptions.value.gasPrice.trim() 
-        ? sanitizeInput(advancedOptions.value.gasPrice.trim())
+      const gasPrice = showAdvanced.value && formModel.value.gasPrice.trim() 
+        ? sanitizeInput(formModel.value.gasPrice.trim())
         : '20000000000';
-      const gasLimit = showAdvanced.value && advancedOptions.value.gasLimit.trim() 
-        ? sanitizeInput(advancedOptions.value.gasLimit.trim())
+      const gasLimit = showAdvanced.value && formModel.value.gasLimit.trim() 
+        ? sanitizeInput(formModel.value.gasLimit.trim())
         : '21000';
-      const nonce = showAdvanced.value && advancedOptions.value.nonce.trim() 
-        ? sanitizeInput(advancedOptions.value.nonce.trim())
+      const nonce = showAdvanced.value && formModel.value.nonce.trim() 
+        ? sanitizeInput(formModel.value.nonce.trim())
         : '0';
-      const data = showAdvanced.value && advancedOptions.value.data.trim() 
-        ? sanitizeInput(advancedOptions.value.data.trim())
+      const data = showAdvanced.value && formModel.value.data.trim() 
+        ? sanitizeInput(formModel.value.data.trim())
         : undefined;
       
       if (chain === 'ETH') {
@@ -248,8 +305,8 @@ async function signTransaction() {
         );
       }
     } else if (chain === 'BTC') {
-      const feeRate = showAdvanced.value && advancedOptions.value.gasPrice.trim()
-        ? sanitizeInput(advancedOptions.value.gasPrice.trim())
+      const feeRate = showAdvanced.value && formModel.value.gasPrice.trim()
+        ? sanitizeInput(formModel.value.gasPrice.trim())
         : undefined;
       
       result = await invoke<{raw_transaction: string, transaction_hash: string}>(
@@ -266,8 +323,8 @@ async function signTransaction() {
         }
       );
     } else if (chain === 'SOL') {
-      const recentBlockhash = showAdvanced.value && advancedOptions.value.data.trim()
-        ? sanitizeInput(advancedOptions.value.data.trim())
+      const recentBlockhash = showAdvanced.value && formModel.value.data.trim()
+        ? sanitizeInput(formModel.value.data.trim())
         : undefined;
       
       const solResult = await invoke<{raw_transaction: string, signature: string}>(
@@ -289,11 +346,11 @@ async function signTransaction() {
         transaction_hash: solResult.signature,
       };
     } else if (chain === 'TRON') {
-      const gasPrice = showAdvanced.value && advancedOptions.value.gasPrice.trim()
-        ? sanitizeInput(advancedOptions.value.gasPrice.trim())
+      const gasPrice = showAdvanced.value && formModel.value.gasPrice.trim()
+        ? sanitizeInput(formModel.value.gasPrice.trim())
         : undefined;
-      const gasLimit = showAdvanced.value && advancedOptions.value.gasLimit.trim()
-        ? sanitizeInput(advancedOptions.value.gasLimit.trim())
+      const gasLimit = showAdvanced.value && formModel.value.gasLimit.trim()
+        ? sanitizeInput(formModel.value.gasLimit.trim())
         : undefined;
       
       const valueInSun = (amountNum * 1e6).toString();
@@ -318,10 +375,8 @@ async function signTransaction() {
     
     signResult.value = result.raw_transaction;
     
-    // 生成二维码
-    qrCode.value = await invoke<string>('generate_qrcode_cmd', { 
-      data: result.raw_transaction 
-    });
+    // 生成二维码数据（QrCode 组件会自动生成）
+    qrCodeData.value = result.raw_transaction;
     
     uiStore.showSuccess(t('messages.signSuccess'));
   } catch (error) {
@@ -338,148 +393,167 @@ function copy(text: string, label: string) {
 }
 
 function resetForm() {
-  showForm.value = false;
-  toAddress.value = '';
-  amount.value = '';
+  formModel.value = {
+    toAddress: '',
+    amount: '',
+    gasPrice: '20000000000',
+    gasLimit: '21000',
+    nonce: '0',
+    data: '',
+  };
   signResult.value = '';
-  qrCode.value = '';
-  addressValid.value = true;
-  addressError.value = '';
+  qrCodeData.value = '';
   showAdvanced.value = false;
+  formRef.value?.restoreValidation();
 }
 </script>
 
 <template>
   <div class="transaction-container">
-    <div v-if="!showForm" class="send-init">
-      <n-button
-        type="info"
-        size="large"
-        block
-        class="send-button"
-        @click="showForm = true"
-      >
-        {{ t('wallet.send') }}
-      </n-button>
+    <n-card class="transaction-card">
       <n-text depth="3" class="hint">{{ t('wallet.signHint') }}</n-text>
-    </div>
-
-    <n-card v-else class="transaction-card">
-      <div class="sign-form">
-      <div class="form-group">
-        <n-input
-          v-model:value="toAddress"
-          :placeholder="getAddressPlaceholder()"
-          :status="addressValid || !toAddress ? undefined : 'error'"
-          @input="validateAddressInput"
-          autocomplete="off"
-          spellcheck="false"
-        />
-        <n-text v-if="addressError" type="error" class="error-text">{{ addressError }}</n-text>
-        <n-text v-else depth="3" class="hint">{{ getAddressHint() }}</n-text>
-      </div>
-
-      <div class="form-group">
-        <n-input
-          v-model:value="amount"
-          :placeholder="t('wallet.amountPlaceholder')"
-          type="text"
-          inputmode="decimal"
-          autocomplete="off"
-        >
-          <template #suffix>
-            <n-text depth="3" class="amount-unit">{{ getAmountUnit() }}</n-text>
+      
+      <n-form
+        ref="formRef"
+        :model="formModel"
+        :rules="formRules"
+        :show-label="false"
+        :show-feedback="true"
+        class="sign-form"
+      >
+        <n-form-item path="toAddress" class="form-group">
+          <n-input
+            v-model:value="formModel.toAddress"
+            :placeholder="getAddressPlaceholder()"
+            autocomplete="off"
+            spellcheck="false"
+            clearable
+          />
+          <template #feedback>
+            <n-text depth="3" class="hint">{{ getAddressHint() }}</n-text>
           </template>
-        </n-input>
-        <n-text depth="3" class="hint">{{ getAmountHint() }}</n-text>
-      </div>
+        </n-form-item>
+
+        <n-form-item path="amount" class="form-group">
+          <n-input
+            v-model:value="formModel.amount"
+            :placeholder="t('wallet.amountPlaceholder')"
+            type="text"
+            inputmode="decimal"
+            autocomplete="off"
+            clearable
+          >
+            <template #suffix>
+              <n-text depth="3" class="amount-unit">{{ getAmountUnit() }}</n-text>
+            </template>
+          </n-input>
+          <template #feedback>
+            <n-text depth="3" class="hint">{{ getAmountHint() }}</n-text>
+          </template>
+        </n-form-item>
 
       <n-collapse v-model:expanded-names="expandedNames">
         <n-collapse-item name="advanced" :title="t('wallet.advancedMode')">
           <n-text depth="3" class="hint">{{ t('wallet.advancedHint') }}</n-text>
           
           <template v-if="walletStore.selectedChain === 'ETH' || walletStore.selectedChain === 'BNB'">
-            <div class="form-group">
+            <n-form-item path="gasPrice" class="form-group">
               <n-input
-                v-model:value="advancedOptions.gasPrice"
+                v-model:value="formModel.gasPrice"
                 :placeholder="'20000000000'"
                 autocomplete="off"
                 spellcheck="false"
               />
-              <n-text depth="3" class="hint">{{ t('wallet.gasPriceHint') }}</n-text>
-            </div>
-            <div class="form-group">
+              <template #feedback>
+                <n-text depth="3" class="hint">{{ t('wallet.gasPriceHint') }}</n-text>
+              </template>
+            </n-form-item>
+            <n-form-item path="gasLimit" class="form-group">
               <n-input
-                v-model:value="advancedOptions.gasLimit"
+                v-model:value="formModel.gasLimit"
                 :placeholder="'21000'"
                 autocomplete="off"
                 spellcheck="false"
               />
-              <n-text depth="3" class="hint">{{ t('wallet.gasLimitHint') }}</n-text>
-            </div>
-            <div class="form-group">
+              <template #feedback>
+                <n-text depth="3" class="hint">{{ t('wallet.gasLimitHint') }}</n-text>
+              </template>
+            </n-form-item>
+            <n-form-item path="nonce" class="form-group">
               <n-input
-                v-model:value="advancedOptions.nonce"
+                v-model:value="formModel.nonce"
                 :placeholder="'0'"
                 autocomplete="off"
                 spellcheck="false"
               />
-              <n-text depth="3" class="hint">{{ t('wallet.nonceHint') }}</n-text>
-            </div>
-            <div class="form-group">
+              <template #feedback>
+                <n-text depth="3" class="hint">{{ t('wallet.nonceHint') }}</n-text>
+              </template>
+            </n-form-item>
+            <n-form-item path="data" class="form-group">
               <n-input
-                v-model:value="advancedOptions.data"
+                v-model:value="formModel.data"
                 :placeholder="'0x...'"
                 autocomplete="off"
                 spellcheck="false"
               />
-              <n-text depth="3" class="hint">{{ t('wallet.dataHint') }}</n-text>
-            </div>
+              <template #feedback>
+                <n-text depth="3" class="hint">{{ t('wallet.dataHint') }}</n-text>
+              </template>
+            </n-form-item>
           </template>
 
           <template v-else-if="walletStore.selectedChain === 'BTC'">
-            <div class="form-group">
+            <n-form-item path="gasPrice" class="form-group">
               <n-input
-                v-model:value="advancedOptions.gasPrice"
+                v-model:value="formModel.gasPrice"
                 :placeholder="'10'"
                 autocomplete="off"
                 spellcheck="false"
               />
-              <n-text depth="3" class="hint">{{ t('wallet.feeRateHint') }}</n-text>
-            </div>
+              <template #feedback>
+                <n-text depth="3" class="hint">{{ t('wallet.feeRateHint') }}</n-text>
+              </template>
+            </n-form-item>
           </template>
 
           <template v-else-if="walletStore.selectedChain === 'SOL'">
-            <div class="form-group">
+            <n-form-item path="data" class="form-group">
               <n-input
-                v-model:value="advancedOptions.data"
+                v-model:value="formModel.data"
                 :placeholder="'Base58 blockhash...'"
                 autocomplete="off"
                 spellcheck="false"
               />
-              <n-text depth="3" class="hint">{{ t('wallet.recentBlockhashHint') }}</n-text>
-            </div>
+              <template #feedback>
+                <n-text depth="3" class="hint">{{ t('wallet.recentBlockhashHint') }}</n-text>
+              </template>
+            </n-form-item>
           </template>
 
           <template v-else-if="walletStore.selectedChain === 'TRON'">
-            <div class="form-group">
+            <n-form-item path="gasPrice" class="form-group">
               <n-input
-                v-model:value="advancedOptions.gasPrice"
+                v-model:value="formModel.gasPrice"
                 :placeholder="'420'"
                 autocomplete="off"
                 spellcheck="false"
               />
-              <n-text depth="3" class="hint">{{ t('wallet.tronGasPriceHint') }}</n-text>
-            </div>
-            <div class="form-group">
+              <template #feedback>
+                <n-text depth="3" class="hint">{{ t('wallet.tronGasPriceHint') }}</n-text>
+              </template>
+            </n-form-item>
+            <n-form-item path="gasLimit" class="form-group">
               <n-input
-                v-model:value="advancedOptions.gasLimit"
+                v-model:value="formModel.gasLimit"
                 :placeholder="'21000'"
                 autocomplete="off"
                 spellcheck="false"
               />
-              <n-text depth="3" class="hint">{{ t('wallet.tronGasLimitHint') }}</n-text>
-            </div>
+              <template #feedback>
+                <n-text depth="3" class="hint">{{ t('wallet.tronGasLimitHint') }}</n-text>
+              </template>
+            </n-form-item>
           </template>
         </n-collapse-item>
       </n-collapse>
@@ -527,13 +601,24 @@ function resetForm() {
           </n-button>
         </div>
 
-        <div v-if="qrCode" class="qr-section">
+        <div v-if="qrCodeData" class="qr-section">
           <n-text strong class="result-label">{{ t('wallet.qrCode') }}</n-text>
-          <n-image :src="qrCode" class="qr-image" />
+          <div class="qr-code-wrapper">
+            <n-qr-code
+              :value="qrCodeData"
+              :size="280"
+              :error-correction-level="'M'"
+              class="qr-code"
+            >
+              <template #icon>
+                <img src="/wallet-logo.svg" alt="Logo" class="qr-logo" />
+              </template>
+            </n-qr-code>
+          </div>
           <n-text depth="3" class="hint">{{ t('wallet.qrCodeHint') }}</n-text>
         </div>
       </div>
-      </div>
+      </n-form>
     </n-card>
   </div>
 </template>
@@ -612,13 +697,31 @@ function resetForm() {
 
 .qr-section {
   text-align: center;
+  margin-top: var(--apple-spacing-lg);
 }
 
-.qr-image {
-  max-width: 250px;
-  width: 100%;
+.qr-code-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--apple-spacing-md);
+  background: var(--apple-bg-secondary);
+  border-radius: var(--apple-radius-lg);
+  margin: var(--apple-spacing-md) auto;
+  max-width: 300px;
+}
+
+.qr-code {
   border-radius: var(--apple-radius-md);
-  margin: var(--apple-spacing-md) 0;
+}
+
+.qr-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  background: white;
+  border-radius: var(--apple-radius-sm);
+  padding: 8px;
 }
 </style>
 

@@ -150,6 +150,16 @@ watch(() => uiStore.theme, () => {
   font-family: var(--apple-font);
   color: var(--apple-text-primary);
   overflow: hidden;
+  padding-top: 64px; /* Header 固定高度（桌面端） */
+  padding-bottom: 64px; /* Footer 固定高度（桌面端） */
+}
+
+/* 移动端适配 */
+@media (max-width: 640px) {
+  .app {
+    padding-top: 56px; /* Header 固定高度（移动端） */
+    padding-bottom: 56px; /* Footer 固定高度（移动端） */
+  }
 }
 
 /* ==================== 主内容区域 ==================== */
@@ -159,6 +169,7 @@ watch(() => uiStore.theme, () => {
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0; /* 重要：允许 flex 子元素缩小 */
+  -webkit-overflow-scrolling: touch; /* iOS 平滑滚动 */
 }
 
 /* ==================== Naive UI 主题定制 ==================== */

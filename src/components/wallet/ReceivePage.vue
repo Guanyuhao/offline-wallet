@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NCard, NButton, NText, NImage, NSkeleton, NTabs, NTabPane, NUpload, NUploadDragger, NInput } from 'naive-ui';
+import { NCard, NButton, NText, NSkeleton, NTabs, NTabPane, NUpload, NUploadDragger, NInput, NQrCode } from 'naive-ui';
 import { useWalletStore, type ChainType } from '../../stores/wallet';
 import { useUIStore } from '../../stores/ui';
-import { invoke } from '@tauri-apps/api/core';
 import { usePlatform } from '../../composables/usePlatform';
 import { getFriendlyErrorMessage, isUserCancelError } from '../../utils/errorHandler';
+import AddressEllipsis from '../common/AddressEllipsis.vue';
 import type { UploadFileInfo } from 'naive-ui';
+
+defineEmits<{
+  (e: 'close'): void;
+}>();
 
 const { t } = useI18n();
 const walletStore = useWalletStore();
@@ -15,7 +19,7 @@ const uiStore = useUIStore();
 const { isDesktop, isMobile } = usePlatform();
 
 const activeTab = ref('yourQR');
-const qrCode = ref('');
+const qrCodeData = ref('');
 const isLoadingQR = ref(false);
 const scannedResult = ref('');
 const isScanning = ref(false);
@@ -42,9 +46,8 @@ async function generateQRCode() {
   
   isLoadingQR.value = true;
   try {
-    qrCode.value = await invoke<string>('generate_qrcode_cmd', {
-      data: currentAddress.value
-    });
+    // 直接使用地址作为二维码数据，QrCode 组件会自动生成
+    qrCodeData.value = currentAddress.value;
   } catch (error) {
     uiStore.showError(t('receive.generateQRFailed') + ': ' + error);
   } finally {
@@ -66,11 +69,6 @@ function copyScannedResult() {
   });
 }
 
-function formatAddress(address: string): string {
-  if (!address) return '';
-  if (address.length <= 20) return address;
-  return `${address.slice(0, 10)}...${address.slice(-10)}`;
-}
 
 // 扫描二维码（桌面端：文件上传）
 async function handleFileUpload(options: { file: UploadFileInfo; fileList: UploadFileInfo[] }) {
@@ -155,7 +153,8 @@ async function startCameraScan() {
     try {
       // @ts-ignore - 动态导入
       const module = await import('@tauri-apps/plugin-barcode-scanner');
-      barcodeScanner = module.default || module;
+      // barcode-scanner 插件导出的是命名导出，不是 default 导出
+      barcodeScanner = module;
     } catch (importError: any) {
       console.error('Failed to import barcode-scanner:', importError);
       // 使用友好的国际化提示
@@ -192,7 +191,7 @@ watch(() => walletStore.primaryAddress, (newAddress) => {
   if (newAddress && activeTab.value === 'yourQR') {
     generateQRCode();
   } else {
-    qrCode.value = '';
+    qrCodeData.value = '';
   }
 }, { immediate: true });
 
@@ -290,18 +289,30 @@ watch(() => activeTab.value, (newTab) => {
                 class="qr-skeleton-item"
               />
             </div>
-            <div v-else-if="qrCode" class="qr-code-wrapper">
-              <n-image :src="qrCode" class="qr-image" />
+            <div v-else-if="qrCodeData" class="qr-code-wrapper">
+              <n-qr-code
+                :value="qrCodeData"
+                :size="280"
+                :error-correction-level="'M'"
+                class="qr-code"
+              >
+                <template #icon>
+                  <img src="/wallet-logo.svg" alt="Logo" class="qr-logo" />
+                </template>
+              </n-qr-code>
             </div>
           </div>
 
           <div v-if="currentAddress" class="address-section">
             <n-text depth="3" class="account-label">{{ t('receive.accountLabel') }}</n-text>
             <div class="address-display">
-              <n-text class="address-text">{{ formatAddress(currentAddress) }}</n-text>
-            </div>
-            <div class="address-full">
-              <n-text class="address-full-text">{{ currentAddress }}</n-text>
+              <AddressEllipsis
+                :address="currentAddress"
+                :prefix-length="6"
+                :suffix-length="4"
+                :copyable="true"
+                @copy="copyAddress"
+              />
             </div>
             <n-button
               type="default"

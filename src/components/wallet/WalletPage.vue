@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NTabs, NTabPane } from 'naive-ui';
+import { NButton, NDrawer, NDrawerContent } from 'naive-ui';
+import { CloseOutline } from '@vicons/ionicons5';
+import { NIcon } from 'naive-ui';
 import ChainSelector from './ChainSelector.vue';
 import AddressDisplay from './AddressDisplay.vue';
 import TransactionForm from './TransactionForm.vue';
 import ReceivePage from './ReceivePage.vue';
 
 const { t } = useI18n();
-const activeTab = ref('send');
+const showSendDrawer = ref(false);
+const showReceiveDrawer = ref(false);
 </script>
 
 <template>
@@ -19,26 +22,84 @@ const activeTab = ref('send');
       <AddressDisplay />
     </div>
     
-    <!-- 操作区域：发送/接收标签页 -->
+    <!-- 操作按钮区域 -->
     <div class="wallet-actions">
-      <n-tabs 
-        v-model:value="activeTab" 
-        type="segment" 
-        class="wallet-tabs"
+      <n-button
+        type="primary"
         size="large"
+        block
+        class="action-button"
+        @click="showSendDrawer = true"
       >
-        <n-tab-pane name="send" :tab="t('wallet.send')">
-          <div class="tab-content">
-            <TransactionForm />
-          </div>
-        </n-tab-pane>
-        <n-tab-pane name="receive" :tab="t('receive.title')">
-          <div class="tab-content">
-            <ReceivePage />
-          </div>
-        </n-tab-pane>
-      </n-tabs>
+        {{ t('wallet.send') }}
+      </n-button>
+      
+      <n-button
+        type="default"
+        size="large"
+        block
+        class="action-button"
+        @click="showReceiveDrawer = true"
+      >
+        {{ t('wallet.receive') }}
+      </n-button>
     </div>
+
+    <!-- 离线发送 Drawer -->
+    <n-drawer
+      v-model:show="showSendDrawer"
+      :width="'100%'"
+      :placement="'right'"
+      :mask-closable="false"
+      class="fullscreen-drawer"
+    >
+      <n-drawer-content>
+        <template #header>
+          <div class="drawer-header">
+            <span class="drawer-title">{{ t('wallet.send') }}</span>
+            <n-button
+              quaternary
+              circle
+              size="large"
+              @click="showSendDrawer = false"
+            >
+              <template #icon>
+                <n-icon :component="CloseOutline" :size="24" />
+              </template>
+            </n-button>
+          </div>
+        </template>
+        <TransactionForm @close="showSendDrawer = false" />
+      </n-drawer-content>
+    </n-drawer>
+
+    <!-- 接收 Drawer -->
+    <n-drawer
+      v-model:show="showReceiveDrawer"
+      :width="'100%'"
+      :placement="'right'"
+      :mask-closable="false"
+      class="fullscreen-drawer"
+    >
+      <n-drawer-content>
+        <template #header>
+          <div class="drawer-header">
+            <span class="drawer-title">{{ t('wallet.receive') }}</span>
+            <n-button
+              quaternary
+              circle
+              size="large"
+              @click="showReceiveDrawer = false"
+            >
+              <template #icon>
+                <n-icon :component="CloseOutline" :size="24" />
+              </template>
+            </n-button>
+          </div>
+        </template>
+        <ReceivePage @close="showReceiveDrawer = false" />
+      </n-drawer-content>
+    </n-drawer>
   </div>
 </template>
 
@@ -47,77 +108,64 @@ const activeTab = ref('send');
   max-width: 480px;
   margin: 0 auto;
   padding: var(--apple-spacing-md);
-  min-height: calc(100vh - 120px);
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: var(--apple-spacing-lg);
+  /* 确保内容可以正常滚动 */
+  min-height: 0;
+  flex: 1;
 }
 
 .wallet-header {
   display: flex;
   flex-direction: column;
   gap: var(--apple-spacing-md);
-  position: sticky;
-  top: var(--apple-spacing-md);
-  z-index: 10;
-  background: var(--apple-bg-primary);
-  padding-bottom: var(--apple-spacing-sm);
-  margin-bottom: var(--apple-spacing-xs);
 }
 
 .wallet-actions {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  gap: var(--apple-spacing-md);
 }
 
-.wallet-tabs {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-:deep(.n-tabs-nav) {
-  margin-bottom: var(--apple-spacing-md);
-  padding: var(--apple-spacing-xs);
-  background: var(--apple-bg-secondary);
+.action-button {
+  height: 56px;
+  font-size: var(--apple-font-size-body);
+  font-weight: var(--apple-font-weight-semibold);
   border-radius: var(--apple-radius-lg);
 }
 
-:deep(.n-tabs-tab) {
-  padding: var(--apple-spacing-sm) var(--apple-spacing-md);
-  border-radius: var(--apple-radius-md);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  font-weight: var(--apple-font-weight-medium);
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 var(--apple-spacing-sm);
 }
 
-:deep(.n-tabs-tab--active) {
-  background: var(--apple-bg-primary);
-  box-shadow: var(--apple-shadow-sm);
+.drawer-title {
+  font-size: var(--apple-font-size-title-3);
+  font-weight: var(--apple-font-weight-semibold);
   color: var(--apple-text-primary);
 }
 
-:deep(.n-tabs-pane-wrapper) {
+/* 全屏 Drawer 样式 */
+:deep(.fullscreen-drawer .n-drawer) {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+:deep(.fullscreen-drawer .n-drawer-content) {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+:deep(.fullscreen-drawer .n-drawer-body-content-wrapper) {
   flex: 1;
   overflow-y: auto;
-  min-height: 0;
-}
-
-.tab-content {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  -webkit-overflow-scrolling: touch;
 }
 
 /* 响应式优化 */
@@ -126,11 +174,6 @@ const activeTab = ref('send');
     padding: var(--apple-spacing-sm);
     gap: var(--apple-spacing-md);
   }
-  
-  .wallet-header {
-    position: relative;
-    top: 0;
-  }
 }
 
 @media (min-width: 768px) {
@@ -138,15 +181,10 @@ const activeTab = ref('send');
     max-width: 600px;
     padding: var(--apple-spacing-xl);
   }
-}
-
-/* 深色模式优化 */
-.dark :deep(.n-tabs-nav) {
-  background: var(--apple-gray-dark-2);
-}
-
-.dark :deep(.n-tabs-tab--active) {
-  background: var(--apple-gray-dark-1);
-  color: var(--apple-text-primary);
+  
+  :deep(.fullscreen-drawer .n-drawer) {
+    width: 600px !important;
+    max-width: 90vw !important;
+  }
 }
 </style>

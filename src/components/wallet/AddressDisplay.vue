@@ -4,6 +4,7 @@ import { useWalletStore, type ChainType } from '../../stores/wallet';
 import { useUIStore } from '../../stores/ui';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
+import AddressEllipsis from '../common/AddressEllipsis.vue';
 
 const { t } = useI18n();
 const walletStore = useWalletStore();
@@ -48,16 +49,23 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
         :animated="true"
         class="address-skeleton"
       />
-      <code v-else class="address-text">{{ walletStore.primaryAddress }}</code>
-      <n-button
-        v-if="!isLoadingAddress"
-        size="small"
-        type="default"
-        class="copy-btn"
-        @click="copyAddress(walletStore.primaryAddress, t('wallet.myAddress'))"
-      >
-        {{ t('common.copy') }}
-      </n-button>
+      <div v-else class="address-content">
+        <AddressEllipsis
+          :address="walletStore.primaryAddress"
+          :prefix-length="6"
+          :suffix-length="4"
+          :copyable="true"
+          @copy="copyAddress(walletStore.primaryAddress, t('wallet.myAddress'))"
+        />
+        <n-button
+          size="small"
+          type="default"
+          class="copy-btn"
+          @click="copyAddress(walletStore.primaryAddress, t('wallet.myAddress'))"
+        >
+          {{ t('common.copy') }}
+        </n-button>
+      </div>
     </div>
 
     <n-collapse class="all-addresses-collapse">
@@ -74,7 +82,13 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
               <span class="chain-symbol-small">{{ chains.find(c => c.value === addr.chain)?.symbol }}</span>
               <span class="chain-name-small">{{ getChainName(addr.chain) }}</span>
             </div>
-            <code class="address-item-value">{{ addr.address }}</code>
+            <AddressEllipsis
+              :address="addr.address"
+              :prefix-length="6"
+              :suffix-length="4"
+              :copyable="true"
+              @copy="copyAddress(addr.address, getChainName(addr.chain))"
+            />
             <n-button
               size="tiny"
               type="default"
@@ -157,14 +171,12 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
   flex: 1;
 }
 
-.address-text {
+.address-content {
   flex: 1;
-  font-family: var(--apple-font-mono);
-  font-size: var(--apple-font-size-footnote);
-  word-break: break-all;
-  color: var(--apple-text-primary);
-  line-height: 1.5;
-  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: var(--apple-spacing-sm);
+  min-width: 0; /* 允许 flex 子元素缩小 */
 }
 
 .copy-btn {

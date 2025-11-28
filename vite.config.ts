@@ -30,12 +30,61 @@ export default defineConfig(async () => ({
     },
   },
   build: {
+    // 代码分割优化
     rollupOptions: {
+      output: {
+        // 手动代码分割，将大库分离
+        manualChunks: (id) => {
+          // node_modules 中的依赖
+          if (id.includes('node_modules')) {
+            // Naive UI 单独打包（UI 库较大）
+            if (id.includes('naive-ui')) {
+              return 'naive-ui';
+            }
+            // Vue 相关
+            if (id.includes('vue') || id.includes('@vue')) {
+              return 'vue-vendor';
+            }
+            // Tauri API 相关
+            if (id.includes('@tauri-apps')) {
+              return 'tauri-vendor';
+            }
+            // 国际化相关
+            if (id.includes('vue-i18n') || id.includes('@intlify')) {
+              return 'i18n-vendor';
+            }
+            // 图标库
+            if (id.includes('@vicons')) {
+              return 'icons-vendor';
+            }
+            // Pinia 状态管理
+            if (id.includes('pinia')) {
+              return 'pinia-vendor';
+            }
+            // 其他第三方库
+            return 'vendor';
+          }
+        },
+        // 优化 chunk 文件命名
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+      },
       external: [
         // 可选依赖，运行时动态导入
         'jsqr',
         '@tauri-apps/plugin-barcode-scanner',
       ],
     },
+    // 提高 chunk 大小警告阈值（因为我们已经做了代码分割）
+    chunkSizeWarningLimit: 600,
+    // 启用 source map（生产环境可选，但有助于调试）
+    sourcemap: false,
+    // 压缩配置
+    minify: 'esbuild',
+    // 启用 CSS 代码分割
+    cssCodeSplit: true,
+    // 目标浏览器
+    target: 'es2020',
   },
 }));

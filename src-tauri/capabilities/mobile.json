@@ -1,5 +1,6 @@
 {
   "identifier": "mobile-capability",
+  "description": "Mobile capability with minimal required permissions",
   "platforms": [
     "android",
     "iOS"
@@ -8,6 +9,7 @@
     "main"
   ],
   "permissions": [
+    "core:default",
     "barcode-scanner:default"
   ]
 }

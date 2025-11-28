@@ -83,9 +83,11 @@ function toggleSettings() {
 
 <style scoped>
 .app-header {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 100;
+  left: 0;
+  right: 0;
+  z-index: 1000;
   background: var(--apple-bg-primary);
   border-bottom: 0.5px solid var(--apple-separator);
   backdrop-filter: blur(20px);
@@ -94,6 +96,7 @@ function toggleSettings() {
   min-height: 64px; /* 统一高度 */
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .app-header__content {
