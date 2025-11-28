@@ -21,6 +21,9 @@ const { t } = useI18n();
   border-top: 0.5px solid var(--apple-separator);
   background: var(--apple-bg-primary);
   flex-shrink: 0; /* 防止 footer 被压缩 */
+  min-height: 64px; /* 与 header 保持一致 */
+  display: flex;
+  align-items: center;
 }
 
 .app-footer__content {
@@ -28,6 +31,11 @@ const { t } = useI18n();
   margin: 0 auto;
   padding: var(--apple-spacing-md) var(--apple-spacing-lg);
   text-align: center;
+  width: 100%;
+  min-height: 64px; /* 与 header 保持一致 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .app-footer__text {
@@ -35,8 +43,13 @@ const { t } = useI18n();
 }
 
 @media (max-width: 640px) {
+  .app-footer {
+    min-height: 56px; /* 移动端与 header 保持一致 */
+  }
+  
   .app-footer__content {
     padding: var(--apple-spacing-sm) var(--apple-spacing-md);
+    min-height: 56px;
   }
 }
 </style>

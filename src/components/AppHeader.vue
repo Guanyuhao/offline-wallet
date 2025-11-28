@@ -91,6 +91,9 @@ function toggleSettings() {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   flex-shrink: 0; /* 防止 header 被压缩 */
+  min-height: 64px; /* 统一高度 */
+  display: flex;
+  align-items: center;
 }
 
 .app-header__content {
@@ -100,6 +103,8 @@ function toggleSettings() {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  min-height: 64px; /* 与 footer 保持一致 */
 }
 
 .app-header__left {
@@ -168,8 +173,13 @@ function toggleSettings() {
 }
 
 @media (max-width: 640px) {
+  .app-header {
+    min-height: 56px; /* 移动端稍小一点 */
+  }
+  
   .app-header__content {
     padding: var(--apple-spacing-sm) var(--apple-spacing-md);
+    min-height: 56px;
   }
   
   .app-header__title-text {
