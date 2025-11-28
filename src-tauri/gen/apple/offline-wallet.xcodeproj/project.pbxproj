@@ -1,0 +1,501 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0B6AC94452949A9F1F1C16F3 /* libapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9288ED062151E211EC057949 /* libapp.a */; };
+		463E31CC1BDACF0C874C15EC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 40AFF73F8594999BDBF82A79 /* LaunchScreen.storyboard */; };
+		4CCAFEB48526186E308F9B6B /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 273C1895EC2B873893EA0251 /* WebKit.framework */; };
+		4DB4A8F696B9CDB2502916B3 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 421EEE0DC05BB9B4629F5961 /* assets */; };
+		546680CF56E067339F17478F /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 25B4C5922F1ECC287293F9C1 /* main.mm */; };
+		8DF196A0D8F5D26A20B407C3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17F451CB9CF00E6E506A2BC5 /* Security.framework */; };
+		940999C8A5149D7837502D94 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A08132AE6B01DF508C35E931 /* MetalKit.framework */; };
+		A2AA43555E435F1594C163B3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C114277EC70F516EF04A68 /* CoreGraphics.framework */; };
+		A5807FF4597095E9C9139783 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E1451C334F65544C34420E8 /* Metal.framework */; };
+		BD1FFBC38531CC7CECC4C3BA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2F28A79B01C7101EDB540CC /* Assets.xcassets */; };
+		EE4311725728173785FBAC6C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC23270035FD1669D577D3DB /* UIKit.framework */; };
+		FA5C6EA1A327B8F1D80D1998 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E07BDEDAFBFF3AA1BBABF04F /* QuartzCore.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0DA8E10ECDC0C9BBEEFFF2ED /* ethereum.rs */ = {isa = PBXFileReference; path = ethereum.rs; sourceTree = "<group>"; };
+		1499784B1B7AAA744FDB6463 /* mnemonic.rs */ = {isa = PBXFileReference; path = mnemonic.rs; sourceTree = "<group>"; };
+		155C98C24F2ED08C61CFDD68 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+		17F451CB9CF00E6E506A2BC5 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		25B4C5922F1ECC287293F9C1 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		273C1895EC2B873893EA0251 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		3E1451C334F65544C34420E8 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		40AFF73F8594999BDBF82A79 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		421EEE0DC05BB9B4629F5961 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = SOURCE_ROOT; };
+		6D05F3A6D462178899A62BE6 /* bitcoin.rs */ = {isa = PBXFileReference; path = bitcoin.rs; sourceTree = "<group>"; };
+		6E9029F435108AA5792C6A27 /* lib.rs */ = {isa = PBXFileReference; path = lib.rs; sourceTree = "<group>"; };
+		8289BE94185A9AD5F8BD83EF /* main.rs */ = {isa = PBXFileReference; path = main.rs; sourceTree = "<group>"; };
+		89889AA1181AB923C1D2569A /* offline-wallet_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "offline-wallet_iOS.entitlements"; sourceTree = "<group>"; };
+		90A2F0F995FD17FB5D8D4FD6 /* bindings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bindings.h; sourceTree = "<group>"; };
+		9288ED062151E211EC057949 /* libapp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libapp.a; sourceTree = "<group>"; };
+		A08132AE6B01DF508C35E931 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		AE70D0777F3342AD69267D67 /* address_validation.rs */ = {isa = PBXFileReference; path = address_validation.rs; sourceTree = "<group>"; };
+		B09CF3D36CB9B6104182DAA3 /* offline-wallet_iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "offline-wallet_iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B2927C16D5858D44EADD88DF /* solana.rs */ = {isa = PBXFileReference; path = solana.rs; sourceTree = "<group>"; };
+		BEA4EF027F325DC260B48443 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C07A2843E6AD97590052D631 /* qrcode_gen.rs */ = {isa = PBXFileReference; path = qrcode_gen.rs; sourceTree = "<group>"; };
+		DC23270035FD1669D577D3DB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		DE9A51045D6C0C899BB7ED32 /* bnb.rs */ = {isa = PBXFileReference; path = bnb.rs; sourceTree = "<group>"; };
+		E07BDEDAFBFF3AA1BBABF04F /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		E2F28A79B01C7101EDB540CC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E4C114277EC70F516EF04A68 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		E534121D10DF55CAEBEED770 /* tron.rs */ = {isa = PBXFileReference; path = tron.rs; sourceTree = "<group>"; };
+		F4F4800905FB5622D647B657 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E819F1625BC9C2C46D0F6497 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0B6AC94452949A9F1F1C16F3 /* libapp.a in Frameworks */,
+				A2AA43555E435F1594C163B3 /* CoreGraphics.framework in Frameworks */,
+				A5807FF4597095E9C9139783 /* Metal.framework in Frameworks */,
+				940999C8A5149D7837502D94 /* MetalKit.framework in Frameworks */,
+				FA5C6EA1A327B8F1D80D1998 /* QuartzCore.framework in Frameworks */,
+				8DF196A0D8F5D26A20B407C3 /* Security.framework in Frameworks */,
+				EE4311725728173785FBAC6C /* UIKit.framework in Frameworks */,
+				4CCAFEB48526186E308F9B6B /* WebKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0FF34CF942BF0B0D857A2B20 /* bindings */ = {
+			isa = PBXGroup;
+			children = (
+				90A2F0F995FD17FB5D8D4FD6 /* bindings.h */,
+			);
+			path = bindings;
+			sourceTree = "<group>";
+		};
+		17C90D6DEC920A30284D7776 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				C7999E8021CAAC3303F095AB /* offline-wallet */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		438CD1C7D7A7B8AAA4198B1E /* chains */ = {
+			isa = PBXGroup;
+			children = (
+				AE70D0777F3342AD69267D67 /* address_validation.rs */,
+				6D05F3A6D462178899A62BE6 /* bitcoin.rs */,
+				DE9A51045D6C0C899BB7ED32 /* bnb.rs */,
+				0DA8E10ECDC0C9BBEEFFF2ED /* ethereum.rs */,
+				F4F4800905FB5622D647B657 /* mod.rs */,
+				B2927C16D5858D44EADD88DF /* solana.rs */,
+				E534121D10DF55CAEBEED770 /* tron.rs */,
+			);
+			path = chains;
+			sourceTree = "<group>";
+		};
+		46390E1D6A8768DC0A30CACA /* crypto */ = {
+			isa = PBXGroup;
+			children = (
+				1499784B1B7AAA744FDB6463 /* mnemonic.rs */,
+				155C98C24F2ED08C61CFDD68 /* mod.rs */,
+			);
+			path = crypto;
+			sourceTree = "<group>";
+		};
+		6A7D6AFDF25CA95E8FDEC585 = {
+			isa = PBXGroup;
+			children = (
+				421EEE0DC05BB9B4629F5961 /* assets */,
+				E2F28A79B01C7101EDB540CC /* Assets.xcassets */,
+				40AFF73F8594999BDBF82A79 /* LaunchScreen.storyboard */,
+				FAE04B6E908FDA7C93B1E5F1 /* Externals */,
+				836F20955EBFED4846EE4435 /* offline-wallet_iOS */,
+				17C90D6DEC920A30284D7776 /* Sources */,
+				B40C434001584C6250B272CA /* src */,
+				8015ECC56CCF80965EE2A4FD /* Frameworks */,
+				A624B0744F0A2D536528C368 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8015ECC56CCF80965EE2A4FD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E4C114277EC70F516EF04A68 /* CoreGraphics.framework */,
+				9288ED062151E211EC057949 /* libapp.a */,
+				3E1451C334F65544C34420E8 /* Metal.framework */,
+				A08132AE6B01DF508C35E931 /* MetalKit.framework */,
+				E07BDEDAFBFF3AA1BBABF04F /* QuartzCore.framework */,
+				17F451CB9CF00E6E506A2BC5 /* Security.framework */,
+				DC23270035FD1669D577D3DB /* UIKit.framework */,
+				273C1895EC2B873893EA0251 /* WebKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		836F20955EBFED4846EE4435 /* offline-wallet_iOS */ = {
+			isa = PBXGroup;
+			children = (
+				BEA4EF027F325DC260B48443 /* Info.plist */,
+				89889AA1181AB923C1D2569A /* offline-wallet_iOS.entitlements */,
+			);
+			path = "offline-wallet_iOS";
+			sourceTree = "<group>";
+		};
+		A624B0744F0A2D536528C368 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B09CF3D36CB9B6104182DAA3 /* offline-wallet_iOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B40C434001584C6250B272CA /* src */ = {
+			isa = PBXGroup;
+			children = (
+				6E9029F435108AA5792C6A27 /* lib.rs */,
+				8289BE94185A9AD5F8BD83EF /* main.rs */,
+				C07A2843E6AD97590052D631 /* qrcode_gen.rs */,
+				438CD1C7D7A7B8AAA4198B1E /* chains */,
+				46390E1D6A8768DC0A30CACA /* crypto */,
+			);
+			name = src;
+			path = ../../src;
+			sourceTree = "<group>";
+		};
+		C7999E8021CAAC3303F095AB /* offline-wallet */ = {
+			isa = PBXGroup;
+			children = (
+				25B4C5922F1ECC287293F9C1 /* main.mm */,
+				0FF34CF942BF0B0D857A2B20 /* bindings */,
+			);
+			path = "offline-wallet";
+			sourceTree = "<group>";
+		};
+		FAE04B6E908FDA7C93B1E5F1 /* Externals */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Externals;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		46DEFC90B50B57AC4669B218 /* offline-wallet_iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C8E592BE41B83A89296397BC /* Build configuration list for PBXNativeTarget "offline-wallet_iOS" */;
+			buildPhases = (
+				2882FF7424A7A57091654976 /* Build Rust Code */,
+				4DEE89B4734CEC4F241B1F67 /* Sources */,
+				32211B00DE0607675F384EAD /* Resources */,
+				E819F1625BC9C2C46D0F6497 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "offline-wallet_iOS";
+			packageProductDependencies = (
+			);
+			productName = "offline-wallet_iOS";
+			productReference = B09CF3D36CB9B6104182DAA3 /* offline-wallet_iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F36196602CBE89B55019AA69 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					46DEFC90B50B57AC4669B218 = {
+						DevelopmentTeam = ZZAL7KSM56;
+					};
+				};
+			};
+			buildConfigurationList = 1B4CA433EC37305A1351F83F /* Build configuration list for PBXProject "offline-wallet" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 6A7D6AFDF25CA95E8FDEC585;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				46DEFC90B50B57AC4669B218 /* offline-wallet_iOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		32211B00DE0607675F384EAD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BD1FFBC38531CC7CECC4C3BA /* Assets.xcassets in Resources */,
+				463E31CC1BDACF0C874C15EC /* LaunchScreen.storyboard in Resources */,
+				4DB4A8F696B9CDB2502916B3 /* assets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2882FF7424A7A57091654976 /* Build Rust Code */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Rust Code";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/Externals/x86_64/${CONFIGURATION}/libapp.a",
+				"$(SRCROOT)/Externals/arm64/${CONFIGURATION}/libapp.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "pnpm tauri ios xcode-script -v --platform ${PLATFORM_DISPLAY_NAME:?} --sdk-root ${SDKROOT:?} --framework-search-paths \"${FRAMEWORK_SEARCH_PATHS:?}\" --header-search-paths \"${HEADER_SEARCH_PATHS:?}\" --gcc-preprocessor-definitions \"${GCC_PREPROCESSOR_DEFINITIONS:-}\" --configuration ${CONFIGURATION:?} ${FORCE_COLOR} ${ARCHS:?}";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4DEE89B4734CEC4F241B1F67 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				546680CF56E067339F17478F /* main.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		28CB818CEB1F1934812B1571 /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ARCHS = (
+					arm64,
+				);
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "offline-wallet_iOS/offline-wallet_iOS.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = ZZAL7KSM56;
+				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = x86_64;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\".\"",
+				);
+				INFOPLIST_FILE = "offline-wallet_iOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(inherited) $(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.offlinewallet.app;
+				PRODUCT_NAME = OfflineWallet;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = arm64;
+			};
+			name = release;
+		};
+		7695755FA023C1E10115AA62 /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ARCHS = (
+					arm64,
+				);
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "offline-wallet_iOS/offline-wallet_iOS.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = ZZAL7KSM56;
+				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = x86_64;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\".\"",
+				);
+				INFOPLIST_FILE = "offline-wallet_iOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(inherited) $(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.offlinewallet.app;
+				PRODUCT_NAME = OfflineWallet;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = arm64;
+			};
+			name = debug;
+		};
+		D9EBCCB9BF7307E908C56E14 /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = release;
+		};
+		FB9DDF75800D2D8001CE1CD7 /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1B4CA433EC37305A1351F83F /* Build configuration list for PBXProject "offline-wallet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB9DDF75800D2D8001CE1CD7 /* debug */,
+				D9EBCCB9BF7307E908C56E14 /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = debug;
+		};
+		C8E592BE41B83A89296397BC /* Build configuration list for PBXNativeTarget "offline-wallet_iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7695755FA023C1E10115AA62 /* debug */,
+				28CB818CEB1F1934812B1571 /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F36196602CBE89B55019AA69 /* Project object */;
+}

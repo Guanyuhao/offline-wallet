@@ -8,7 +8,11 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "fetch-icons": "python3 scripts/fetch_chain_icons.py"
+    "fetch-icons": "python3 scripts/fetch_chain_icons.py",
+    "ios": "tauri ios init",
+    "android": "tauri android init",
+    "build:ios": "tauri ios build --open",
+    "build:android": "tauri android build --open"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
