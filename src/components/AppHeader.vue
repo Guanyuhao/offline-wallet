@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { NButton, useDialog } from 'naive-ui';
-import { WalletOutline, MenuOutline } from '@vicons/ionicons5';
+import { MenuOutline } from '@vicons/ionicons5';
 import { NIcon } from 'naive-ui';
 import SettingsDrawer from './SettingsDrawer.vue';
 import { useWalletStore } from '../stores/wallet';
@@ -53,7 +53,7 @@ function toggleSettings() {
     <div class="app-header__content">
       <div class="app-header__left">
         <div class="app-header__logo">
-          <n-icon :component="WalletOutline" :size="24" />
+          <img src="/wallet-logo.svg" alt="Wallet Logo" class="app-header__logo-img" />
         </div>
         <div class="app-header__title">
           <h1 class="app-header__title-text">{{ t('app.name') }}</h1>
@@ -112,8 +112,20 @@ function toggleSettings() {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--apple-blue);
   flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+
+.app-header__logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.app-header__logo:hover .app-header__logo-img {
+  transform: scale(1.1);
 }
 
 .app-header__title {
