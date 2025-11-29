@@ -11,31 +11,37 @@
 ## ✨ 特色
 
 ### 🎨 极简设计
+
 - 粉紫渐变背景，像 Uniswap 一样时尚
 - 大按钮、大字体，老少皆宜
 - 流畅动画，现代体验
 
 ### 🔰 小白友好
+
 - **0专业术语** - 不需要懂 Wei、Gas、Nonce
 - **3步完成** - 创建 → 备份 → 使用
 - **清晰引导** - Emoji 图标 + 通俗文字
 
 ### 🔒 安全可靠
+
 - **完全离线** - 无需联网即可使用
 - **私钥安全** - 所有操作在本地完成
 - **即时擦除** - 签名后立即清除敏感数据
 
 ### 🌍 国际化
+
 - 简体中文
 - English
 - 一键切换
 
 ### UI 选择
+
 **Naive UI** ⭐ 推荐
+
 - **特点**: 简洁、现代、TypeScript 友好
 - **风格**: 接近 Apple 设计语言
 - **安装**: `npm i -D naive-ui @vicons/ionicons5`
-- **优势**: 
+- **优势**:
   - 组件丰富且简洁
   - 支持暗色模式
   - 性能优秀
@@ -63,15 +69,18 @@ pnpm tauri build
 ### 1. 创建钱包（3步走）
 
 #### 第一步：开始
+
 - 点击"✨ 创建新钱包"
 
 #### 第二步：备份
+
 - 点击显示助记词
 - 用纸笔抄写12个单词
 - 勾选"我已安全备份"
 - 点击"我已备份完成"
 
 #### 第三步：使用
+
 - 查看你的地址
 - 复制地址收款
 - 签名交易转账
@@ -146,16 +155,19 @@ pnpm tauri build
 ## 🎯 适合人群
 
 ### 👴 老年人
+
 - 大按钮，容易点
 - 大字体，看得清
 - 简单话，能理解
 
 ### 👦 年轻人
+
 - 好看的设计
 - 流畅的动画
 - 快速的操作
 
 ### 🔰 新手
+
 - 0专业知识
 - 3步就能用
 - 有问题有提示
@@ -164,31 +176,22 @@ pnpm tauri build
 
 ## 📊 技术栈
 
-- **前端**: Vue 3 + TypeScript + Pinia + Vue I18n
+- **前端**: Vue 3 + TypeScript + Pinia + Vue I18n + Naive UI
 - **后端**: Rust + Tauri 2.0
-- **加密**: bip39 + ethers + tiny-hderive
-- **样式**: 原生 CSS（Design Tokens）
+- **加密**: AES-256-GCM + Argon2id + Web Crypto API
+- **测试**: Vitest + Vue Test Utils + Testing Library
+- **代码质量**: ESLint + Prettier + TypeScript 严格模式
 
----
-
-## 🔧 项目结构
-
-```
-src/
-├── i18n/           # 国际化
-├── stores/         # Pinia 状态
-├── components/     # 公共组件
-├── styles/         # 设计系统
-└── App.vue         # 主应用（极简版）
-```
+> 详细技术栈和项目结构请参考 [PRODUCTION.md](./PRODUCTION.md)
 
 ---
 
 ## 📖 文档
 
-- [REDESIGN-NOTES.md](./REDESIGN-NOTES.md) - 极简化改造说明
+- [TESTING.md](./TESTING.md) - 测试指南（测试标准、运行方法、最佳实践）
+- [PRODUCTION.md](./PRODUCTION.md) - 生产级别改造指南（包含安全实施）
+- [BUILD-GUIDE.md](./BUILD-GUIDE.md) - 构建指南（Windows、Android、macOS，包含图标设置）
 - [ROADMAP.md](./ROADMAP.md) - 功能路线图
-- [UPGRADE-SUMMARY.md](./UPGRADE-SUMMARY.md) - 升级总结
 
 ---
 
@@ -196,13 +199,13 @@ src/
 
 ### 术语简化对照
 
-| 专业术语 | 简化表达 |
-|---------|---------|
-| BIP39 助记词 | 助记词 |
-| 1000000000000000000 Wei | 1 ETH |
-| Gas Price / Gas Limit | （隐藏，使用默认值）|
-| Nonce | （隐藏）|
-| 派生路径 m/44'/60'/0'/0/0 | （隐藏）|
+| 专业术语                  | 简化表达             |
+| ------------------------- | -------------------- |
+| BIP39 助记词              | 助记词               |
+| 1000000000000000000 Wei   | 1 ETH                |
+| Gas Price / Gas Limit     | （隐藏，使用默认值） |
+| Nonce                     | （隐藏）             |
+| 派生路径 m/44'/60'/0'/0/0 | （隐藏）             |
 
 ### 自动处理的技术细节
 
