@@ -77,7 +77,6 @@ async function handleFileUpload(options: { file: UploadFileInfo; fileList: Uploa
     // 动态导入 jsQR（桌面端需要）
     let jsQR: any;
     try {
-      // @ts-expect-error - 动态导入 jsQR
       const jsQRModule = await import('jsqr');
       jsQR = jsQRModule.default || jsQRModule;
     } catch (importError: any) {
@@ -146,7 +145,6 @@ async function startCameraScan() {
     // 动态导入 barcode-scanner（移动端需要）
     let barcodeScanner: any;
     try {
-      // @ts-expect-error - 动态导入 barcode-scanner
       const module = await import('@tauri-apps/plugin-barcode-scanner');
       // barcode-scanner 插件导出的是命名导出，不是 default 导出
       barcodeScanner = module;
