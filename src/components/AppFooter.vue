@@ -8,9 +8,9 @@ const { t } = useI18n();
 <template>
   <footer class="app-footer">
     <div class="app-footer__content">
-      <n-text depth="3" class="app-footer__text">
+      <NText depth="3" class="app-footer__text">
         {{ t('app.subtitle') }}
-      </n-text>
+      </NText>
     </div>
   </footer>
 </template>
@@ -51,11 +51,10 @@ const { t } = useI18n();
   .app-footer {
     min-height: 56px; /* 移动端与 header 保持一致 */
   }
-  
+
   .app-footer__content {
     padding: var(--apple-spacing-sm) var(--apple-spacing-md);
     min-height: 56px;
   }
 }
 </style>
-

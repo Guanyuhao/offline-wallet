@@ -9,24 +9,27 @@ const uiStore = useUIStore();
 
 const menuOptions = computed(() => [
   {
-    label: () => h('span', { style: 'display: flex; align-items: center; gap: 8px;' }, [
-      h('span', '◐'),
-      h('span', t('theme.system'))
-    ]),
+    label: () =>
+      h('span', { style: 'display: flex; align-items: center; gap: 8px;' }, [
+        h('span', '◐'),
+        h('span', t('theme.system')),
+      ]),
     key: 'auto',
   },
   {
-    label: () => h('span', { style: 'display: flex; align-items: center; gap: 8px;' }, [
-      h('span', '○'),
-      h('span', t('theme.light'))
-    ]),
+    label: () =>
+      h('span', { style: 'display: flex; align-items: center; gap: 8px;' }, [
+        h('span', '○'),
+        h('span', t('theme.light')),
+      ]),
     key: 'light',
   },
   {
-    label: () => h('span', { style: 'display: flex; align-items: center; gap: 8px;' }, [
-      h('span', '●'),
-      h('span', t('theme.dark'))
-    ]),
+    label: () =>
+      h('span', { style: 'display: flex; align-items: center; gap: 8px;' }, [
+        h('span', '●'),
+        h('span', t('theme.dark')),
+      ]),
     key: 'dark',
   },
 ]);
@@ -37,11 +40,11 @@ function handleSelectTheme(key: string) {
 </script>
 
 <template>
-  <n-menu
+  <NMenu
     :options="menuOptions"
     :value="uiStore.theme"
-    @update:value="handleSelectTheme"
     class="theme-menu"
+    @update:value="handleSelectTheme"
   />
 </template>
 

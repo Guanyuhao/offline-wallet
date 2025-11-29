@@ -1,93 +1,84 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NDrawer, NDrawerContent, NDivider, NText, NButton, useDialog } from 'naive-ui';
-import LanguageSwitcher from './LanguageSwitcher.vue';
-import ThemeSwitcher from './ThemeSwitcher.vue';
-import { useAppMessage } from '../composables/useMessage';
+import { NDrawer, NDrawerContent, NSelect, NText } from 'naive-ui';
+import { useUIStore, type ThemeType } from '../stores/ui';
+import { availableLanguages, setLanguage } from '../i18n';
 
-const { t } = useI18n();
-const dialog = useDialog();
+const { t, locale } = useI18n();
+const uiStore = useUIStore();
 
 const props = defineProps<{
   show: boolean;
-  showExit?: boolean;
 }>();
 
 const emit = defineEmits<{
   (e: 'update:show', value: boolean): void;
-  (e: 'exit'): void;
 }>();
-
-function handleExit() {
-  dialog.warning({
-    title: t('wallet.exitConfirm.title'),
-    content: t('wallet.exitConfirm.content'),
-    positiveText: t('wallet.exitConfirm.confirm'),
-    negativeText: t('common.cancel'),
-    onPositiveClick: () => {
-      emit('exit');
-      try {
-        const message = useAppMessage();
-        message.success(t('wallet.exitSuccess'));
-      } catch (error) {
-        console.log('Exit successful');
-      }
-    },
-  });
-}
 
 const showDrawer = computed({
   get: () => props.show,
-  set: (value) => emit('update:show', value)
+  set: (value) => emit('update:show', value),
 });
+
+const themeOptions = [
+  { label: t('theme.system'), value: 'auto' },
+  { label: t('theme.light'), value: 'light' },
+  { label: t('theme.dark'), value: 'dark' },
+];
+
+const languageOptions = availableLanguages.map((lang) => ({
+  label: lang.nativeName,
+  value: lang.code,
+}));
+
+function handleThemeChange(value: string) {
+  uiStore.setTheme(value as ThemeType);
+}
+
+function handleLanguageChange(value: string) {
+  setLanguage(value);
+}
 </script>
 
 <template>
-  <n-drawer
+  <NDrawer
     v-model:show="showDrawer"
     :width="320"
     placement="right"
     :mask-closable="true"
     class="settings-drawer"
   >
-    <n-drawer-content :title="t('menu.title')" :closable="true">
+    <NDrawerContent :title="t('menu.title')" :closable="true">
       <div class="settings-content">
         <!-- 主题设置 -->
         <div class="settings-section">
-          <n-text depth="3" class="settings-section-label">
+          <NText depth="3" class="settings-section-label">
             {{ t('settings.theme') }}
-          </n-text>
-          <ThemeSwitcher />
+          </NText>
+          <NSelect
+            :value="uiStore.theme"
+            :options="themeOptions"
+            class="settings-select"
+            @update:value="handleThemeChange"
+          />
         </div>
-
-        <n-divider />
 
         <!-- 语言设置 -->
         <div class="settings-section">
-          <n-text depth="3" class="settings-section-label">
+          <NText depth="3" class="settings-section-label">
             {{ t('settings.language') }}
-          </n-text>
-          <LanguageSwitcher />
-        </div>
-
-        <!-- 退出钱包 -->
-        <n-divider v-if="props.showExit" />
-
-        <div v-if="props.showExit" class="settings-section">
-          <n-button
-            type="error"
-            block
-            size="large"
-            class="exit-wallet-btn"
-            @click="handleExit"
-          >
-            {{ t('wallet.exit') }}
-          </n-button>
+          </NText>
+          <NSelect
+            :value="locale"
+            :options="languageOptions"
+            class="settings-select"
+            @update:value="handleLanguageChange"
+          />
         </div>
       </div>
-    </n-drawer-content>
-  </n-drawer>
+    </NDrawerContent>
+  </NDrawer>
 </template>
 
 <style scoped>
@@ -117,8 +108,7 @@ const showDrawer = computed({
   color: var(--apple-text-tertiary);
 }
 
-.exit-wallet-btn {
-  margin-top: var(--apple-spacing-md);
+.settings-select {
+  width: 100%;
 }
-
 </style>

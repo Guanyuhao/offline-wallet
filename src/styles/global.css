@@ -20,6 +20,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* 确保html背景色与header一致，防止滚动时透视 */
+  background-color: var(--apple-bg-primary, var(--bg-primary));
 }
 
 body {
@@ -27,14 +29,23 @@ body {
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
   color: var(--text-primary);
-  background-color: var(--bg-primary);
+  background-color: var(--apple-bg-primary, var(--bg-primary));
   min-height: 100vh;
-  transition: background-color var(--transition-base), color var(--transition-base);
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base);
+  /* 防止滚动时内容透视 */
+  overflow-x: hidden;
 }
 
 /* ============ 排版 ============ */
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
   color: var(--text-primary);
@@ -108,7 +119,8 @@ pre {
 
 /* ============ 列表 ============ */
 
-ul, ol {
+ul,
+ol {
   margin-left: var(--spacing-6);
   margin-bottom: var(--spacing-4);
 }
@@ -140,7 +152,9 @@ select {
   background-color: var(--bg-primary);
   border: var(--input-border-width) solid var(--border-primary);
   border-radius: var(--radius-base);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 textarea {
@@ -173,8 +187,8 @@ select:disabled {
 }
 
 /* Checkbox 和 Radio */
-input[type="checkbox"],
-input[type="radio"] {
+input[type='checkbox'],
+input[type='radio'] {
   width: auto;
   height: auto;
   margin-right: var(--spacing-2);
@@ -358,7 +372,7 @@ button:focus-visible {
     background: white;
     color: black;
   }
-  
+
   button,
   .no-print {
     display: none !important;
@@ -378,4 +392,3 @@ button:focus-visible {
     font-size: 18px;
   }
 }
-

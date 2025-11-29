@@ -1,51 +1,38 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NButton, useDialog } from 'naive-ui';
+import { NButton } from 'naive-ui';
 import { MenuOutline } from '@vicons/ionicons5';
 import { NIcon } from 'naive-ui';
 import SettingsDrawer from './SettingsDrawer.vue';
-import { useWalletStore } from '../stores/wallet';
-import { useAppMessage } from '../composables/useMessage';
 
 const { t } = useI18n();
-const walletStore = useWalletStore();
-const dialog = useDialog();
 
 const props = defineProps<{
-  showExit?: boolean;
+  showSettingsDrawer?: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: 'exit'): void;
+  (e: 'update:showSettingsDrawer', value: boolean): void;
 }>();
 
-const showExitButton = computed(() => props.showExit && walletStore.isWalletCreated);
 const showSettings = ref(false);
 
-function handleExit() {
-  dialog.warning({
-    title: t('wallet.exitConfirm.title'),
-    content: t('wallet.exitConfirm.content'),
-    positiveText: t('wallet.exitConfirm.confirm'),
-    negativeText: t('common.cancel'),
-    onPositiveClick: () => {
-      emit('exit');
-      // 延迟调用 message，确保 API 已初始化
-      try {
-        const message = useAppMessage();
-        message.success(t('wallet.exitSuccess'));
-      } catch (error) {
-        // Message API 未初始化时静默失败
-        console.log('Exit successful');
-      }
-    },
-  });
+function toggleSettings() {
+  const newValue = !showSettings.value;
+  showSettings.value = newValue;
+  emit('update:showSettingsDrawer', newValue);
 }
 
-function toggleSettings() {
-  showSettings.value = !showSettings.value;
-}
+// 监听外部控制
+watch(
+  () => props.showSettingsDrawer,
+  (newValue) => {
+    if (newValue !== undefined) {
+      showSettings.value = newValue;
+    }
+  }
+);
 </script>
 
 <template>
@@ -59,44 +46,34 @@ function toggleSettings() {
           <h1 class="app-header__title-text">{{ t('app.name') }}</h1>
         </div>
       </div>
-      
+
       <div class="app-header__actions">
-        <n-button
+        <NButton
           type="default"
           size="small"
           class="app-header__menu-btn"
-          @click="toggleSettings"
           :title="t('menu.title')"
+          @click="toggleSettings"
         >
-          <n-icon :component="MenuOutline" :size="20" />
-        </n-button>
+          <NIcon :component="MenuOutline" :size="20" />
+        </NButton>
       </div>
     </div>
-    
-    <SettingsDrawer 
-      v-model:show="showSettings" 
-      :show-exit="showExitButton"
-      @exit="handleExit"
+
+    <SettingsDrawer
+      v-model:show="showSettings"
+      @update:show="(val) => emit('update:showSettingsDrawer', val)"
     />
   </header>
 </template>
 
 <style scoped>
 .app-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: var(--apple-bg-primary);
-  border-bottom: 0.5px solid var(--apple-separator);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  flex-shrink: 0; /* 防止 header 被压缩 */
-  min-height: 64px; /* 统一高度 */
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
-  width: 100%;
+  background: transparent;
 }
 
 .app-header__content {
@@ -107,7 +84,7 @@ function toggleSettings() {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  min-height: 64px; /* 与 footer 保持一致 */
+  height: 100%;
 }
 
 .app-header__left {
@@ -176,15 +153,10 @@ function toggleSettings() {
 }
 
 @media (max-width: 640px) {
-  .app-header {
-    min-height: 56px; /* 移动端稍小一点 */
-  }
-  
   .app-header__content {
     padding: var(--apple-spacing-sm) var(--apple-spacing-md);
-    min-height: 56px;
   }
-  
+
   .app-header__title-text {
     font-size: var(--apple-font-size-headline);
   }

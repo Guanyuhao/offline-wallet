@@ -11,6 +11,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- This component only sets up the message API -->
+  <div style="display: none">
+    <!-- This component only sets up the message API -->
+  </div>
 </template>
-

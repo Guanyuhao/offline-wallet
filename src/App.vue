@@ -1,171 +1,166 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { NConfigProvider, NGlobalStyle, NLoadingBarProvider, darkTheme, NMessageProvider, NDialogProvider } from 'naive-ui';
-import { useWalletStore } from './stores/wallet';
-import { useUIStore } from './stores/ui';
+import { ref, computed, onMounted } from 'vue';
+import {
+  NConfigProvider,
+  NGlobalStyle,
+  NLoadingBarProvider,
+  darkTheme,
+  NMessageProvider,
+  NDialogProvider,
+  NLayout,
+  NLayoutHeader,
+  NLayoutContent,
+  NLayoutFooter,
+} from 'naive-ui';
 import AppHeader from './components/AppHeader.vue';
-import AppFooter from './components/AppFooter.vue';
+import SplashScreen from './components/SplashScreen.vue';
 import StartPage from './components/start/StartPage.vue';
 import BackupPage from './components/backup/BackupPage.vue';
 import WalletPage from './components/wallet/WalletPage.vue';
+import UnlockWallet from './components/UnlockWallet.vue';
+import BottomNavigation from './components/BottomNavigation.vue';
+import SecurityStatusBanner from './components/wallet/SecurityStatusBanner.vue';
 import MessageSetup from './components/MessageSetup.vue';
+import ExitConfirmDialog from './components/ExitConfirmDialog.vue';
+import ErrorBoundary from './components/ErrorBoundary.vue';
+import EncryptionGuideDialog from './components/EncryptionGuideDialog.vue';
+import { useAutoWebViewPerformance } from './composables/useWebViewPerformance';
+import { useAutoLock } from './composables/useAutoLock';
+import { useAppLayout } from './composables/useAppLayout';
+import { useAppState } from './composables/useAppState';
+import { useTheme } from './composables/useTheme';
+import { useUIStore } from './stores/ui';
 
-const walletStore = useWalletStore();
+// 初始化 composables
+useAutoLock();
+useAutoWebViewPerformance();
+const { headerStyle } = useAppLayout();
+const { isDarkMode } = useTheme();
+const appState = useAppState();
 const uiStore = useUIStore();
-const { t } = useI18n();
 
-const step = ref<'start' | 'backup' | 'wallet'>('start');
-const mnemonic = ref('');
-const wordCount = ref<12 | 24>(12);
+// 开屏页面状态
+const showSplash = ref(true);
 
-// 当前是否为深色模式
-const isDarkMode = ref(false);
+// 使用 computed 包装状态值以解决 TypeScript 类型问题
+const step = computed(() => appState.step.value);
+const mnemonic = computed(() => appState.mnemonic.value);
+const wordCount = computed(() => appState.wordCount.value);
+const showExitDialog = computed({
+  get: () => appState.showExitDialog.value,
+  set: (val) => {
+    appState.showExitDialog.value = val;
+  },
+});
+const showEncryptionGuide = computed({
+  get: () => appState.showEncryptionGuide.value,
+  set: (val) => {
+    appState.showEncryptionGuide.value = val;
+  },
+});
+const showSettingsDrawer = computed({
+  get: () => appState.showSettingsDrawer.value,
+  set: (val) => {
+    appState.showSettingsDrawer.value = val;
+  },
+});
 
-// 更新深色模式状态
-const updateNaiveTheme = () => {
-  const root = document.documentElement;
-  isDarkMode.value = root.classList.contains('dark');
-};
+// Wallet 页面的 tab 状态（只在 wallet 页面时使用）
+const walletActiveTab = ref<'account' | 'transaction' | 'settings'>('account');
+const showWalletFooter = computed(() => step.value === 'wallet');
 
-import { getFriendlyErrorMessage } from './utils/errorHandler';
-
-async function handleCreate(data: { wordCount: 12 | 24; mnemonic: string }) {
-  wordCount.value = data.wordCount;
-  mnemonic.value = data.mnemonic;
-  step.value = 'backup';
-}
-
-async function handleImport(importedMnemonic: string) {
-  try {
-    await walletStore.createWallet(importedMnemonic, '');
-    step.value = 'wallet';
-    uiStore.showSuccess(t('messages.walletImported'));
-  } catch (error) {
-    const friendlyError = getFriendlyErrorMessage(error, t);
-    if (friendlyError) {
-      uiStore.showError(friendlyError);
-    }
-  }
-}
-
-async function handleBackupFinish() {
-  try {
-    uiStore.showLoading();
-    await walletStore.createWallet(mnemonic.value, '');
-    step.value = 'wallet';
-    uiStore.showSuccess(t('messages.walletCreated'));
-  } catch (error) {
-    const friendlyError = getFriendlyErrorMessage(error, t);
-    if (friendlyError) {
-      uiStore.showError(friendlyError);
-    }
-  } finally {
-    uiStore.hideLoading();
-  }
-}
-
-function handleBackupCancel() {
-  walletStore.clearWallet();
-  mnemonic.value = '';
-  step.value = 'start';
-}
-
-function handleExit() {
-  walletStore.clearWallet();
-  mnemonic.value = '';
-  step.value = 'start';
+// 开屏页面完成后的处理
+async function handleSplashComplete() {
+  showSplash.value = false;
+  await appState.handleSplashComplete();
 }
 
 onMounted(() => {
   uiStore.initTheme();
-  updateNaiveTheme();
-
-  // 监听主题变化事件
-  window.addEventListener('theme-changed', updateNaiveTheme);
-
-  // 监听 DOM 变化以更新主题
-  const observer = new MutationObserver(() => {
-    updateNaiveTheme();
-  });
-
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['class']
-  });
-});
-
-// 监听 store 中的主题变化
-watch(() => uiStore.theme, () => {
-  updateNaiveTheme();
 });
 </script>
 
 <template>
-  <n-config-provider :theme="isDarkMode ? darkTheme : null">
-    <n-global-style />
-    <n-loading-bar-provider>
-      <n-message-provider>
-        <n-dialog-provider>
-          <MessageSetup />
-          <div class="app">
-            <AppHeader :show-exit="step === 'wallet'" @exit="handleExit" />
-            <main class="app-content">
-              <StartPage v-if="step === 'start'" @create="handleCreate" @import="handleImport" />
+  <NConfigProvider :theme="isDarkMode ? darkTheme : null">
+    <NGlobalStyle />
+    <NLoadingBarProvider>
+      <NMessageProvider>
+        <NDialogProvider>
+          <ErrorBoundary>
+            <MessageSetup />
+            <ExitConfirmDialog
+              v-model:show="showExitDialog"
+              @confirmed="appState.handleExitConfirmed"
+            />
+            <EncryptionGuideDialog
+              v-model:show="showEncryptionGuide"
+              @enable="appState.handleEncryptionGuideEnable"
+              @skip="appState.handleEncryptionGuideSkip"
+            />
 
-              <BackupPage v-if="step === 'backup'" :mnemonic="mnemonic" :word-count="wordCount"
-                @finish="handleBackupFinish" @cancel="handleBackupCancel" />
+            <!-- 开屏页面 -->
+            <SplashScreen v-if="showSplash" @complete="handleSplashComplete" />
 
-              <WalletPage v-if="step === 'wallet'" />
-            </main>
+            <!-- 主应用内容 - 使用 Naive UI Layout -->
+            <NLayout v-else style="height: 100vh" content-class="layout-content-wrapper">
+              <!-- Header - 所有页面共用 -->
+              <NLayoutHeader bordered :style="headerStyle">
+                <AppHeader v-model:show-settings-drawer="showSettingsDrawer" />
+              </NLayoutHeader>
 
-            <AppFooter />
-          </div>
-        </n-dialog-provider>
-      </n-message-provider>
-    </n-loading-bar-provider>
-  </n-config-provider>
+              <!-- Content - flex: 1, 内容超过后可滚动 -->
+              <NLayoutContent :native-scrollbar="false">
+                <!-- 钱包页面的安全状态横幅 -->
+                <SecurityStatusBanner
+                  v-if="step === 'wallet'"
+                  @enable="walletActiveTab = 'settings'"
+                />
+
+                <!-- 页面内容 -->
+                <StartPage
+                  v-if="step === 'start'"
+                  @create="appState.handleCreate"
+                  @import="appState.handleImport"
+                />
+
+                <BackupPage
+                  v-if="step === 'backup'"
+                  :mnemonic="mnemonic"
+                  :word-count="wordCount"
+                  @finish="appState.handleBackupFinish"
+                  @cancel="appState.handleBackupCancel"
+                />
+
+                <UnlockWallet
+                  v-if="step === 'unlock'"
+                  @unlocked="appState.handleWalletUnlocked"
+                  @forgot-password="appState.handleForgotPassword"
+                />
+
+                <WalletPage
+                  v-if="step === 'wallet'"
+                  v-model:show-settings-drawer="showSettingsDrawer"
+                  :active-tab="walletActiveTab"
+                  @exit="appState.handleExit"
+                />
+              </NLayoutContent>
+
+              <!-- Footer - 只在钱包页面显示 -->
+              <NLayoutFooter v-if="showWalletFooter">
+                <BottomNavigation
+                  :active-tab="walletActiveTab"
+                  @update:active-tab="(tab) => (walletActiveTab = tab)"
+                />
+              </NLayoutFooter>
+            </NLayout>
+          </ErrorBoundary>
+        </NDialogProvider>
+      </NMessageProvider>
+    </NLoadingBarProvider>
+  </NConfigProvider>
 </template>
 
 <style>
-/* ==================== 全局样式 ==================== */
-.app {
-  min-height: 100vh;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: var(--apple-bg-primary);
-  font-family: var(--apple-font);
-  color: var(--apple-text-primary);
-  overflow: hidden;
-  padding-top: 64px;
-  /* Header 固定高度（桌面端） */
-  padding-bottom: 64px;
-  /* Footer 固定高度（桌面端） */
-}
-
-/* 移动端适配 */
-@media (max-width: 640px) {
-  .app {
-    padding-top: 56px;
-    /* Header 固定高度（移动端） */
-    padding-bottom: 56px;
-    /* Footer 固定高度（移动端） */
-  }
-}
-
-/* ==================== 主内容区域 ==================== */
-.app-content {
-  flex: 1;
-  width: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  min-height: 0;
-  /* 重要：允许 flex 子元素缩小 */
-  -webkit-overflow-scrolling: touch;
-  /* iOS 平滑滚动 */
-}
-
 /* ==================== Naive UI 主题定制 ==================== */
 :root {
   --n-color-primary: var(--apple-blue);
@@ -222,20 +217,9 @@ watch(() => uiStore.theme, () => {
   --n-color-hover: var(--apple-bg-secondary);
 }
 
-/* ==================== 动画 ==================== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.app>* {
-  animation: fadeIn var(--apple-transition-base) ease-out;
+.layout-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 </style>

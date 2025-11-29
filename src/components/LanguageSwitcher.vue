@@ -19,11 +19,11 @@ function handleSelectLanguage(key: string) {
 </script>
 
 <template>
-  <n-menu
+  <NMenu
     :options="menuOptions"
     :value="locale"
-    @update:value="handleSelectLanguage"
     class="language-menu"
+    @update:value="handleSelectLanguage"
   />
 </template>
 

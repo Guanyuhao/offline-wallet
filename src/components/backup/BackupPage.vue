@@ -22,7 +22,7 @@ const understood = ref(false);
 
 function copyMnemonic() {
   navigator.clipboard.writeText(props.mnemonic).then(() => {
-    uiStore.showSuccess(t('backup.copyMnemonic') + ' ' + t('common.success'));
+    uiStore.showSuccess(`${t('backup.copyMnemonic')} ${t('common.success')}`);
   });
 }
 
@@ -37,29 +37,25 @@ function handleFinish() {
 
 <template>
   <div class="backup-page">
-    <n-card class="backup-card">
+    <NCard class="backup-card">
       <h2 class="card-title">{{ t('backup.title') }}</h2>
-      <n-text depth="3" class="card-description">{{ t('backup.description') }}</n-text>
+      <NText depth="3" class="card-description">{{ t('backup.description') }}</NText>
 
       <div class="mnemonic-container">
         <div v-if="!showMnemonic" class="mnemonic-hidden" @click="showMnemonic = true">
           <div class="hidden-icon">●</div>
-          <n-text depth="3">{{ t('backup.clickToShow') }}</n-text>
-          <n-text depth="3" class="word-count-text">{{ wordCount }} {{ t('common.words') }}</n-text>
+          <NText depth="3">{{ t('backup.clickToShow') }}</NText>
+          <NText depth="3" class="word-count-text">{{ wordCount }} {{ t('common.words') }}</NText>
         </div>
         <div v-else class="mnemonic-words" :class="{ 'words-24': wordCount === 24 }">
-          <span
-            v-for="(word, i) in mnemonic.split(' ')"
-            :key="i"
-            class="word-item"
-          >
+          <span v-for="(word, i) in mnemonic.split(' ')" :key="i" class="word-item">
             <span class="word-number">{{ i + 1 }}</span>
             <span class="word-text">{{ word }}</span>
           </span>
         </div>
       </div>
 
-      <n-button
+      <NButton
         v-if="showMnemonic"
         type="default"
         size="medium"
@@ -68,43 +64,32 @@ function handleFinish() {
         @click="copyMnemonic"
       >
         {{ t('backup.copyMnemonic') }}
-      </n-button>
+      </NButton>
 
-      <n-alert type="warning" class="warning-alert">
+      <NAlert type="warning" class="warning-alert">
         <template #header>
-          <n-text strong>{{ t('backup.warning.title') }}</n-text>
+          <NText strong>{{ t('backup.warning.title') }}</NText>
         </template>
         <ul class="warning-list">
           <li>{{ t('backup.warning.tip1') }}</li>
           <li>{{ t('backup.warning.tip2') }}</li>
           <li>{{ t('backup.warning.tip3') }}</li>
         </ul>
-      </n-alert>
+      </NAlert>
 
-      <n-checkbox v-model:checked="understood" class="understand-checkbox">
+      <NCheckbox v-model:checked="understood" class="understand-checkbox">
         {{ t('backup.understand') }}
-      </n-checkbox>
+      </NCheckbox>
 
-      <n-space vertical :size="12">
-        <n-button
-          type="info"
-          size="large"
-          block
-          :disabled="!understood"
-          @click="handleFinish"
-        >
+      <NSpace vertical :size="12">
+        <NButton type="info" size="large" block :disabled="!understood" @click="handleFinish">
           {{ t('backup.finish') }}
-        </n-button>
-        <n-button
-          type="default"
-          size="large"
-          block
-          @click="emit('cancel')"
-        >
+        </NButton>
+        <NButton type="default" size="large" block @click="emit('cancel')">
           {{ t('common.cancel') }}
-        </n-button>
-      </n-space>
-    </n-card>
+        </NButton>
+      </NSpace>
+    </NCard>
   </div>
 </template>
 
@@ -227,7 +212,19 @@ function handleFinish() {
 
 .understand-checkbox {
   margin-bottom: var(--apple-spacing-lg);
-  display: block;
+  display: flex;
+  align-items: center;
+}
+
+.understand-checkbox :deep(.n-checkbox-box) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.understand-checkbox :deep(.n-checkbox__label) {
+  display: flex;
+  align-items: center;
+  line-height: 1.5;
 }
 </style>
-
