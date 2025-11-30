@@ -34,26 +34,25 @@ function handleCopy() {
 </script>
 
 <template>
-  <n-popover v-if="props.address && props.address.length > prefixLength + suffixLength + 3" trigger="hover">
+  <NPopover
+    v-if="props.address && props.address.length > prefixLength + suffixLength + 3"
+    trigger="hover"
+  >
     <template #trigger>
-      <n-text
-        class="address-ellipsis-text"
-        :class="{ 'is-copyable': copyable }"
-        @click="handleCopy"
-      >
+      <NText class="address-ellipsis-text" :class="{ 'is-copyable': copyable }" @click="handleCopy">
         {{ displayAddress }}
-      </n-text>
+      </NText>
     </template>
     <code class="address-full">{{ address }}</code>
-  </n-popover>
-  <n-text
+  </NPopover>
+  <NText
     v-else
     class="address-ellipsis-text"
     :class="{ 'is-copyable': copyable }"
     @click="handleCopy"
   >
     {{ displayAddress }}
-  </n-text>
+  </NText>
 </template>
 
 <style scoped>
@@ -86,10 +85,9 @@ function handleCopy() {
   .address-ellipsis-text {
     font-size: var(--apple-font-size-caption-1);
   }
-  
+
   .address-full {
     max-width: 250px;
   }
 }
 </style>
-

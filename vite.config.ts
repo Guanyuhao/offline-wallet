@@ -1,12 +1,30 @@
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+
+// 性能优化插件
+const performanceOptimization = () => ({
+  name: 'performance-optimization',
+  transformIndexHtml(html: string) {
+    // 在生产环境注入性能优化 meta 标签
+    if (process.env.NODE_ENV === 'production') {
+      return html.replace(
+        '<head>',
+        `<head>
+    <!-- 性能优化 -->
+    <meta http-equiv="x-dns-prefetch-control" content="on" />
+    <meta name="format-detection" content="telephone=no" />`
+      );
+    }
+    return html;
+  },
+});
 
 // @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
 export default defineConfig(async () => ({
-  plugins: [vue()],
+  plugins: [vue(), performanceOptimization()],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
@@ -19,14 +37,14 @@ export default defineConfig(async () => ({
     host: host || false,
     hmr: host
       ? {
-          protocol: "ws",
+          protocol: 'ws',
           host,
           port: 1421,
         }
       : undefined,
     watch: {
       // 3. tell Vite to ignore watching `src-tauri`
-      ignored: ["**/src-tauri/**"],
+      ignored: ['**/src-tauri/**'],
     },
   },
   build: {

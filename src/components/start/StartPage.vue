@@ -61,39 +61,37 @@ async function handleImport() {
 
 <template>
   <div class="start-page">
-    <n-card class="start-card">
+    <NAlert type="info" class="tip-alert">
+      {{ t('start.tip') }}
+    </NAlert>
+
+    <NCard class="start-card">
       <h2 class="card-title">{{ t('start.title') }}</h2>
 
       <div class="word-count-section">
-        <n-text depth="3" class="section-label">{{ t('start.wordCountLabel') }}</n-text>
-        <n-radio-group v-model:value="wordCount" class="word-count-radio">
-          <n-radio :value="12">
+        <NText depth="3" class="section-label">{{ t('start.wordCountLabel') }}</NText>
+        <NRadioGroup v-model:value="wordCount" class="word-count-radio">
+          <NRadio :value="12">
             {{ t('start.words12') }}
-            <n-text depth="3" class="recommend-badge">{{ t('start.recommended') }}</n-text>
-          </n-radio>
-          <n-radio :value="24">
+            <NText depth="3" class="recommend-badge">{{ t('start.recommended') }}</NText>
+          </NRadio>
+          <NRadio :value="24">
             {{ t('start.words24') }}
-            <n-text depth="3" class="recommend-badge">{{ t('start.moreSafe') }}</n-text>
-          </n-radio>
-        </n-radio-group>
+            <NText depth="3" class="recommend-badge">{{ t('start.moreSafe') }}</NText>
+          </NRadio>
+        </NRadioGroup>
       </div>
 
-      <n-button
-        type="info"
-        size="large"
-        block
-        class="action-button"
-        @click="handleCreate"
-      >
+      <NButton type="info" size="large" block class="action-button" @click="handleCreate">
         {{ t('start.createNew') }}
-      </n-button>
+      </NButton>
 
       <div class="divider">
-        <n-text depth="3">{{ t('common.or') }}</n-text>
+        <NText depth="3">{{ t('common.or') }}</NText>
       </div>
 
       <div class="import-section">
-        <n-input
+        <NInput
           v-model:value="inputMnemonic"
           type="textarea"
           :placeholder="t('start.importPlaceholder')"
@@ -102,42 +100,32 @@ async function handleImport() {
           autocomplete="off"
           :show-count="false"
         />
-        <n-button
-          type="default"
-          size="large"
-          block
-          class="action-button"
-          @click="handleImport"
-        >
+        <NButton type="default" size="large" block class="action-button" @click="handleImport">
           {{ t('start.import') }}
-        </n-button>
+        </NButton>
       </div>
-    </n-card>
-
-    <n-alert type="info" class="tip-alert">
-      {{ t('start.tip') }}
-    </n-alert>
+    </NCard>
 
     <div class="features-section">
       <div class="feature-item">
         <div class="feature-icon">●</div>
         <div class="feature-content">
-          <n-text strong class="feature-title">{{ t('start.features.offline.title') }}</n-text>
-          <n-text depth="3" class="feature-desc">{{ t('start.features.offline.desc') }}</n-text>
+          <NText strong class="feature-title">{{ t('start.features.offline.title') }}</NText>
+          <NText depth="3" class="feature-desc">{{ t('start.features.offline.desc') }}</NText>
         </div>
       </div>
       <div class="feature-item">
         <div class="feature-icon">●</div>
         <div class="feature-content">
-          <n-text strong class="feature-title">{{ t('start.features.secure.title') }}</n-text>
-          <n-text depth="3" class="feature-desc">{{ t('start.features.secure.desc') }}</n-text>
+          <NText strong class="feature-title">{{ t('start.features.secure.title') }}</NText>
+          <NText depth="3" class="feature-desc">{{ t('start.features.secure.desc') }}</NText>
         </div>
       </div>
       <div class="feature-item">
         <div class="feature-icon">●</div>
         <div class="feature-content">
-          <n-text strong class="feature-title">{{ t('start.features.erase.title') }}</n-text>
-          <n-text depth="3" class="feature-desc">{{ t('start.features.erase.desc') }}</n-text>
+          <NText strong class="feature-title">{{ t('start.features.erase.title') }}</NText>
+          <NText depth="3" class="feature-desc">{{ t('start.features.erase.desc') }}</NText>
         </div>
       </div>
     </div>
@@ -267,4 +255,3 @@ async function handleImport() {
   color: var(--apple-text-secondary);
 }
 </style>
-

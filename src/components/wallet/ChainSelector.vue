@@ -18,7 +18,7 @@ const chains = [
 ];
 
 const currentChain = computed(() => {
-  return chains.find(c => c.value === walletStore.selectedChain);
+  return chains.find((c) => c.value === walletStore.selectedChain);
 });
 
 function handleSelectChain(chain: ChainType) {
@@ -32,13 +32,9 @@ function openDrawer() {
 </script>
 
 <template>
-  <n-card class="chain-selector-card">
-    <n-text depth="3" class="label">{{ t('wallet.selectNetwork') }}</n-text>
-    <n-button
-      block
-      class="network-selector-btn"
-      @click="openDrawer"
-    >
+  <NCard class="chain-selector-card">
+    <NText depth="3" class="label">{{ t('wallet.selectNetwork') }}</NText>
+    <NButton block class="network-selector-btn" @click="openDrawer">
       <div class="network-selector-content">
         <img
           v-if="currentChain"
@@ -47,15 +43,15 @@ function openDrawer() {
           class="network-icon"
         />
         <div class="network-info">
-          <n-text strong class="network-name">{{ currentChain?.name }}</n-text>
-          <n-text depth="3" class="network-symbol">{{ currentChain?.symbol }}</n-text>
+          <NText strong class="network-name">{{ currentChain?.name }}</NText>
+          <NText depth="3" class="network-symbol">{{ currentChain?.symbol }}</NText>
         </div>
-        <n-text depth="3" class="network-arrow">›</n-text>
+        <NText depth="3" class="network-arrow">›</NText>
       </div>
-    </n-button>
-  </n-card>
+    </NButton>
+  </NCard>
 
-  <n-drawer
+  <NDrawer
     v-model:show="showDrawer"
     :width="'100%'"
     :height="'calc(100vh - 200px)'"
@@ -64,30 +60,27 @@ function openDrawer() {
     :auto-focus="false"
     class="network-drawer"
   >
-    <n-drawer-content :title="t('wallet.selectNetwork')" :closable="true">
+    <NDrawerContent :title="t('wallet.selectNetwork')" :closable="true">
       <div class="network-list">
         <div
           v-for="chain in chains"
           :key="chain.value"
-          :class="['network-item', { 'network-item--active': walletStore.selectedChain === chain.value }]"
+          :class="[
+            'network-item',
+            { 'network-item--active': walletStore.selectedChain === chain.value },
+          ]"
           @click="handleSelectChain(chain.value)"
         >
-          <img
-            :src="chain.icon"
-            :alt="chain.name"
-            class="network-item-icon"
-          />
+          <img :src="chain.icon" :alt="chain.name" class="network-item-icon" />
           <div class="network-item-info">
-            <n-text strong class="network-item-name">{{ chain.name }}</n-text>
-            <n-text depth="3" class="network-item-symbol">{{ chain.symbol }}</n-text>
+            <NText strong class="network-item-name">{{ chain.name }}</NText>
+            <NText depth="3" class="network-item-symbol">{{ chain.symbol }}</NText>
           </div>
-          <div v-if="walletStore.selectedChain === chain.value" class="network-item-check">
-            ✓
-          </div>
+          <div v-if="walletStore.selectedChain === chain.value" class="network-item-check">✓</div>
         </div>
       </div>
-    </n-drawer-content>
-  </n-drawer>
+    </NDrawerContent>
+  </NDrawer>
 </template>
 
 <style scoped>

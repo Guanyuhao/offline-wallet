@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { NCard, NButton, NText, NCollapse, NCollapseItem, NSkeleton, NDrawer, NDrawerContent } from 'naive-ui';
+import {
+  NCard,
+  NButton,
+  NText,
+  NCollapse,
+  NCollapseItem,
+  NSkeleton,
+  NDrawer,
+  NDrawerContent,
+} from 'naive-ui';
 import { ChevronDownOutline } from '@vicons/ionicons5';
 import { NIcon } from 'naive-ui';
 import { useWalletStore, type ChainType } from '../../stores/wallet';
@@ -23,11 +32,11 @@ const chains = [
 ];
 
 function getChainName(chain: ChainType): string {
-  return chains.find(c => c.value === chain)?.name || chain;
+  return chains.find((c) => c.value === chain)?.name || chain;
 }
 
 const currentChain = computed(() => {
-  return chains.find(c => c.value === walletStore.selectedChain);
+  return chains.find((c) => c.value === walletStore.selectedChain);
 });
 
 function copyAddress(address: string, label: string) {
@@ -45,12 +54,12 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
 </script>
 
 <template>
-  <n-card class="address-card">
+  <NCard class="address-card">
     <!-- 网络选择器 - 放在左上角 -->
     <div class="chain-selector-header">
       <div class="chain-selector-trigger" @click="showChainDrawer = true">
-        <n-text depth="3" class="chain-label">{{ t('wallet.selectNetwork') }}</n-text>
-        <n-icon :component="ChevronDownOutline" :size="16" class="chain-arrow" />
+        <NText depth="3" class="chain-label">{{ t('wallet.selectNetwork') }}</NText>
+        <NIcon :component="ChevronDownOutline" :size="16" class="chain-arrow" />
       </div>
       <div v-if="currentChain" class="current-chain-tag">
         <img
@@ -63,8 +72,11 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
       </div>
     </div>
 
-    <div class="address-display">
-      <n-skeleton
+    <div
+      class="address-display"
+      @click="!isLoadingAddress && copyAddress(walletStore.primaryAddress, t('wallet.myAddress'))"
+    >
+      <NSkeleton
         v-if="isLoadingAddress"
         :width="'100%'"
         :height="20"
@@ -76,32 +88,25 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
           :address="walletStore.primaryAddress"
           :prefix-length="6"
           :suffix-length="4"
-          :copyable="true"
-          @copy="copyAddress(walletStore.primaryAddress, t('wallet.myAddress'))"
         />
-        <n-button
-          size="small"
-          type="default"
-          class="copy-btn"
-          @click="copyAddress(walletStore.primaryAddress, t('wallet.myAddress'))"
-        >
-          {{ t('common.copy') }}
-        </n-button>
       </div>
     </div>
 
-    <n-collapse class="all-addresses-collapse">
-      <n-collapse-item :title="t('wallet.showAllAddresses')" name="all">
+    <NCollapse class="all-addresses-collapse">
+      <NCollapseItem :title="t('wallet.showAllAddresses')" name="all">
         <div class="all-addresses-list">
           <div
             v-for="addr in walletStore.addresses"
             :key="addr.chain"
+            v-memo="[addr.chain, walletStore.selectedChain, addr.address]"
             class="address-item"
             :class="{ active: addr.chain === walletStore.selectedChain }"
             @click="walletStore.setSelectedChain(addr.chain)"
           >
             <div class="address-item-header">
-              <span class="chain-symbol-small">{{ chains.find(c => c.value === addr.chain)?.symbol }}</span>
+              <span class="chain-symbol-small">{{
+                chains.find((c) => c.value === addr.chain)?.symbol
+              }}</span>
               <span class="chain-name-small">{{ getChainName(addr.chain) }}</span>
             </div>
             <AddressEllipsis
@@ -111,23 +116,23 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
               :copyable="true"
               @copy="copyAddress(addr.address, getChainName(addr.chain))"
             />
-            <n-button
+            <NButton
               size="tiny"
               type="default"
               class="copy-btn-small"
               @click.stop="copyAddress(addr.address, getChainName(addr.chain))"
             >
               {{ t('common.copy') }}
-            </n-button>
+            </NButton>
           </div>
         </div>
-      </n-collapse-item>
-    </n-collapse>
+      </NCollapseItem>
+    </NCollapse>
 
-    <n-text depth="3" class="hint">{{ t('wallet.addressHint') }}</n-text>
-    
+    <NText depth="3" class="hint">{{ t('wallet.addressHint') }}</NText>
+
     <!-- 网络选择 Drawer -->
-    <n-drawer
+    <NDrawer
       v-model:show="showChainDrawer"
       :width="'100%'"
       :height="'calc(100vh - 200px)'"
@@ -136,31 +141,28 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
       :auto-focus="false"
       class="network-drawer"
     >
-      <n-drawer-content :title="t('wallet.selectNetwork')" :closable="true">
+      <NDrawerContent :title="t('wallet.selectNetwork')" :closable="true">
         <div class="network-list">
           <div
             v-for="chain in chains"
             :key="chain.value"
-            :class="['network-item', { 'network-item--active': walletStore.selectedChain === chain.value }]"
+            :class="[
+              'network-item',
+              { 'network-item--active': walletStore.selectedChain === chain.value },
+            ]"
             @click="handleSelectChain(chain.value)"
           >
-            <img
-              :src="chain.icon"
-              :alt="chain.name"
-              class="network-item-icon"
-            />
+            <img :src="chain.icon" :alt="chain.name" class="network-item-icon" />
             <div class="network-item-info">
-              <n-text strong class="network-item-name">{{ chain.name }}</n-text>
-              <n-text depth="3" class="network-item-symbol">{{ chain.symbol }}</n-text>
+              <NText strong class="network-item-name">{{ chain.name }}</NText>
+              <NText depth="3" class="network-item-symbol">{{ chain.symbol }}</NText>
             </div>
-            <div v-if="walletStore.selectedChain === chain.value" class="network-item-check">
-              ✓
-            </div>
+            <div v-if="walletStore.selectedChain === chain.value" class="network-item-check">✓</div>
           </div>
         </div>
-      </n-drawer-content>
-    </n-drawer>
-  </n-card>
+      </NDrawerContent>
+    </NDrawer>
+  </NCard>
 </template>
 
 <style scoped>
@@ -333,11 +335,18 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
   min-height: 56px;
   transition: all 0.2s ease;
   border: 0.5px solid transparent;
+  cursor: pointer;
+  user-select: none;
 }
 
 .address-display:hover {
   background: var(--apple-bg-tertiary);
   border-color: var(--apple-separator);
+}
+
+.address-display:active {
+  transform: scale(0.98);
+  background: var(--apple-bg-tertiary);
 }
 
 .address-skeleton {
@@ -348,12 +357,7 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
   flex: 1;
   display: flex;
   align-items: center;
-  gap: var(--apple-spacing-sm);
   min-width: 0; /* 允许 flex 子元素缩小 */
-}
-
-.copy-btn {
-  flex-shrink: 0;
 }
 
 .all-addresses-collapse {
@@ -424,4 +428,3 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
   line-height: 1.5;
 }
 </style>
-
