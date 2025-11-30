@@ -24,13 +24,19 @@
         "decorations": true,
         "alwaysOnTop": false,
         "skipTaskbar": false,
-        "visible": true
+        "visible": true,
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
       }
     ],
     "security": {
       "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' ws://localhost:* http://localhost:* ipc://localhost; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
     },
     "withGlobalTauri": true
+  },
+  "plugins": {
+    "webview": {
+      "additionalBrowserArgs": "--enable-features=VaapiVideoDecoder,UseSkiaRenderer --enable-gpu-rasterization --enable-zero-copy --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --disable-features=TranslateUI --blink-settings=imagesEnabled=true,preferredColorScheme=light"
+    }
   },
   "bundle": {
     "active": true,
@@ -42,6 +48,7 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "resources": ["icons/icon.png", "icons/128x128.png"],
     "iOS": {
       "developmentTeam": "ZZAL7KSM56"
     }

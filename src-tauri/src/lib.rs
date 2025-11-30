@@ -168,7 +168,28 @@ fn generate_qrcode_cmd(data: String) -> Result<String, String> {
 
 /// 生成带 logo 的二维码（返回 Base64 编码的 PNG）
 #[tauri::command]
-fn generate_qrcode_with_logo_cmd(data: String, logo_path: Option<String>) -> Result<String, String> {
+fn generate_qrcode_with_logo_cmd(
+    app: tauri::AppHandle,
+    data: String, 
+    logo_path: Option<String>
+) -> Result<String, String> {
+    // 尝试使用 Tauri 资源目录查找 logo（iOS 真机环境）
+    #[cfg(target_os = "ios")]
+    {
+        if logo_path.is_none() {
+            if let Ok(resource_dir) = app.path().resource_dir() {
+                let icon_path = resource_dir.join("icons").join("icon.png");
+                if icon_path.exists() {
+                    return generate_qrcode_with_logo(&data, Some(icon_path.to_str().unwrap()));
+                }
+                let icon_path_128 = resource_dir.join("icons").join("128x128.png");
+                if icon_path_128.exists() {
+                    return generate_qrcode_with_logo(&data, Some(icon_path_128.to_str().unwrap()));
+                }
+            }
+        }
+    }
+    
     generate_qrcode_with_logo(&data, logo_path.as_deref())
 }
 

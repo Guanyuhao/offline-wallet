@@ -12,18 +12,25 @@ import {
   NLayoutContent,
   NLayoutFooter,
 } from 'naive-ui';
+import { defineAsyncComponent } from 'vue';
 import AppHeader from './components/AppHeader.vue';
 import SplashScreen from './components/SplashScreen.vue';
-import StartPage from './components/start/StartPage.vue';
-import BackupPage from './components/backup/BackupPage.vue';
-import WalletPage from './components/wallet/WalletPage.vue';
-import UnlockWallet from './components/UnlockWallet.vue';
-import BottomNavigation from './components/BottomNavigation.vue';
-import SecurityStatusBanner from './components/wallet/SecurityStatusBanner.vue';
-import MessageSetup from './components/MessageSetup.vue';
-import ExitConfirmDialog from './components/ExitConfirmDialog.vue';
 import ErrorBoundary from './components/ErrorBoundary.vue';
-import EncryptionGuideDialog from './components/EncryptionGuideDialog.vue';
+import MessageSetup from './components/MessageSetup.vue';
+
+// 懒加载非关键组件 - 按需加载，减少初始包大小
+const StartPage = defineAsyncComponent(() => import('./components/start/StartPage.vue'));
+const BackupPage = defineAsyncComponent(() => import('./components/backup/BackupPage.vue'));
+const WalletPage = defineAsyncComponent(() => import('./components/wallet/WalletPage.vue'));
+const UnlockWallet = defineAsyncComponent(() => import('./components/UnlockWallet.vue'));
+const BottomNavigation = defineAsyncComponent(() => import('./components/BottomNavigation.vue'));
+const SecurityStatusBanner = defineAsyncComponent(
+  () => import('./components/wallet/SecurityStatusBanner.vue')
+);
+const ExitConfirmDialog = defineAsyncComponent(() => import('./components/ExitConfirmDialog.vue'));
+const EncryptionGuideDialog = defineAsyncComponent(
+  () => import('./components/EncryptionGuideDialog.vue')
+);
 import { useAutoWebViewPerformance } from './composables/useWebViewPerformance';
 import { useAutoLock } from './composables/useAutoLock';
 import { useAppLayout } from './composables/useAppLayout';
@@ -34,7 +41,7 @@ import { useUIStore } from './stores/ui';
 // 初始化 composables
 useAutoLock();
 useAutoWebViewPerformance();
-const { headerStyle } = useAppLayout();
+const { headerStyle, layoutHeightStyle } = useAppLayout();
 const { isDarkMode } = useTheme();
 const appState = useAppState();
 const uiStore = useUIStore();
@@ -102,7 +109,7 @@ onMounted(() => {
             <SplashScreen v-if="showSplash" @complete="handleSplashComplete" />
 
             <!-- 主应用内容 - 使用 Naive UI Layout -->
-            <NLayout v-else style="height: 100vh" content-class="layout-content-wrapper">
+            <NLayout v-else :style="layoutHeightStyle" content-class="layout-content-wrapper">
               <!-- Header - 所有页面共用 -->
               <NLayoutHeader bordered :style="headerStyle">
                 <AppHeader v-model:show-settings-drawer="showSettingsDrawer" />
@@ -221,5 +228,9 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  height: 100%;
+  /* 确保布局容器不会超出视口（键盘弹起时自动调整） */
+  /* 优先级：dvh（现代浏览器） > --viewport-height（JS设置） > calc(var(--vh) * 100)（降级） */
+  max-height: var(--dvh, var(--viewport-height, calc(var(--vh, 1vh) * 100)));
 }
 </style>

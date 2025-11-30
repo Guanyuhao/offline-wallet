@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { NCard, NButton, NCheckbox, NAlert, NText, NSpace } from 'naive-ui';
 import { useUIStore } from '../../stores/ui';
@@ -19,6 +19,9 @@ const emit = defineEmits<{
 
 const showMnemonic = ref(false);
 const understood = ref(false);
+
+// 使用 computed 缓存助记词数组，避免每次渲染都 split
+const mnemonicWords = computed(() => props.mnemonic.split(' '));
 
 function copyMnemonic() {
   navigator.clipboard.writeText(props.mnemonic).then(() => {
@@ -48,7 +51,12 @@ function handleFinish() {
           <NText depth="3" class="word-count-text">{{ wordCount }} {{ t('common.words') }}</NText>
         </div>
         <div v-else class="mnemonic-words" :class="{ 'words-24': wordCount === 24 }">
-          <span v-for="(word, i) in mnemonic.split(' ')" :key="i" class="word-item">
+          <span
+            v-for="(word, i) in mnemonicWords"
+            :key="`${word}-${i}`"
+            v-memo="[word, i, wordCount]"
+            class="word-item"
+          >
             <span class="word-number">{{ i + 1 }}</span>
             <span class="word-text">{{ word }}</span>
           </span>

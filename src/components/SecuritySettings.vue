@@ -12,6 +12,8 @@ import {
   deleteBiometricPassword,
   hasBiometricPassword,
   retrieveEncryptedMnemonic,
+  syncWalletToStorage,
+  clearWalletData,
 } from '../composables/useWalletStorage';
 import {
   checkPasswordStrength,
@@ -94,7 +96,8 @@ watch(password, async (newPassword) => {
 });
 
 function handleEnableEncryption() {
-  if (!walletStore.mnemonic) {
+  // 修复：检查钱包是否已创建，而不是检查 mnemonic（因为 mnemonic 在创建后会被清空）
+  if (!walletStore.isWalletCreated) {
     uiStore.showError(t('security.createWalletFirst') || '请先导入或创建钱包');
     return;
   }
@@ -144,6 +147,11 @@ async function handleSetPassword() {
       }
 
       encryptionEnabled.value = true;
+
+      // 启用加密存储后，立即保存地址到 localStorage
+      if (walletStore.isWalletCreated) {
+        await syncWalletToStorage();
+      }
     } else if (isEnablingBiometric.value) {
       // 如果是手动启用生物识别，先验证密码是否正确
       try {
@@ -197,6 +205,11 @@ function handleDisableEncryption() {
         }
 
         encryptionEnabled.value = false;
+
+        // 禁用加密存储后，立即清除地址缓存
+        // 因为地址是从助记词派生的，没有加密助记词就没有意义
+        clearWalletData();
+
         uiStore.showSuccess(t('security.encryptionDisabled') || '加密存储已禁用');
 
         // 注意：当前内存中的助记词仍然保留，钱包可以继续使用

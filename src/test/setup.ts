@@ -7,6 +7,47 @@ afterEach(() => {
   cleanup();
 });
 
+// Mock window.matchMedia (全局设置)
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  configurable: true,
+  value: (query: string) => {
+    const listeners: Array<(event: MediaQueryListEvent) => void> = [];
+    return {
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: (_event: string, handler: (event: MediaQueryListEvent) => void) => {
+        if (typeof handler === 'function') {
+          listeners.push(handler);
+        }
+      },
+      removeEventListener: (_event: string, handler: (event: MediaQueryListEvent) => void) => {
+        const index = listeners.indexOf(handler);
+        if (index > -1) listeners.splice(index, 1);
+      },
+      addListener: (handler: (event: MediaQueryListEvent) => void) => {
+        if (typeof handler === 'function') {
+          listeners.push(handler);
+        }
+      }, // deprecated
+      removeListener: (handler: (event: MediaQueryListEvent) => void) => {
+        const index = listeners.indexOf(handler);
+        if (index > -1) listeners.splice(index, 1);
+      }, // deprecated
+      dispatchEvent: vi.fn(),
+    };
+  },
+});
+
+// Mock CSS.supports
+Object.defineProperty(window, 'CSS', {
+  writable: true,
+  value: {
+    supports: vi.fn().mockReturnValue(false),
+  },
+});
+
 // Mock Tauri APIs
 if (typeof globalThis !== 'undefined') {
   // 确保 window 对象存在
@@ -19,6 +60,10 @@ if (typeof globalThis !== 'undefined') {
   if (globalThis.window) {
     // @ts-expect-error - Mock Tauri internals for testing
     globalThis.window.__TAURI_INTERNALS__ = {};
+    // @ts-expect-error - Mock Tauri metadata
+    globalThis.window.__TAURI_METADATA__ = {
+      platform: 'desktop',
+    };
   }
 
   // Mock console methods to reduce noise in tests

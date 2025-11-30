@@ -4,8 +4,8 @@
  * 安全策略：
  * 1. 助记词加密存储在系统级安全存储（Keychain/Keystore）
  * 2. 前端不存储任何敏感信息（助记词、密码等）
- * 3. 地址信息可以安全存储（不敏感）
- * 4. 使用 localStorage 仅存储钱包标识和地址（非敏感信息）
+ * 3. 地址信息仅在存在加密助记词时存储到 localStorage（因为地址是从助记词派生的，没有助记词就没有意义）
+ * 4. 如果没有加密助记词，地址缓存会被清除，用户需要重新导入助记词
  */
 
 import { invoke } from '@tauri-apps/api/core';
@@ -108,11 +108,22 @@ export function initializeWalletFromStorage(): boolean {
 
 /**
  * 同步钱包数据到存储
+ * 只有在存在加密助记词（系统级存储）的情况下才保存地址
+ * 因为地址是从助记词派生的，没有助记词就没有意义
  */
-export function syncWalletToStorage(): void {
+export async function syncWalletToStorage(): Promise<void> {
   const walletStore = useWalletStore();
 
   if (!walletStore.isWalletCreated) {
+    clearWalletData();
+    return;
+  }
+
+  // 检查是否存在加密的助记词（系统级存储）
+  // 只有在有加密助记词的情况下才保存地址
+  const hasEncrypted = await hasEncryptedMnemonic();
+  if (!hasEncrypted) {
+    // 没有加密助记词，清除地址缓存
     clearWalletData();
     return;
   }

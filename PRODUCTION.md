@@ -253,9 +253,10 @@ GitHub Actions 配置了完整的 CI/CD 流程：
   - Argon2id：密码哈希，内存硬函数，抗暴力破解
 
 - **存储位置**:
-  - macOS/iOS: `~/Library/Application Support/offline-wallet/encrypted_mnemonic.dat`
-  - Windows: `%APPDATA%/offline-wallet/encrypted_mnemonic.dat`
-  - Linux: `~/.local/share/offline-wallet/encrypted_mnemonic.dat`
+  - macOS/iOS: Keychain Services
+  - Android: Keystore
+  - Windows: Credential Manager
+  - Linux: Secret Service API
 
 - **文件权限**:
   - Unix: 600（仅所有者可读写）
@@ -266,7 +267,9 @@ GitHub Actions 配置了完整的 CI/CD 流程：
 - 所有敏感操作都有二次确认
 - 错误信息不泄露敏感数据
 - 使用安全的存储方式
-- 自动锁定机制保护钱包
+- 自动锁定机制保护钱包（5分钟无活动或应用进入后台）
+
+> 📖 **详细说明**: 关于助记词存储生命周期、创建和删除时机、典型场景分析等，请参考 [MNEMONIC_STORAGE_LIFECYCLE.md](./MNEMONIC_STORAGE_LIFECYCLE.md)
 
 ## 📊 性能优化
 

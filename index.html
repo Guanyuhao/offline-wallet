@@ -5,8 +5,36 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="icon" type="image/svg+xml" href="/wallet-icon.svg" />
     <link rel="apple-touch-icon" href="/wallet-icon.svg" />
-    <!-- 点击输入框屏幕被缩放了，需要禁用 -->
+    <!-- 
+      Viewport Meta 配置 - 基于 W3C 官方标准
+      
+      【问题原因】
+      移动端 WebView 键盘弹起时，传统 100vh 使用的是布局视口高度（不包含键盘），
+      导致内容被键盘遮挡或出现"不合理区域"。
+      
+      【W3C 官方解决方案】
+      interactive-widget=resizes-content: 告诉浏览器键盘弹起时自动调整视口大小
+      标准：CSS Viewport Module Level 4
+      参考：https://www.w3.org/TR/css-viewport-4/#interactive-widget
+      支持：Chrome 114+, Safari 15.4+
+      
+      【其他属性说明】
+      - width=device-width: 设置视口宽度为设备宽度
+      - initial-scale=1.0: 初始缩放比例
+      - maximum-scale=5.0: 最大缩放比例
+      - user-scalable=no: 禁用用户缩放（防止点击输入框时屏幕缩放）
+    -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no, interactive-widget=resizes-content" />
+    
+    <!-- 性能优化：预加载关键资源 -->
+    <link rel="preload" href="/wallet-logo.svg" as="image" type="image/svg+xml" />
+    <link rel="preload" href="/wallet-icon.svg" as="image" type="image/svg+xml" />
+    
+    <!-- DNS 预解析（如果有外部资源） -->
+    <!-- <link rel="dns-prefetch" href="https://example.com" /> -->
+    
+    <!-- 预连接（如果有外部 API） -->
+    <!-- <link rel="preconnect" href="https://api.example.com" crossorigin /> -->
     <meta name="description" content="安全、简单、离线的加密货币钱包 - 完全离线操作，保护您的私钥安全" />
     <!-- 安全相关 Meta 标签 -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' ws://localhost:* http://localhost:* ipc://localhost;" />

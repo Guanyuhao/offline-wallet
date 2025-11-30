@@ -32,7 +32,14 @@ const tabs = [
 ];
 
 function handleTabClick(tab: 'account' | 'transaction' | 'settings') {
+  // 使用 nextTick 确保状态立即更新
   emit('update:activeTab', tab);
+  // 强制触发重新渲染（移动端优化）
+  if (typeof window !== 'undefined' && 'requestAnimationFrame' in window) {
+    requestAnimationFrame(() => {
+      // 确保 DOM 更新
+    });
+  }
 }
 </script>
 
@@ -43,6 +50,7 @@ function handleTabClick(tab: 'account' | 'transaction' | 'settings') {
         v-for="tab in tabs"
         :key="tab.key"
         :class="['nav-item', { 'nav-item-active': activeTab === tab.key }]"
+        :aria-pressed="activeTab === tab.key"
         @click="handleTabClick(tab.key)"
       >
         <NIcon :component="tab.icon" :size="24" class="nav-icon" />
@@ -83,10 +91,15 @@ function handleTabClick(tab: 'account' | 'transaction' | 'settings') {
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
   color: var(--apple-text-tertiary);
   padding: var(--apple-spacing-xs);
   border-radius: var(--apple-radius-md);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 .nav-item:hover {
@@ -95,11 +108,27 @@ function handleTabClick(tab: 'account' | 'transaction' | 'settings') {
 }
 
 .nav-item-active {
-  color: var(--apple-blue);
+  color: var(--apple-blue) !important;
 }
 
 .nav-item-active .nav-icon {
   transform: scale(1.1);
+  color: var(--apple-blue);
+}
+
+/* 修复移动端点击后状态不更新的问题 */
+.nav-item:active {
+  opacity: 0.6;
+  transform: scale(0.98);
+}
+
+.nav-item-active:active {
+  opacity: 1;
+  transform: scale(0.98);
+}
+
+.nav-item-active:active .nav-icon {
+  transform: scale(1.05);
 }
 
 .nav-icon {

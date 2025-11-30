@@ -12,6 +12,7 @@ import {
   initializeWalletFromStorage,
   syncWalletToStorage,
   hasEncryptedMnemonic,
+  clearWalletData,
 } from './useWalletStorage';
 import { getFriendlyErrorMessage } from '../utils/errorHandler';
 
@@ -45,7 +46,8 @@ export function useAppState() {
   async function handleImport(importedMnemonic: string) {
     try {
       await walletStore.createWallet(importedMnemonic, '');
-      syncWalletToStorage();
+      // 只有在有加密助记词的情况下才保存地址
+      await syncWalletToStorage();
       step.value = 'wallet';
       uiStore.showSuccess(t('messages.walletImported'));
     } catch (error) {
@@ -61,7 +63,8 @@ export function useAppState() {
     try {
       uiStore.showLoading();
       await walletStore.createWallet(mnemonic.value, '');
-      syncWalletToStorage();
+      // 只有在有加密助记词的情况下才保存地址
+      await syncWalletToStorage();
       step.value = 'wallet';
       uiStore.showSuccess(t('messages.walletCreated'));
 
@@ -113,28 +116,34 @@ export function useAppState() {
 
   // 开屏页面完成后的处理
   async function handleSplashComplete() {
-    // 检查是否有缓存的钱包
-    if (hasStoredWallet()) {
-      // 尝试从存储恢复钱包数据
-      const restored = initializeWalletFromStorage();
-      if (restored && walletStore.isWalletCreated) {
-        // 检查是否存在加密的助记词（系统级存储）
-        const hasEncrypted = await hasEncryptedMnemonic();
-        if (hasEncrypted) {
+    // 先检查是否存在加密的助记词（系统级存储）
+    const hasEncrypted = await hasEncryptedMnemonic();
+
+    if (hasEncrypted) {
+      // 有加密助记词，检查是否有缓存的钱包地址
+      if (hasStoredWallet()) {
+        // 尝试从存储恢复钱包数据
+        const restored = initializeWalletFromStorage();
+        if (restored && walletStore.isWalletCreated) {
           // 需要解锁钱包
           needsUnlock.value = true;
           step.value = 'unlock';
         } else {
-          // 没有加密存储，直接进入钱包页面（但助记词不在内存中）
-          // 这种情况下，用户只能查看地址，无法签名交易
-          step.value = 'wallet';
+          // 存储数据无效，清除并进入开始页面
+          clearWalletData();
+          step.value = 'start';
         }
       } else {
-        // 存储数据无效，进入开始页面
-        step.value = 'start';
+        // 没有缓存地址，需要解锁（助记词存在但地址未缓存）
+        step.value = 'unlock';
       }
     } else {
-      // 没有缓存，进入开始页面
+      // 没有加密助记词，清除可能存在的地址缓存
+      // 因为地址是从助记词派生的，没有助记词就没有意义
+      if (hasStoredWallet()) {
+        clearWalletData();
+      }
+      // 进入开始页面
       step.value = 'start';
     }
   }
@@ -155,11 +164,12 @@ export function useAppState() {
   }
 
   // 监听钱包变化，同步到存储
+  // syncWalletToStorage 内部已经检查加密助记词，这里直接调用即可
   watch(
     () => walletStore.addresses,
-    () => {
+    async () => {
       if (walletStore.isWalletCreated) {
-        syncWalletToStorage();
+        await syncWalletToStorage();
       }
     },
     { deep: true }
@@ -167,9 +177,9 @@ export function useAppState() {
 
   watch(
     () => walletStore.selectedChain,
-    () => {
+    async () => {
       if (walletStore.isWalletCreated) {
-        syncWalletToStorage();
+        await syncWalletToStorage();
       }
     }
   );

@@ -98,6 +98,7 @@ const isLoadingAddress = computed(() => !walletStore.primaryAddress);
           <div
             v-for="addr in walletStore.addresses"
             :key="addr.chain"
+            v-memo="[addr.chain, walletStore.selectedChain, addr.address]"
             class="address-item"
             :class="{ active: addr.chain === walletStore.selectedChain }"
             @click="walletStore.setSelectedChain(addr.chain)"

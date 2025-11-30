@@ -192,6 +192,7 @@ pnpm tauri build
 - [PRODUCTION.md](./PRODUCTION.md) - 生产级别改造指南（包含安全实施）
 - [BUILD-GUIDE.md](./BUILD-GUIDE.md) - 构建指南（Windows、Android、macOS，包含图标设置）
 - [ROADMAP.md](./ROADMAP.md) - 功能路线图
+- [MNEMONIC_STORAGE_LIFECYCLE.md](./MNEMONIC_STORAGE_LIFECYCLE.md) - 助记词存储生命周期说明（详细场景分析）
 
 ---
 
