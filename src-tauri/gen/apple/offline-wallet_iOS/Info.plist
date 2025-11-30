@@ -44,5 +44,7 @@
 	<false/>
 	<key>UIRequiresFullScreen</key>
 	<false/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>使用 Face ID 或 Touch ID 来解锁钱包，提供更安全和便捷的身份验证方式。</string>
 </dict>
 </plist>

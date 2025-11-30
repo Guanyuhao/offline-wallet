@@ -3,23 +3,67 @@ use base64::{Engine as _, engine::general_purpose};
 use std::path::PathBuf;
 use image::{RgbImage, Rgb, ImageFormat, imageops::FilterType, GenericImageView};
 
-/// 从 src-tauri/icons 目录查找 logo 文件
+/// 从资源目录查找 logo 文件
+/// 在 iOS 真机上，资源文件被打包到 app bundle 中
+/// 注意：iOS bundle 中的资源文件路径与开发环境不同
 fn find_logo_file() -> Option<PathBuf> {
     // 尝试的路径列表（按优先级排序）
-    let possible_paths = vec![
-        // 从 src-tauri/icons 目录（开发环境）
-        PathBuf::from("icons").join("icon.png"),
-        PathBuf::from("icons").join("128x128.png"),
-        PathBuf::from("src-tauri").join("icons").join("icon.png"),
-        PathBuf::from("src-tauri").join("icons").join("128x128.png"),
-        // 从当前工作目录的 icons（构建后）
-        PathBuf::from("icons").join("icon.png"),
-        PathBuf::from("icons").join("128x128.png"),
-    ];
+    let mut possible_paths = vec![];
     
+    // 1. iOS bundle 中的资源路径（真机环境）
+    // iOS 应用 bundle 的资源通常在应用主 bundle 的根目录
+    #[cfg(target_os = "ios")]
+    {
+        // 尝试从 NSBundle 主 bundle 路径查找（通过环境变量或标准路径）
+        // iOS bundle 资源通常在 .app/ 目录下
+        if let Ok(bundle_path) = std::env::var("BUNDLE_PATH") {
+            possible_paths.push(PathBuf::from(&bundle_path).join("icon.png"));
+            possible_paths.push(PathBuf::from(&bundle_path).join("128x128.png"));
+            possible_paths.push(PathBuf::from(&bundle_path).join("icons").join("icon.png"));
+            possible_paths.push(PathBuf::from(&bundle_path).join("icons").join("128x128.png"));
+        }
+        // iOS bundle 资源的标准位置
+        possible_paths.push(PathBuf::from("icon.png"));
+        possible_paths.push(PathBuf::from("128x128.png"));
+        possible_paths.push(PathBuf::from("icons").join("icon.png"));
+        possible_paths.push(PathBuf::from("icons").join("128x128.png"));
+    }
+    
+    // 2. 尝试从可执行文件所在目录查找（开发环境和桌面端）
+    if let Ok(exe_path) = std::env::current_exe() {
+        if let Some(exe_dir) = exe_path.parent() {
+            // 开发环境：src-tauri/icons
+            possible_paths.push(exe_dir.join("icons").join("icon.png"));
+            possible_paths.push(exe_dir.join("icons").join("128x128.png"));
+            possible_paths.push(exe_dir.join("src-tauri").join("icons").join("icon.png"));
+            possible_paths.push(exe_dir.join("src-tauri").join("icons").join("128x128.png"));
+            // 构建后：相对于可执行文件的 icons
+            possible_paths.push(exe_dir.join("icons").join("icon.png"));
+            possible_paths.push(exe_dir.join("icons").join("128x128.png"));
+        }
+    }
+    
+    // 3. 尝试从当前工作目录查找（开发环境）
+    if let Ok(cwd) = std::env::current_dir() {
+        possible_paths.push(cwd.join("icons").join("icon.png"));
+        possible_paths.push(cwd.join("icons").join("128x128.png"));
+        possible_paths.push(cwd.join("src-tauri").join("icons").join("icon.png"));
+        possible_paths.push(cwd.join("src-tauri").join("icons").join("128x128.png"));
+    }
+    
+    // 4. 尝试相对路径（开发环境）
+    possible_paths.push(PathBuf::from("icons").join("icon.png"));
+    possible_paths.push(PathBuf::from("icons").join("128x128.png"));
+    possible_paths.push(PathBuf::from("src-tauri").join("icons").join("icon.png"));
+    possible_paths.push(PathBuf::from("src-tauri").join("icons").join("128x128.png"));
+    
+    // 遍历所有可能的路径
     for path in possible_paths {
         if path.exists() && path.is_file() {
-            return Some(path);
+            // 验证文件是否可读
+            if std::fs::metadata(&path).is_ok() {
+                return Some(path);
+            }
         }
     }
     
@@ -33,7 +77,8 @@ pub fn generate_qrcode_base64(data: &str) -> Result<String, String> {
 
 /// 生成带 logo 的二维码并返回 Base64 编码的 PNG 图片
 /// logo 会自动从 src-tauri/icons 目录加载
-pub fn generate_qrcode_with_logo(data: &str, _logo_path: Option<&str>) -> Result<String, String> {
+/// logo_path: 如果提供，优先使用此路径；否则自动查找
+pub fn generate_qrcode_with_logo(data: &str, logo_path: Option<&str>) -> Result<String, String> {
     // 生成二维码
     let code = QrCode::new(data)
         .map_err(|e| format!("Failed to generate QR code: {}", e))?;
@@ -66,9 +111,23 @@ pub fn generate_qrcode_with_logo(data: &str, _logo_path: Option<&str>) -> Result
     }
 
     // 始终尝试在中间添加 logo（从 src-tauri/icons 目录）
-    if let Some(logo_file_path) = find_logo_file() {
-        if let Ok(logo_img) = image::open(&logo_file_path) {
-            // logo 大小为二维码的 1/4.5，确保大小合适且居中
+    // 优先使用传入的 logo_path，否则自动查找
+    let logo_img_result = if let Some(path) = logo_path {
+        // 使用传入的路径
+        image::open(path)
+    } else if let Some(logo_file_path) = find_logo_file() {
+        // 自动查找
+        image::open(&logo_file_path)
+    } else {
+        // 找不到文件
+        Err(image::ImageError::IoError(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "Logo file not found"
+        )))
+    };
+    
+    if let Ok(logo_img) = logo_img_result {
+        // logo 大小为二维码的 1/4.5，确保大小合适且居中
             let logo_size = ((img_width as f32 / 4.5) as u32).min((img_height as f32 / 4.5) as u32);
             // 确保 logo 大小是偶数，避免对齐问题
             let logo_size = (logo_size / 2) * 2;
@@ -123,7 +182,6 @@ pub fn generate_qrcode_with_logo(data: &str, _logo_path: Option<&str>) -> Result
                     }
                 }
             }
-        }
     }
     
     let mut png_bytes = Vec::new();

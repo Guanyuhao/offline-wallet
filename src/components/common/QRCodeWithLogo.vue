@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
-import { NSkeleton } from 'naive-ui';
+import { NSkeleton, NText } from 'naive-ui';
 
 interface Props {
   value: string;
@@ -24,7 +24,7 @@ async function generateQRCode() {
 
   isLoading.value = true;
   error.value = '';
-  
+
   try {
     // 使用 Rust 方案生成带 logo 的二维码（logo 自动从 src-tauri/icons 目录加载）
     const result = await invoke<string>('generate_qrcode_with_logo_cmd', {
@@ -57,15 +57,15 @@ watch(() => props.value, generateQRCode, { immediate: true });
 <template>
   <div class="qr-code-container">
     <div v-if="isLoading" class="qr-skeleton">
-      <n-skeleton
-        :width="size"
-        :height="size"
+      <NSkeleton
+        :width="size ?? 200"
+        :height="size ?? 200"
         :animated="true"
         class="qr-skeleton-item"
       />
     </div>
     <div v-else-if="error" class="qr-error">
-      <n-text depth="3">{{ error }}</n-text>
+      <NText depth="3">{{ error }}</NText>
     </div>
     <img
       v-else-if="qrCodeImage"
@@ -108,4 +108,3 @@ watch(() => props.value, generateQRCode, { immediate: true });
   image-rendering: crisp-edges;
 }
 </style>
-

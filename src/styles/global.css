@@ -20,6 +20,26 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* 确保html背景色与header一致，防止滚动时透视 */
+  background-color: var(--apple-bg-primary, var(--bg-primary));
+  /* WebView 性能优化 */
+  -webkit-overflow-scrolling: touch;
+  /* 启用硬件加速 */
+  transform: translateZ(0);
+  /* 优化字体渲染 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* WebView 视口高度修复 - 初始值 */
+  /* 优先使用现代 CSS 单位，降级到 JS 设置的变量 */
+  --vh: 1vh;
+  --dvh: 100dvh;
+  --svh: 100svh;
+  --lvh: 100lvh;
+  --viewport-height: 100vh; /* JS 设置的降级值 */
+  /* 防止页面整体滚动 */
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
 }
 
 body {
@@ -27,14 +47,43 @@ body {
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
   color: var(--text-primary);
-  background-color: var(--bg-primary);
-  min-height: 100vh;
-  transition: background-color var(--transition-base), color var(--transition-base);
+  background-color: var(--apple-bg-primary, var(--bg-primary));
+  /* 使用动态视口高度替代 100vh（键盘弹起时自动调整） */
+  /* 优先级：dvh（现代浏览器） > --viewport-height（JS设置） > calc(var(--vh) * 100)（降级） */
+  min-height: var(--dvh, var(--viewport-height, calc(var(--vh, 1vh) * 100)));
+  height: var(--dvh, var(--viewport-height, calc(var(--vh, 1vh) * 100)));
+  max-height: var(--dvh, var(--viewport-height, calc(var(--vh, 1vh) * 100)));
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base);
+  /* 防止滚动时内容透视 */
+  overflow: hidden;
+  /* WebView 性能优化 */
+  -webkit-overflow-scrolling: touch;
+  /* 启用 GPU 加速 */
+  will-change: scroll-position;
+  /* 优化渲染性能 */
+  contain: layout style paint;
+  /* 减少重绘 */
+  backface-visibility: hidden;
+  perspective: 1000px;
+  /* 防止页面整体滚动 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
 }
 
 /* ============ 排版 ============ */
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
   color: var(--text-primary);
@@ -108,7 +157,8 @@ pre {
 
 /* ============ 列表 ============ */
 
-ul, ol {
+ul,
+ol {
   margin-left: var(--spacing-6);
   margin-bottom: var(--spacing-4);
 }
@@ -140,7 +190,9 @@ select {
   background-color: var(--bg-primary);
   border: var(--input-border-width) solid var(--border-primary);
   border-radius: var(--radius-base);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 textarea {
@@ -173,8 +225,8 @@ select:disabled {
 }
 
 /* Checkbox 和 Radio */
-input[type="checkbox"],
-input[type="radio"] {
+input[type='checkbox'],
+input[type='radio'] {
   width: auto;
   height: auto;
   margin-right: var(--spacing-2);
@@ -351,6 +403,61 @@ button:focus-visible {
   color: var(--text-primary);
 }
 
+/* ============ WebView 视口高度修复 ============ */
+
+/* 确保 #app 容器使用动态高度（键盘弹起时自动调整） */
+/* 优先级：dvh（现代浏览器） > --viewport-height（JS设置） > calc(var(--vh) * 100)（降级） */
+#app {
+  height: var(--dvh, var(--viewport-height, calc(var(--vh, 1vh) * 100)));
+  max-height: var(--dvh, var(--viewport-height, calc(var(--vh, 1vh) * 100)));
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* ============ WebView 性能优化类 ============ */
+
+/* GPU 加速容器 */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* 优化滚动性能 */
+.optimize-scroll {
+  -webkit-overflow-scrolling: touch;
+  overflow-scrolling: touch;
+  will-change: scroll-position;
+  contain: layout style paint;
+}
+
+/* 优化动画性能 */
+.optimize-animation {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* 优化图片渲染 */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  /* 延迟加载占位符 */
+  content-visibility: auto;
+}
+
+/* 优化列表渲染 */
+.list-optimized {
+  contain: layout style paint;
+  content-visibility: auto;
+}
+
+/* 减少重排 */
+.no-reflow {
+  contain: strict;
+}
+
 /* ============ 打印样式 ============ */
 
 @media print {
@@ -358,7 +465,7 @@ button:focus-visible {
     background: white;
     color: black;
   }
-  
+
   button,
   .no-print {
     display: none !important;
@@ -378,4 +485,3 @@ button:focus-visible {
     font-size: 18px;
   }
 }
-

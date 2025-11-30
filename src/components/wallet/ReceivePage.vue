@@ -1,7 +1,17 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { NCard, NButton, NText, NSkeleton, NTabs, NTabPane, NUpload, NUploadDragger, NInput } from 'naive-ui';
+import {
+  NCard,
+  NButton,
+  NText,
+  NSkeleton,
+  NTabs,
+  NTabPane,
+  NUpload,
+  NUploadDragger,
+  NInput,
+} from 'naive-ui';
 import { useWalletStore } from '../../stores/wallet';
 import { useUIStore } from '../../stores/ui';
 import { usePlatform } from '../../composables/usePlatform';
@@ -27,15 +37,15 @@ const isScanning = ref(false);
 
 const currentAddress = computed(() => walletStore.primaryAddress);
 
-async function generateQRCode() {
+function generateQRCode() {
   if (!currentAddress.value) return;
-  
+
   isLoadingQR.value = true;
   try {
     // 使用地址作为二维码数据，QRCodeWithLogo 组件会调用 Rust 后端生成
     qrCodeData.value = currentAddress.value;
   } catch (error) {
-    uiStore.showError(t('receive.generateQRFailed') + ': ' + error);
+    uiStore.showError(`${t('receive.generateQRFailed')}: ${error}`);
   } finally {
     isLoadingQR.value = false;
   }
@@ -51,10 +61,9 @@ function copyAddress() {
 function copyScannedResult() {
   if (!scannedResult.value) return;
   navigator.clipboard.writeText(scannedResult.value).then(() => {
-    uiStore.showSuccess(t('common.copy') + ' ' + t('common.success'));
+    uiStore.showSuccess(`${t('common.copy')} ${t('common.success')}`);
   });
 }
-
 
 // 扫描二维码（桌面端：文件上传）
 async function handleFileUpload(options: { file: UploadFileInfo; fileList: UploadFileInfo[] }) {
@@ -68,7 +77,6 @@ async function handleFileUpload(options: { file: UploadFileInfo; fileList: Uploa
     // 动态导入 jsQR（桌面端需要）
     let jsQR: any;
     try {
-      // @ts-ignore - 动态导入
       const jsQRModule = await import('jsqr');
       jsQR = jsQRModule.default || jsQRModule;
     } catch (importError: any) {
@@ -76,7 +84,7 @@ async function handleFileUpload(options: { file: UploadFileInfo; fileList: Uploa
       isScanning.value = false;
       return;
     }
-    
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
@@ -137,7 +145,6 @@ async function startCameraScan() {
     // 动态导入 barcode-scanner（移动端需要）
     let barcodeScanner: any;
     try {
-      // @ts-ignore - 动态导入
       const module = await import('@tauri-apps/plugin-barcode-scanner');
       // barcode-scanner 插件导出的是命名导出，不是 default 导出
       barcodeScanner = module;
@@ -147,16 +154,16 @@ async function startCameraScan() {
       uiStore.showError(t('messages.barcodeScannerNotAvailable'));
       return;
     }
-    
+
     if (!barcodeScanner || !barcodeScanner.scan) {
       uiStore.showError(t('messages.barcodeScannerNotInstalled'));
       return;
     }
-    
+
     const { scan, Format } = barcodeScanner;
-    const result = await scan({ 
-      windowed: true, 
-      formats: [Format.QRCode] 
+    const result = await scan({
+      windowed: true,
+      formats: [Format.QRCode],
     });
     scannedResult.value = result;
     uiStore.showSuccess(t('receive.scanQRSuccess'));
@@ -173,57 +180,67 @@ async function startCameraScan() {
 }
 
 // 监听地址变化，自动生成二维码
-watch(() => walletStore.primaryAddress, (newAddress) => {
-  if (newAddress && activeTab.value === 'yourQR') {
-    generateQRCode();
-  } else {
-    qrCodeData.value = '';
-  }
-}, { immediate: true });
+watch(
+  () => walletStore.primaryAddress,
+  (newAddress) => {
+    if (newAddress && activeTab.value === 'yourQR') {
+      generateQRCode();
+    } else {
+      qrCodeData.value = '';
+    }
+  },
+  { immediate: true }
+);
 
 // 监听网络变化，重新生成二维码
-watch(() => walletStore.selectedChain, () => {
-  if (currentAddress.value && activeTab.value === 'yourQR') {
-    generateQRCode();
+watch(
+  () => walletStore.selectedChain,
+  () => {
+    if (currentAddress.value && activeTab.value === 'yourQR') {
+      generateQRCode();
+    }
   }
-});
+);
 
 // 监听标签页切换
-watch(() => activeTab.value, (newTab) => {
-  if (newTab === 'yourQR' && currentAddress.value) {
-    generateQRCode();
+watch(
+  () => activeTab.value,
+  (newTab) => {
+    if (newTab === 'yourQR' && currentAddress.value) {
+      generateQRCode();
+    }
   }
-});
+);
 </script>
 
 <template>
   <div class="receive-page">
-    <n-card class="receive-card">
-      <n-tabs v-model:value="activeTab" type="segment" class="receive-tabs">
+    <NCard class="receive-card">
+      <NTabs v-model:value="activeTab" type="segment" class="receive-tabs">
         <!-- 扫描二维码标签页 -->
-        <n-tab-pane name="scanQR" :tab="t('receive.scanQR')">
+        <NTabPane name="scanQR" :tab="t('receive.scanQR')">
           <div class="scan-section">
             <!-- 桌面端：文件上传 -->
             <div v-if="isDesktop()" class="scan-desktop">
-              <n-upload
+              <NUpload
                 :file-list="[]"
                 :max="1"
                 accept="image/*"
                 :on-change="handleFileUpload"
                 :show-file-list="false"
               >
-                <n-upload-dragger>
+                <NUploadDragger>
                   <div class="upload-content">
-                    <n-text strong>{{ t('receive.selectImage') }}</n-text>
-                    <n-text depth="3" class="upload-hint">{{ t('receive.scanQRHint') }}</n-text>
+                    <NText strong>{{ t('receive.selectImage') }}</NText>
+                    <NText depth="3" class="upload-hint">{{ t('receive.scanQRHint') }}</NText>
                   </div>
-                </n-upload-dragger>
-              </n-upload>
+                </NUploadDragger>
+              </NUpload>
             </div>
 
             <!-- 移动端：摄像头扫描 -->
             <div v-else-if="isMobile()" class="scan-mobile">
-              <n-button
+              <NButton
                 type="info"
                 size="large"
                 block
@@ -231,55 +248,42 @@ watch(() => activeTab.value, (newTab) => {
                 @click="startCameraScan"
               >
                 {{ t('receive.scanQR') }}
-              </n-button>
-              <n-text depth="3" class="scan-hint">
+              </NButton>
+              <NText depth="3" class="scan-hint">
                 {{ t('receive.scanQRHint') }}
-              </n-text>
+              </NText>
             </div>
 
             <!-- 扫描结果 -->
             <div v-if="scannedResult" class="scan-result">
-              <n-text strong class="result-label">{{ t('receive.scanQRSuccess') }}</n-text>
-              <n-input
+              <NText strong class="result-label">{{ t('receive.scanQRSuccess') }}</NText>
+              <NInput
                 :value="scannedResult"
                 type="textarea"
                 readonly
                 :rows="3"
                 class="result-text"
               />
-              <n-button
-                type="default"
-                size="medium"
-                block
-                @click="copyScannedResult"
-              >
+              <NButton type="default" size="medium" block @click="copyScannedResult">
                 {{ t('common.copy') }}
-              </n-button>
+              </NButton>
             </div>
           </div>
-        </n-tab-pane>
+        </NTabPane>
 
         <!-- 您的二维码标签页 -->
-        <n-tab-pane name="yourQR" :tab="t('receive.yourQR')">
+        <NTabPane name="yourQR" :tab="t('receive.yourQR')">
           <div class="qr-container">
             <div v-if="isLoadingQR || !currentAddress" class="qr-skeleton">
-              <n-skeleton
-                :width="280"
-                :height="280"
-                :animated="true"
-                class="qr-skeleton-item"
-              />
+              <NSkeleton :width="280" :height="280" :animated="true" class="qr-skeleton-item" />
             </div>
             <div v-else-if="qrCodeData" class="qr-code-wrapper">
-              <QRCodeWithLogo
-                :value="qrCodeData"
-                :size="280"
-              />
+              <QRCodeWithLogo :value="qrCodeData" :size="280" />
             </div>
           </div>
 
           <div v-if="currentAddress" class="address-section">
-            <n-text depth="3" class="account-label">{{ t('receive.accountLabel') }}</n-text>
+            <NText depth="3" class="account-label">{{ t('receive.accountLabel') }}</NText>
             <div class="address-display">
               <AddressEllipsis
                 :address="currentAddress"
@@ -289,7 +293,7 @@ watch(() => activeTab.value, (newTab) => {
                 @copy="copyAddress"
               />
             </div>
-            <n-button
+            <NButton
               type="default"
               size="medium"
               block
@@ -297,25 +301,16 @@ watch(() => activeTab.value, (newTab) => {
               @click="copyAddress"
             >
               {{ t('receive.copyAddress') }}
-            </n-button>
+            </NButton>
           </div>
 
           <div v-else class="loading-section">
-            <n-skeleton
-              :width="'100%'"
-              :height="20"
-              :animated="true"
-            />
-            <n-skeleton
-              :width="'80%'"
-              :height="20"
-              :animated="true"
-              style="margin-top: 8px;"
-            />
+            <NSkeleton :width="'100%'" :height="20" :animated="true" />
+            <NSkeleton :width="'80%'" :height="20" :animated="true" style="margin-top: 8px" />
           </div>
-        </n-tab-pane>
-      </n-tabs>
-    </n-card>
+        </NTabPane>
+      </NTabs>
+    </NCard>
   </div>
 </template>
 
@@ -478,7 +473,7 @@ watch(() => activeTab.value, (newTab) => {
     width: 240px;
     height: 240px;
   }
-  
+
   .qr-skeleton-item {
     width: 240px !important;
     height: 240px !important;
