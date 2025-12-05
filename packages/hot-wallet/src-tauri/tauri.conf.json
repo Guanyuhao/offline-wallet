@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "HotWallet",
+  "version": "0.1.0",
+  "identifier": "com.offlinewallet.hot",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:1421",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "热钱包 - 交易助手",
+        "width": 400,
+        "height": 600,
+        "resizable": true,
+        "fullscreen": false,
+        "minimizable": true,
+        "maximizable": true,
+        "closable": true,
+        "transparent": false,
+        "decorations": true,
+        "alwaysOnTop": false,
+        "skipTaskbar": false,
+        "visible": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https: ws://localhost:* http://localhost:* ipc://localhost; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+    },
+    "withGlobalTauri": true
+  },
+  "plugins": {
+    "webview": {
+      "additionalBrowserArgs": "--enable-features=VaapiVideoDecoder,UseSkiaRenderer --enable-gpu-rasterization"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "../../../src-tauri/icons/32x32.png",
+      "../../../src-tauri/icons/128x128.png",
+      "../../../src-tauri/icons/128x128@2x.png",
+      "../../../src-tauri/icons/icon.icns",
+      "../../../src-tauri/icons/icon.ico"
+    ],
+    "resources": ["../../../src-tauri/icons/icon.png", "../../../src-tauri/icons/128x128.png"],
+    "iOS": {
+      "developmentTeam": "ZZAL7KSM56"
+    }
+  }
+}

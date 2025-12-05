@@ -1,0 +1,18 @@
+{
+  "cold-wallet-capabilities": {
+    "identifier": "cold-wallet-capabilities",
+    "description": "Cold wallet capabilities - completely offline",
+    "local": true,
+    "windows": ["main"],
+    "permissions": [
+      "core:default",
+      "core:window:allow-close",
+      "core:window:allow-hide",
+      "core:window:allow-show",
+      "core:window:allow-minimize",
+      "core:window:allow-maximize",
+      "core:window:allow-unmaximize",
+      "core:window:allow-start-dragging"
+    ]
+  }
+}

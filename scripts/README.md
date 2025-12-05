@@ -49,14 +49,14 @@ python3 scripts/fetch_chain_icons.py
 
 在前端代码中，可以通过以下方式使用图标：
 
-```vue
+```tsx
 <img src="/icons/eth.png" alt="Ethereum" />
 ```
 
 或者使用动态路径：
 
-```vue
-<img :src="`/icons/${chain.toLowerCase()}.png`" :alt="chainName" />
+```tsx
+<img src={`/icons/${chain.toLowerCase()}.png`} alt={chainName} />
 ```
 
 ## 注意事项
@@ -64,4 +64,3 @@ python3 scripts/fetch_chain_icons.py
 - 脚本使用 Python 标准库，无需额外依赖
 - 图标会自动覆盖已存在的文件
 - 如果所有源都失败，会跳过该链的图标下载
-

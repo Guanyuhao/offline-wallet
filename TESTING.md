@@ -157,7 +157,7 @@ describe('Component Integration', () => {
 
 ### 3. 组件测试 (Component Tests)
 
-测试 Vue 组件的渲染和交互。
+测试 React 组件的渲染和交互。
 
 **要求**:
 
@@ -165,7 +165,7 @@ describe('Component Integration', () => {
 - 测试 props 传递
 - 测试事件触发
 - 测试用户交互（点击、输入等）
-- 使用 Testing Library 进行用户中心测试
+- 使用 React Testing Library 进行用户中心测试
 
 **示例**:
 
@@ -453,16 +453,11 @@ open coverage/index.html
 - 快速执行
 - 内置覆盖率
 
-### Vue Test Utils
+### React Testing Library
 
-- Vue 组件测试工具
-- mount/shallowMount
-- 组件交互测试
-
-### Testing Library
-
+- React 组件测试工具
+- render/screen 查询
 - 用户中心测试
-- 查询元素
 - 用户交互模拟
 
 ## 🔍 测试检查清单
@@ -500,6 +495,6 @@ open coverage/index.html
 ## 📖 参考资源
 
 - [Vitest 文档](https://vitest.dev/)
-- [Vue Test Utils 文档](https://test-utils.vuejs.org/)
+- [React Testing Library 文档](https://testing-library.com/react/)
 - [Testing Library 文档](https://testing-library.com/)
 - [测试最佳实践](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library)

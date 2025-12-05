@@ -4,7 +4,7 @@
 
 ## ✅ 已完成的核心功能
 
-- ✅ **测试框架**: Vitest + Vue Test Utils + Testing Library（覆盖率目标 70%）
+- ✅ **测试框架**: Vitest + React Testing Library（覆盖率目标 70%）
 - ✅ **代码质量**: TypeScript 严格模式 + ESLint + Prettier + Git Hooks
 - ✅ **错误处理**: ErrorBoundary + 全局错误处理 + 错误国际化
 - ✅ **UX 优化**: LoadingState + EmptyState + ErrorState 组件
@@ -17,8 +17,7 @@
 
 - `vitest`: 测试框架
 - `@vitest/ui`: 测试 UI
-- `@vue/test-utils`: Vue 组件测试工具
-- `@testing-library/vue`: Vue Testing Library
+- `@testing-library/react`: React 组件测试工具
 - `@testing-library/jest-dom`: DOM 断言
 - `@testing-library/user-event`: 用户交互模拟
 - `jsdom`: DOM 环境模拟
@@ -28,7 +27,8 @@
 - `eslint`: 代码检查
 - `@typescript-eslint/eslint-plugin`: TypeScript ESLint 插件
 - `@typescript-eslint/parser`: TypeScript ESLint 解析器
-- `eslint-plugin-vue`: Vue ESLint 插件
+- `eslint-plugin-react`: React ESLint 插件
+- `eslint-plugin-react-hooks`: React Hooks ESLint 插件
 - `eslint-config-prettier`: Prettier 集成
 - `prettier`: 代码格式化
 
@@ -70,7 +70,7 @@ pnpm build:prod       # 生产构建（包含检查）
 ├── src/
 │   ├── test/              # 测试工具和配置
 │   ├── components/common/ # 通用组件（Loading/Empty/Error）
-│   └── composables/       # Composables（错误处理等）
+│   └── hooks/             # React Hooks（错误处理等）
 ```
 
 详细文件结构请查看项目根目录。
@@ -90,7 +90,8 @@ pnpm build:prod       # 生产构建（包含检查）
 
 ### ESLint 规则
 
-- Vue 3 最佳实践
+- React 最佳实践
+- React Hooks 规则
 - TypeScript 严格规则
 - 代码质量规则
 
@@ -222,10 +223,10 @@ GitHub Actions 配置了完整的 CI/CD 流程：
 
 ### 组件规范
 
-- 使用 `<script setup>` 语法
-- 明确 props 类型
-- 使用 `defineEmits` 定义事件
-- 添加必要的注释
+- 使用函数式组件
+- 明确 props 类型（使用 TypeScript interface）
+- 使用 React Hooks 管理状态和副作用
+- 添加必要的注释和类型注解
 
 ## 🔒 安全
 

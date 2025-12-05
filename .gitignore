@@ -1,4 +1,4 @@
-# Logs
+# ==================== 日志文件 ====================
 logs
 *.log
 npm-debug.log*
@@ -7,23 +7,95 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# ==================== Node.js / pnpm ====================
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
+
+# ==================== 构建产物 ====================
+dist/
+dist-ssr/
+build/
 *.local
 
-# Test coverage
+# ==================== Rust / Cargo ====================
+# Rust 编译产物
+**/target/
+# 保留 Cargo.lock（应用项目应该提交）
+# Cargo.lock
+
+# Rust 调试文件
+*.pdb
+*.dSYM/
+
+# ==================== Tauri ====================
+# Tauri 生成的代码（部分可能需要提交，根据实际情况调整）
+# **/src-tauri/gen/
+
+# Tauri 构建产物
+**/src-tauri/target/
+**/src-tauri/WixTools/
+
+# ==================== 测试覆盖率 ====================
 coverage/
 *.lcov
 .nyc_output
+.nyc_output/
 
-# Editor directories and files
+# ==================== 环境变量 ====================
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# ==================== IDE 和编辑器 ====================
 .vscode/*
 !.vscode/extensions.json
-.idea
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ==================== 操作系统文件 ====================
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ==================== 临时文件 ====================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.cache
+.cache/
+
+# ==================== 其他 ====================
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.orig
+*.rej

@@ -14,13 +14,13 @@
 
 ### 阶段一：代码质量与架构优化 ✅
 
-- 前端架构重构（Pinia + Composables + TypeScript）
+- 前端架构重构（React + TypeScript）
 - 后端架构优化（模块化 + 测试覆盖 >70%）
 - 代码质量工具（ESLint + Prettier + Git Hooks + CI/CD）
 
 ### 阶段二：国际化支持 ✅
 
-- 前端国际化（vue-i18n + 中英文完整翻译 + 语言切换）
+- 前端国际化（中英文完整翻译 + 语言切换）
 
 ### 阶段五：安全性增强 ✅
 
@@ -193,7 +193,7 @@
 ### 8.1 自动化测试 ✅
 
 - [x] 单元测试（Vitest）
-- [x] 组件测试（Vue Test Utils）
+- [x] 组件测试（React Testing Library）
 - [ ] E2E 测试（Playwright）
 - [x] Rust 单元测试
 - [x] 集成测试

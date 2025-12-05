@@ -7,6 +7,5 @@
   "useTabs": false,
   "arrowParens": "always",
   "endOfLine": "lf",
-  "bracketSpacing": true,
-  "vueIndentScriptAndStyle": false
+  "bracketSpacing": true
 }
