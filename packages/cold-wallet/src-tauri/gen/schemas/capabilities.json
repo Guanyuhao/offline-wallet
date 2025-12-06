@@ -1,7 +1,7 @@
 {
   "cold-wallet-capabilities": {
     "identifier": "cold-wallet-capabilities",
-    "description": "Cold wallet capabilities - completely offline",
+    "description": "Cold wallet capabilities for desktop - no barcode scanner (desktop uses Web API)",
     "local": true,
     "windows": ["main"],
     "permissions": [
@@ -13,6 +13,25 @@
       "core:window:allow-maximize",
       "core:window:allow-unmaximize",
       "core:window:allow-start-dragging"
-    ]
+    ],
+    "platforms": ["macOS", "windows", "linux"]
+  },
+  "cold-wallet-capabilities-mobile": {
+    "identifier": "cold-wallet-capabilities-mobile",
+    "description": "Cold wallet capabilities for mobile (iOS/Android) - includes barcode scanner",
+    "local": true,
+    "windows": ["main"],
+    "permissions": [
+      "core:default",
+      "core:window:allow-close",
+      "core:window:allow-hide",
+      "core:window:allow-show",
+      "core:window:allow-minimize",
+      "core:window:allow-maximize",
+      "core:window:allow-unmaximize",
+      "core:window:allow-start-dragging",
+      "barcode-scanner:default"
+    ],
+    "platforms": ["iOS", "android"]
   }
 }

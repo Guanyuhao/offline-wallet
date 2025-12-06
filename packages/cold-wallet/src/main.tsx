@@ -6,7 +6,11 @@ import 'antd-mobile/es/global';
 import App from './App';
 import './styles/index.css';
 
-ReactDOM.createRoot(document.getElementById('app')!).render(
+const rootElement = document.getElementById('app');
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <ConfigProvider locale={zhCN}>
       <App />

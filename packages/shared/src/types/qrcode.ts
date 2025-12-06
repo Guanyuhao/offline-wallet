@@ -28,7 +28,7 @@ export interface QRCodeBase {
   /** 时间戳 */
   timestamp: number;
   /** 链类型 */
-  chain: 'eth' | 'btc' | 'sol' | 'bnb' | 'tron';
+  chain: 'eth' | 'btc' | 'sol' | 'bnb' | 'tron' | 'kaspa';
 }
 
 /**

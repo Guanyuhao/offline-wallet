@@ -4,17 +4,37 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev:cold": "cd packages/cold-wallet && pnpm dev",
-    "dev:hot": "cd packages/hot-wallet && pnpm dev",
-    "build:cold": "cd packages/cold-wallet && pnpm tauri build",
-    "build:hot": "cd packages/hot-wallet && pnpm tauri build",
+    "dev": "pnpm --filter cold-wallet dev",
+    "dev:cold": "pnpm --filter cold-wallet tauri dev",
+    "dev:hot": "pnpm --filter hot-wallet tauri dev",
+    "dev:all": "pnpm --parallel --filter './packages/*' tauri dev",
+    "build": "pnpm --filter cold-wallet build",
+    "build:cold": "pnpm --filter cold-wallet tauri build",
+    "build:hot": "pnpm --filter hot-wallet tauri build",
+    "build:all": "pnpm --filter './packages/*' tauri build",
+    "build:cold:ios": "pnpm --filter cold-wallet build:ios",
+    "build:cold:android": "pnpm --filter cold-wallet build:android",
+    "build:hot:ios": "pnpm --filter hot-wallet build:ios",
+    "build:hot:android": "pnpm --filter hot-wallet build:android",
+    "clean": "pnpm --filter './packages/*' clean && rm -rf node_modules packages/*/node_modules packages/*/dist packages/*/src-tauri/target",
+    "clean:cold": "pnpm --filter cold-wallet clean && rm -rf packages/cold-wallet/dist packages/cold-wallet/src-tauri/target",
+    "clean:hot": "pnpm --filter hot-wallet clean && rm -rf packages/hot-wallet/dist packages/hot-wallet/src-tauri/target",
+    "typecheck": "pnpm --filter './packages/*' typecheck",
+    "lint": "pnpm --filter './packages/*' lint",
+    "lint:fix": "pnpm --filter './packages/*' lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\" --ignore-path .gitignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\" --ignore-path .gitignore",
     "fetch-icons": "python3 scripts/fetch_chain_icons.py",
+    "generate-icons": "node scripts/generate-wallet-icons.js",
     "prepare": "husky install || true"
   },
-  "dependencies": {},
   "devDependencies": {
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.0",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "sharp": "^0.34.5"
   }
 }

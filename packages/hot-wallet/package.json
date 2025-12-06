@@ -5,11 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
     "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "build": "tsc --noEmit && vite build",
+    "build:tauri": "pnpm build && tauri build",
     "build:ios": "tauri ios build --open",
-    "build:android": "tauri android build --open"
+    "build:android": "tauri android build --open",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "clean": "rm -rf dist node_modules/.vite .vite src-tauri/target"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

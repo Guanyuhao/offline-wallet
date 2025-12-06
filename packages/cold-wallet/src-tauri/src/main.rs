@@ -8,16 +8,16 @@ mod qrcode;
 mod chains;
 
 use crypto::{mnemonic, secure_storage};
+use chains::address_validation::{self, AddressValidationResult};
 
-#[cfg(target_os = "ios")]
-#[no_mangle]
-pub extern "C" fn run_app() {
-    main();
-}
-
-#[cfg(not(target_os = "ios"))]
-fn main() {
-    tauri::Builder::default()
+fn setup_app() {
+    let builder = tauri::Builder::default();
+    
+    // 仅在移动端注册二维码扫描插件
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    let builder = builder.plugin(tauri_plugin_barcode_scanner::init());
+    
+    builder
         .invoke_handler(tauri::generate_handler![
             // 安全存储相关
             store_encrypted_mnemonic,
@@ -30,6 +30,9 @@ fn main() {
             validate_mnemonic,
             // 地址生成
             derive_address,
+            // 地址验证
+            validate_address,
+            validate_address_with_message,
             // 交易签名
             sign_transaction,
             // 二维码生成
@@ -37,6 +40,17 @@ fn main() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[cfg(target_os = "ios")]
+#[tauri::mobile_entry_point]
+fn main() {
+    setup_app();
+}
+
+#[cfg(not(target_os = "ios"))]
+fn main() {
+    setup_app();
 }
 
 // ==================== 安全存储命令 ====================
@@ -96,10 +110,23 @@ fn derive_address(
         "sol" => chains::ChainType::Sol,
         "bnb" => chains::ChainType::Bnb,
         "tron" => chains::ChainType::Tron,
+        "kaspa" | "kas" => chains::ChainType::Kaspa,
         _ => return Err(format!("Unsupported chain: {}", chain)),
     };
 
     chains::derive_address(chain_type, &mnemonic, derivation_path.as_deref())
+}
+
+// ==================== 地址验证命令 ====================
+
+#[tauri::command]
+fn validate_address(chain: String, address: String) -> Result<bool, String> {
+    Ok(address_validation::validate_address(&chain.to_uppercase(), &address))
+}
+
+#[tauri::command]
+fn validate_address_with_message(chain: String, address: String) -> Result<AddressValidationResult, String> {
+    Ok(address_validation::validate_address_with_message(&chain.to_uppercase(), &address))
 }
 
 // ==================== 交易签名命令 ====================
@@ -112,6 +139,7 @@ fn sign_transaction(chain: String, mnemonic: String, tx_data: String) -> Result<
         "sol" => chains::ChainType::Sol,
         "bnb" => chains::ChainType::Bnb,
         "tron" => chains::ChainType::Tron,
+        "kaspa" | "kas" => chains::ChainType::Kaspa,
         _ => return Err(format!("Unsupported chain: {}", chain)),
     };
 

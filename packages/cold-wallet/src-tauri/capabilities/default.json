@@ -1,8 +1,9 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "identifier": "cold-wallet-capabilities",
-  "description": "Cold wallet capabilities - completely offline",
+  "description": "Cold wallet capabilities for desktop - no barcode scanner (desktop uses Web API)",
   "windows": ["main"],
+  "platforms": ["macOS", "windows", "linux"],
   "permissions": [
     "core:default",
     "core:window:allow-close",

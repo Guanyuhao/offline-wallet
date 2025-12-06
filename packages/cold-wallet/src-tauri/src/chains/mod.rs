@@ -3,6 +3,8 @@ pub mod bitcoin;
 pub mod solana;
 pub mod bnb;
 pub mod tron;
+pub mod kaspa;
+pub mod address_validation;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -14,6 +16,7 @@ pub enum ChainType {
     Sol,
     Bnb,
     Tron,
+    Kaspa,
 }
 
 /// 从助记词派生地址
@@ -52,6 +55,10 @@ pub fn derive_address(
         }
         ChainType::Tron => {
             let result = tron::derive_tron_address(mnemonic, None, index)?;
+            Ok(result.address)
+        }
+        ChainType::Kaspa => {
+            let result = kaspa::derive_kaspa_address(mnemonic, None, index)?;
             Ok(result.address)
         }
     }
@@ -120,6 +127,17 @@ pub fn sign_transaction(
                 .and_then(|v| v.as_u64())
                 .unwrap_or(0) as u32;
             let result = tron::sign_tron_transaction(mnemonic, None, index, tx)?;
+            Ok(serde_json::to_string(&result)
+                .map_err(|e| format!("Failed to serialize: {}", e))?)
+        }
+        ChainType::Kaspa => {
+            let tx: kaspa::KaspaTransaction = serde_json::from_value(tx_json.clone())
+                .map_err(|e| format!("Invalid KASPA transaction: {}", e))?;
+            let index = tx_json
+                .get("index")
+                .and_then(|v| v.as_u64())
+                .unwrap_or(0) as u32;
+            let result = kaspa::sign_kaspa_transaction(mnemonic, None, index, tx)?;
             Ok(serde_json::to_string(&result)
                 .map_err(|e| format!("Failed to serialize: {}", e))?)
         }

@@ -1,6 +1,48 @@
-# 图标抓取脚本
+# 脚本说明
 
-## 功能
+## 钱包图标生成脚本
+
+### 功能
+
+自动生成冷钱包和热钱包的应用图标，支持多种尺寸和格式（PNG、ICNS、ICO）。
+
+### 使用方法
+
+```bash
+# 使用 npm 脚本（推荐）
+pnpm generate-icons
+
+# 或直接运行
+node scripts/generate-wallet-icons.js
+```
+
+### 生成的图标
+
+脚本会为冷钱包和热钱包分别生成以下图标文件：
+
+- `32x32.png` - 小尺寸图标
+- `128x128.png` - 标准尺寸图标
+- `128x128@2x.png` - 高分辨率图标（256x256）
+- `icon.png` - 大尺寸图标（512x512）
+- `icon.icns` - macOS 图标文件
+- `icon.ico` - Windows 图标文件
+- `{cold|hot}-icon.svg` - SVG 源文件
+
+### 图标设计
+
+- **冷钱包图标**：蓝色/冷色调，保险箱风格，带有离线指示器和安全盾牌装饰
+- **热钱包图标**：红色/暖色调，现代钱包风格，带有在线指示器和交易箭头装饰
+
+### 输出位置
+
+- 冷钱包图标：`packages/cold-wallet/src-tauri/icons/`
+- 热钱包图标：`packages/hot-wallet/src-tauri/icons/`
+
+---
+
+## 区块链图标抓取脚本
+
+### 功能
 
 自动从公开 CDN 抓取主流区块链的图标，保存为 PNG 格式供应用使用。
 

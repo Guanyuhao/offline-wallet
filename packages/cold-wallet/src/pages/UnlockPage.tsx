@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Button, Card, Input, Toast } from 'antd-mobile';
-import { NavBar, SafeArea } from 'antd-mobile';
+import { Toast } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
 import useWalletStore from '../stores/useWalletStore';
+import PasswordInput from '../components/PasswordInput';
+import StandardCard from '../components/StandardCard';
+import PrimaryButton from '../components/PrimaryButton';
 
 function UnlockPage() {
   const navigate = useNavigate();
@@ -14,6 +16,7 @@ function UnlockPage() {
 
   useEffect(() => {
     checkWalletExists();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkWalletExists = async () => {
@@ -80,13 +83,11 @@ function UnlockPage() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '16px',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        padding: '20px',
+        background: '#f5f5f7',
       }}
     >
-      <SafeArea position="top" />
-
-      <Card
+      <StandardCard
         style={{
           width: '100%',
           maxWidth: '400px',
@@ -96,36 +97,50 @@ function UnlockPage() {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '24px',
+            gap: '32px',
             alignItems: 'center',
+            padding: '8px',
           }}
         >
           <div
             style={{
-              fontSize: '64px',
+              fontSize: '72px',
             }}
           >
             🔒
           </div>
-          <h1>解锁钱包</h1>
-          <p style={{ color: '#666', textAlign: 'center' }}>请输入密码解锁您的钱包</p>
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 600, color: '#1d1d1f' }}>
+              解锁钱包
+            </h1>
+            <p
+              style={{
+                marginTop: '8px',
+                color: '#86868b',
+                fontSize: '17px',
+              }}
+            >
+              请输入密码解锁您的钱包
+            </p>
+          </div>
 
-          <Input
-            type="password"
+          <PasswordInput
             placeholder="请输入密码"
             value={password}
             onChange={(val) => setPassword(val)}
             onEnterPress={handleUnlock}
-            style={{ width: '100%' }}
+            style={{
+              width: '100%',
+              borderRadius: '12px',
+              fontSize: '17px',
+            }}
           />
 
-          <Button color="primary" block loading={loading} onClick={handleUnlock}>
+          <PrimaryButton loading={loading} onClick={handleUnlock}>
             解锁
-          </Button>
+          </PrimaryButton>
         </div>
-      </Card>
-
-      <SafeArea position="bottom" />
+      </StandardCard>
     </div>
   );
 }

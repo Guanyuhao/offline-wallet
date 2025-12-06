@@ -3,19 +3,37 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "sideEffects": [
+    "*.css",
+    "**/*.css",
+    "src/styles/**/*",
+    "antd-mobile/es/global"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
     "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "build": "tsc --noEmit && vite build",
+    "build:tauri": "pnpm build && tauri build",
+    "ios:init": "tauri ios init",
+    "android:init": "tauri android init",
     "build:ios": "tauri ios build --open",
-    "build:android": "tauri android build --open"
+    "build:android": "tauri android build --open",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "clean": "rm -rf dist node_modules/.vite .vite src-tauri/target"
   },
   "dependencies": {
+    "@offline-wallet/shared": "workspace:*",
     "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-barcode-scanner": "~2",
     "@tauri-apps/plugin-biometric": "^2.3.2",
     "antd-mobile": "^5.37.0",
     "antd-mobile-icons": "^0.3.0",
+    "jsqr": "^1.4.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
@@ -23,6 +41,7 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
+    "@types/node": "^24.10.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

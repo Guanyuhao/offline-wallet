@@ -2,8 +2,6 @@
  * 工具函数集合
  */
 
-import { QRCodeProtocol, QRCodeType, AddressQRCode } from '@shared/types/qrcode';
-
 /**
  * 格式化地址显示（中间省略）
  */
@@ -28,16 +26,19 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 /**
- * 生成地址二维码数据
+ * 从剪贴板读取文本
  */
-export function createAddressQRCode(chain: string, address: string, label?: string): string {
-  const data: AddressQRCode = {
-    type: QRCodeType.ADDRESS,
-    version: '1.0.0',
-    timestamp: Date.now(),
-    chain: chain as any,
-    address,
-    label,
-  };
-  return QRCodeProtocol.encode(data);
+export async function readFromClipboard(): Promise<string | null> {
+  try {
+    const text = await navigator.clipboard.readText();
+    return text;
+  } catch (error) {
+    console.error('读取剪贴板失败:', error);
+    return null;
+  }
 }
+
+// 注意：createAddressQRCode, loadBarcodeScanner, ensureCameraPermission, scanQRCode
+// 已迁移到 @offline-wallet/shared/utils
+// 请从 shared 包导入：
+// import { createAddressQRCode, loadBarcodeScanner, ensureCameraPermission, scanQRCode } from '@offline-wallet/shared/utils';

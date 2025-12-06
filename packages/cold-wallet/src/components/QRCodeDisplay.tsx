@@ -74,7 +74,9 @@ function QRCodeDisplay({ data, size = 256 }: QRCodeDisplayProps) {
       style={{
         width: size,
         height: size,
-        borderRadius: '8px',
+        borderRadius: '12px',
+        display: 'block',
+        background: '#ffffff',
       }}
     />
   );

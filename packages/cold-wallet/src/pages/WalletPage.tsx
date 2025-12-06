@@ -1,18 +1,23 @@
 import { useState, useEffect } from 'react';
-import { Button, Card, Grid, Toast, Dialog } from 'antd-mobile';
-import { NavBar, SafeArea, TabBar } from 'antd-mobile';
+import { Button, Grid, Toast, Dialog, Space } from 'antd-mobile';
+import {
+  ReceivePaymentOutline,
+  HandPayCircleOutline,
+  LockOutline,
+  SetOutline,
+} from 'antd-mobile-icons';
 import { useNavigate } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
-import { AppOutline, PayCircleOutline, UserOutline } from 'antd-mobile-icons';
 import useWalletStore from '../stores/useWalletStore';
-import QRCodeDisplay from '../components/QRCodeDisplay';
-import { formatAddress, createAddressQRCode, copyToClipboard } from '../utils';
+import PageLayout from '../components/PageLayout';
+import StandardCard from '../components/StandardCard';
+import AddressDisplay from '../components/AddressDisplay';
+import { ChainType, SUPPORTED_CHAINS, CHAIN_DISPLAY_NAMES } from '../config/chainConfig';
 
 function WalletPage() {
   const navigate = useNavigate();
   const { isUnlocked, mnemonic, currentChain, address, setAddress, setUnlocked, clearMnemonic } =
     useWalletStore();
-  const [showQRCode, setShowQRCode] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -21,6 +26,7 @@ function WalletPage() {
       return;
     }
     loadAddress();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isUnlocked, mnemonic, currentChain]);
 
   const loadAddress = async () => {
@@ -44,6 +50,15 @@ function WalletPage() {
     }
   };
 
+  const handleChainChange = (chain: ChainType) => {
+    // 如果选择的是当前链，直接返回，避免不必要的更新
+    if (chain === currentChain) {
+      return;
+    }
+    // 直接更新状态，React 会自动批处理更新
+    useWalletStore.getState().setCurrentChain(chain);
+  };
+
   const handleLock = () => {
     Dialog.confirm({
       content: '确定要锁定钱包吗？',
@@ -57,172 +72,154 @@ function WalletPage() {
 
   const handleShowQRCode = () => {
     if (!address) return;
-    setShowQRCode(true);
+    navigate('/receive');
   };
 
-  const qrCodeData = address ? createAddressQRCode(currentChain, address) : '';
-
   return (
-    <div
-      style={{
-        height: '100vh',
-        minHeight: '-webkit-fill-available',
-        display: 'flex',
-        flexDirection: 'column',
+    <PageLayout
+      title="我的钱包"
+      showBack={false}
+      navBarProps={{
+        right: (
+          <Button size="small" color="warning" onClick={handleLock}>
+            <Space>
+              <LockOutline fontSize={16} />
+              <span>锁定</span>
+            </Space>
+          </Button>
+        ),
       }}
     >
-      <SafeArea position="top" />
-      <NavBar
-        right={
-          <Button size="small" color="danger" onClick={handleLock}>
-            锁定
-          </Button>
-        }
-      >
-        我的钱包
-      </NavBar>
-
-      <div
+      {/* 地址卡片 */}
+      <StandardCard
         style={{
-          flex: 1,
-          overflow: 'auto',
-          padding: '16px',
+          marginBottom: '16px',
         }}
       >
-        {/* 地址卡片 */}
-        <Card style={{ marginBottom: '16px' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+          }}
+        >
           <div
             style={{
               display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <span style={{ color: '#666' }}>当前链</span>
-              <span style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{currentChain}</span>
-            </div>
+            <span style={{ color: '#666' }}>当前链</span>
+            <span style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{currentChain}</span>
+          </div>
 
-            {address && (
-              <>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '8px',
-                  }}
-                >
-                  <span style={{ color: '#666' }}>地址</span>
-                  <div
+          {address && (
+            <>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+              >
+                <span style={{ color: '#86868b', fontSize: '15px' }}>地址</span>
+                <AddressDisplay address={address} />
+              </div>
+
+              <Grid columns={2} gap={8}>
+                <Grid.Item>
+                  <Button
+                    color="primary"
+                    block
+                    onClick={handleShowQRCode}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
+                      borderRadius: '12px',
+                      height: '44px',
+                      fontSize: '16px',
                     }}
                   >
-                    <span
-                      style={{
-                        fontFamily: 'monospace',
-                        wordBreak: 'break-all',
-                        flex: 1,
-                      }}
-                    >
-                      {formatAddress(address)}
-                    </span>
-                    <Button
-                      size="small"
-                      onClick={async () => {
-                        const success = await copyToClipboard(address);
-                        if (success) {
-                          Toast.show({
-                            content: '已复制',
-                            position: 'top',
-                          });
-                        }
-                      }}
-                    >
-                      复制
-                    </Button>
-                  </div>
-                </div>
+                    <Space>
+                      <ReceivePaymentOutline />
+                      <span>收款</span>
+                    </Space>
+                  </Button>
+                </Grid.Item>
+                <Grid.Item>
+                  <Button
+                    color="default"
+                    block
+                    onClick={() => navigate('/sign')}
+                    style={{
+                      borderRadius: '12px',
+                      height: '44px',
+                      fontSize: '16px',
+                    }}
+                  >
+                    <Space>
+                      <HandPayCircleOutline />
+                      <span>签名交易</span>
+                    </Space>
+                  </Button>
+                </Grid.Item>
+              </Grid>
+            </>
+          )}
 
-                <Grid columns={2} gap={8}>
-                  <Grid.Item>
-                    <Button color="primary" block onClick={handleShowQRCode}>
-                      显示二维码
-                    </Button>
-                  </Grid.Item>
-                  <Grid.Item>
-                    <Button color="success" block onClick={() => navigate('/sign')}>
-                      签名交易
-                    </Button>
-                  </Grid.Item>
-                </Grid>
-              </>
-            )}
+          {loading && <div style={{ textAlign: 'center', color: '#999' }}>加载中...</div>}
+        </div>
+      </StandardCard>
 
-            {loading && <div style={{ textAlign: 'center', color: '#999' }}>加载中...</div>}
-          </div>
-        </Card>
+      {/* 链选择 */}
+      <StandardCard
+        title="选择链"
+        style={{
+          marginTop: '16px',
+        }}
+      >
+        <Grid columns={3} gap={8}>
+          {SUPPORTED_CHAINS.map((chain) => (
+            <Grid.Item key={chain}>
+              <Button
+                color={currentChain === chain ? 'primary' : 'default'}
+                block
+                onClick={() => handleChainChange(chain)}
+                style={{
+                  borderRadius: '8px',
+                  height: '44px',
+                  fontSize: '14px',
+                  fontWeight: currentChain === chain ? '600' : '400',
+                }}
+              >
+                {CHAIN_DISPLAY_NAMES[chain]}
+              </Button>
+            </Grid.Item>
+          ))}
+        </Grid>
+      </StandardCard>
 
-        {/* 链选择 */}
-        <Card title="选择链">
-          <Grid columns={3} gap={8}>
-            {(['eth', 'btc', 'sol', 'bnb', 'tron'] as const).map((chain) => (
-              <Grid.Item key={chain}>
-                <Button
-                  color={currentChain === chain ? 'primary' : 'default'}
-                  block
-                  onClick={() => {
-                    useWalletStore.getState().setCurrentChain(chain);
-                  }}
-                >
-                  {chain.toUpperCase()}
-                </Button>
-              </Grid.Item>
-            ))}
-          </Grid>
-        </Card>
-      </div>
-
-      {/* 二维码弹窗 */}
-      {showQRCode && address && (
-        <Dialog
-          visible={showQRCode}
-          content={
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '16px',
-                padding: '16px',
-              }}
-            >
-              <h3>地址二维码</h3>
-              <QRCodeDisplay data={qrCodeData} size={256} />
-              <p style={{ fontSize: '12px', color: '#666', wordBreak: 'break-all' }}>{address}</p>
-            </div>
-          }
-          closeOnAction
-          onClose={() => setShowQRCode(false)}
-          actions={[
-            {
-              key: 'close',
-              text: '关闭',
-            },
-          ]}
-        />
-      )}
-
-      <SafeArea position="bottom" />
-    </div>
+      {/* 设置入口 */}
+      <StandardCard
+        style={{
+          marginTop: '16px',
+        }}
+      >
+        <Button
+          block
+          onClick={() => navigate('/settings')}
+          style={{
+            borderRadius: '12px',
+            height: '50px',
+            fontSize: '18px',
+          }}
+        >
+          <Space>
+            <SetOutline />
+            <span>设置</span>
+          </Space>
+        </Button>
+      </StandardCard>
+    </PageLayout>
   );
 }
 

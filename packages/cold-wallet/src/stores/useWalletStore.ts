@@ -4,14 +4,14 @@ interface WalletState {
   // 钱包状态
   isUnlocked: boolean;
   hasWallet: boolean;
-  currentChain: 'eth' | 'btc' | 'sol' | 'bnb' | 'tron';
+  currentChain: 'eth' | 'btc' | 'sol' | 'bnb' | 'tron' | 'kaspa';
   address: string | null;
   mnemonic: string | null; // 仅在内存中，解锁时临时存储
 
   // Actions
   setUnlocked: (unlocked: boolean) => void;
   setHasWallet: (has: boolean) => void;
-  setCurrentChain: (chain: 'eth' | 'btc' | 'sol' | 'bnb' | 'tron') => void;
+  setCurrentChain: (chain: 'eth' | 'btc' | 'sol' | 'bnb' | 'tron' | 'kaspa') => void;
   setAddress: (address: string | null) => void;
   setMnemonic: (mnemonic: string | null) => void;
   reset: () => void;

@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Button, Card, TextArea, Toast } from 'antd-mobile';
-import { NavBar, SafeArea } from 'antd-mobile';
+import { TextArea, Toast } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
 import useWalletStore from '../stores/useWalletStore';
+import PasswordInput from '../components/PasswordInput';
+import PageLayout from '../components/PageLayout';
+import StandardCard from '../components/StandardCard';
+import PrimaryButton from '../components/PrimaryButton';
 
 function ImportWalletPage() {
   const navigate = useNavigate();
@@ -91,78 +94,52 @@ function ImportWalletPage() {
   };
 
   return (
-    <div
-      style={{
-        height: '100vh',
-        minHeight: '-webkit-fill-available',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <SafeArea position="top" />
-      <NavBar onBack={() => navigate(-1)}>导入钱包</NavBar>
+    <PageLayout title="导入钱包" onBack={() => navigate(-1)}>
+      <StandardCard>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}
+        >
+          <h2>导入钱包</h2>
+          <p style={{ color: '#666' }}>输入您的12或24个助记词</p>
 
-      <div
-        style={{
-          flex: 1,
-          overflow: 'auto',
-          padding: '16px',
-        }}
-      >
-        <Card>
-          <div
+          <TextArea
+            placeholder="请输入助记词，用空格分隔"
+            value={mnemonic}
+            onChange={(val) => setMnemonicLocal(val)}
+            rows={4}
+            style={{ fontFamily: 'monospace', borderRadius: '12px', fontSize: '17px' }}
+          />
+
+          <PasswordInput
+            placeholder="设置密码（至少8位）"
+            value={password}
+            onChange={(val) => setPassword(val)}
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
+              borderRadius: '12px',
+              fontSize: '17px',
             }}
-          >
-            <h2>导入钱包</h2>
-            <p style={{ color: '#666' }}>输入您的12或24个助记词</p>
+          />
 
-            <TextArea
-              placeholder="请输入助记词，用空格分隔"
-              value={mnemonic}
-              onChange={(val) => setMnemonicLocal(val)}
-              rows={4}
-              style={{ fontFamily: 'monospace' }}
-            />
+          <PasswordInput
+            placeholder="请再次输入密码"
+            value={confirmPassword}
+            onChange={(val) => setConfirmPassword(val)}
+            style={{
+              borderRadius: '12px',
+              fontSize: '17px',
+            }}
+          />
 
-            <input
-              type="password"
-              placeholder="设置密码（至少8位）"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '16px',
-              }}
-            />
-
-            <input
-              type="password"
-              placeholder="请再次输入密码"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              style={{
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '16px',
-              }}
-            />
-
-            <Button color="primary" block loading={loading} onClick={handleImport}>
-              导入钱包
-            </Button>
-          </div>
-        </Card>
-      </div>
-
-      <SafeArea position="bottom" />
-    </div>
+          <PrimaryButton loading={loading} onClick={handleImport}>
+            导入钱包
+          </PrimaryButton>
+        </div>
+      </StandardCard>
+    </PageLayout>
   );
 }
 

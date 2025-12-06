@@ -5,6 +5,11 @@ description = "Cold Wallet - Completely offline cryptocurrency wallet"
 authors = ["you"]
 edition = "2021"
 
+[lib]
+name = "cold_wallet_lib"
+path = "src/main.rs"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
@@ -30,8 +35,14 @@ secp256k1 = { version = "0.29", features = ["rand", "global-context", "recovery"
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
 bs58 = "0.5"
 
+# Bech32 编码（用于 Kaspa 地址）
+bech32 = "0.11"
+
 # Tron 相关
 sha3 = "0.10"
+
+# Kaspa 相关 - 官方地址生成库
+kaspa-addresses = "0.15"
 
 # 通用加密
 rand = "0.8"
@@ -64,4 +75,5 @@ chrono = "0.4"
 
 [target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
 tauri-plugin-biometric = "2"
+tauri-plugin-barcode-scanner = "2"
 
