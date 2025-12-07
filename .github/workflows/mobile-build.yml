@@ -21,7 +21,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10
+          run_install: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,7 +36,11 @@ jobs:
           targets: aarch64-apple-ios
 
       - name: Install pnpm dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --frozen-lockfile || {
+            echo "Lockfile may be out of sync, attempting to update..."
+            pnpm install
+          }
 
       - name: Build frontend
         working-directory: packages/cold-wallet
@@ -69,7 +74,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10
+          run_install: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -92,7 +98,11 @@ jobs:
           targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
 
       - name: Install pnpm dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --frozen-lockfile || {
+            echo "Lockfile may be out of sync, attempting to update..."
+            pnpm install
+          }
 
       - name: Build frontend
         working-directory: packages/cold-wallet

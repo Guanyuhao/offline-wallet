@@ -1,4 +1,113 @@
 {
+  "barcode-scanner": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "This permission set configures which\nbarcode scanning features are by default exposed.\n\n#### Granted Permissions\n\nIt allows all barcode related features.\n\n",
+      "permissions": [
+        "allow-cancel",
+        "allow-check-permissions",
+        "allow-open-app-settings",
+        "allow-request-permissions",
+        "allow-scan",
+        "allow-vibrate"
+      ]
+    },
+    "permissions": {
+      "allow-cancel": {
+        "identifier": "allow-cancel",
+        "description": "Enables the cancel command without any pre-configured scope.",
+        "commands": { "allow": ["cancel"], "deny": [] }
+      },
+      "allow-check-permissions": {
+        "identifier": "allow-check-permissions",
+        "description": "Enables the check_permissions command without any pre-configured scope.",
+        "commands": { "allow": ["check_permissions"], "deny": [] }
+      },
+      "allow-open-app-settings": {
+        "identifier": "allow-open-app-settings",
+        "description": "Enables the open_app_settings command without any pre-configured scope.",
+        "commands": { "allow": ["open_app_settings"], "deny": [] }
+      },
+      "allow-request-permissions": {
+        "identifier": "allow-request-permissions",
+        "description": "Enables the request_permissions command without any pre-configured scope.",
+        "commands": { "allow": ["request_permissions"], "deny": [] }
+      },
+      "allow-scan": {
+        "identifier": "allow-scan",
+        "description": "Enables the scan command without any pre-configured scope.",
+        "commands": { "allow": ["scan"], "deny": [] }
+      },
+      "allow-vibrate": {
+        "identifier": "allow-vibrate",
+        "description": "Enables the vibrate command without any pre-configured scope.",
+        "commands": { "allow": ["vibrate"], "deny": [] }
+      },
+      "deny-cancel": {
+        "identifier": "deny-cancel",
+        "description": "Denies the cancel command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["cancel"] }
+      },
+      "deny-check-permissions": {
+        "identifier": "deny-check-permissions",
+        "description": "Denies the check_permissions command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["check_permissions"] }
+      },
+      "deny-open-app-settings": {
+        "identifier": "deny-open-app-settings",
+        "description": "Denies the open_app_settings command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["open_app_settings"] }
+      },
+      "deny-request-permissions": {
+        "identifier": "deny-request-permissions",
+        "description": "Denies the request_permissions command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["request_permissions"] }
+      },
+      "deny-scan": {
+        "identifier": "deny-scan",
+        "description": "Denies the scan command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["scan"] }
+      },
+      "deny-vibrate": {
+        "identifier": "deny-vibrate",
+        "description": "Denies the vibrate command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["vibrate"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
+  "biometric": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "This permission set configures which\nbiometric features are by default exposed.\n\n#### Granted Permissions\n\nIt allows acccess to all biometric commands.\n\n",
+      "permissions": ["allow-authenticate", "allow-status"]
+    },
+    "permissions": {
+      "allow-authenticate": {
+        "identifier": "allow-authenticate",
+        "description": "Enables the authenticate command without any pre-configured scope.",
+        "commands": { "allow": ["authenticate"], "deny": [] }
+      },
+      "allow-status": {
+        "identifier": "allow-status",
+        "description": "Enables the status command without any pre-configured scope.",
+        "commands": { "allow": ["status"], "deny": [] }
+      },
+      "deny-authenticate": {
+        "identifier": "deny-authenticate",
+        "description": "Denies the authenticate command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["authenticate"] }
+      },
+      "deny-status": {
+        "identifier": "deny-status",
+        "description": "Denies the status command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["status"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
   "core": {
     "default_permission": {
       "identifier": "default",

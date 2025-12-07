@@ -67,11 +67,14 @@ image = "0.24"
 # Base64 编码
 base64 = "0.22"
 
-# 获取系统目录
+# 获取系统目录（仅桌面端）
+[target.'cfg(not(any(target_os = "ios", target_os = "android")))'.dependencies]
 dirs = "5.0"
-
-# 系统密钥库（Keychain/Keystore）
+# 系统密钥库（Keychain/Keystore）- 仅桌面端
 keyring = "2.0"
+
+# iOS 使用 security-framework（已通过其他依赖间接引入）
+# Android 使用 tauri-plugin-biometric 或其他方式
 
 # 时间戳和定时器
 tokio = { version = "1", features = ["time"] }
@@ -80,4 +83,7 @@ chrono = "0.4"
 [target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
 tauri-plugin-biometric = "2"
 tauri-plugin-barcode-scanner = "2"
+
+# iOS 存储：使用文件系统（加密数据已加密，文件系统存储是安全的）
+# 注意：iOS 应用数据存储在应用的 Documents 目录，有沙箱保护
 

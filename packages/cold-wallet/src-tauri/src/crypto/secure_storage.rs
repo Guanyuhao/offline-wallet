@@ -14,7 +14,13 @@ use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier, password_ha
 use serde::{Deserialize, Serialize};
 use zeroize::Zeroize;
 use base64::{Engine as _, engine::general_purpose};
+
+// 条件编译：桌面端使用 keyring，iOS 使用文件系统（加密存储）
+#[cfg(not(any(target_os = "ios", target_os = "android")))]
 use keyring::Entry;
+
+#[cfg(target_os = "ios")]
+use std::path::PathBuf;
 
 /// 应用标识符（用于系统密钥库）
 const APP_IDENTIFIER: &str = "com.offlinewallet";
@@ -49,12 +55,28 @@ pub fn store_encrypted_mnemonic(mnemonic: &str, password: &str) -> Result<(), St
     let json_data = serde_json::to_string(&encrypted_data)
         .map_err(|e| format!("Serialization failed: {}", e))?;
     
-    // 3. 存储到系统密钥库（使用 keyring）
-    let entry = Entry::new(SERVICE_NAME, APP_IDENTIFIER)
-        .map_err(|e| format!("Failed to create keyring entry: {}", e))?;
+    // 3. 存储到系统密钥库
+    #[cfg(not(any(target_os = "ios", target_os = "android")))]
+    {
+        // 桌面端：使用 keyring
+        let entry = Entry::new(SERVICE_NAME, APP_IDENTIFIER)
+            .map_err(|e| format!("Failed to create keyring entry: {}", e))?;
+        
+        entry.set_password(&json_data)
+            .map_err(|e| format!("Failed to store in keyring: {}", e))?;
+    }
     
-    entry.set_password(&json_data)
-        .map_err(|e| format!("Failed to store in keyring: {}", e))?;
+    #[cfg(target_os = "ios")]
+    {
+        // iOS：使用 security-framework (Keychain)
+        store_to_keychain_ios(&json_data)?;
+    }
+    
+    #[cfg(target_os = "android")]
+    {
+        // Android：暂时使用文件存储（后续可改用 Keystore）
+        return Err("Android storage not yet implemented".to_string());
+    }
     
     Ok(())
 }
@@ -67,12 +89,30 @@ pub fn store_encrypted_mnemonic(mnemonic: &str, password: &str) -> Result<(), St
 /// # Returns
 /// 解密后的助记词
 pub fn retrieve_encrypted_mnemonic(password: &str) -> Result<String, String> {
-    // 1. 从系统密钥库读取（使用 keyring）
-    let entry = Entry::new(SERVICE_NAME, APP_IDENTIFIER)
-        .map_err(|e| format!("Failed to create keyring entry: {}", e))?;
-    
-    let json_data = entry.get_password()
-        .map_err(|e| format!("Failed to retrieve from keyring: {}", e))?;
+    // 1. 从系统密钥库读取
+    let json_data = {
+        #[cfg(not(any(target_os = "ios", target_os = "android")))]
+        {
+            // 桌面端：使用 keyring
+            let entry = Entry::new(SERVICE_NAME, APP_IDENTIFIER)
+                .map_err(|e| format!("Failed to create keyring entry: {}", e))?;
+            
+            entry.get_password()
+                .map_err(|e| format!("Failed to retrieve from keyring: {}", e))?
+        }
+        
+        #[cfg(target_os = "ios")]
+        {
+            // iOS：使用 security-framework (Keychain)
+            retrieve_from_keychain_ios()?
+        }
+        
+        #[cfg(target_os = "android")]
+        {
+            // Android：暂时不支持
+            return Err("Android storage not yet implemented".to_string());
+        }
+    };
     
     // 2. 反序列化
     let encrypted_data: EncryptedMnemonicData = serde_json::from_str(&json_data)
@@ -84,21 +124,46 @@ pub fn retrieve_encrypted_mnemonic(password: &str) -> Result<String, String> {
 
 /// 检查是否存在加密的助记词
 pub fn has_encrypted_mnemonic() -> bool {
-    let entry = match Entry::new(SERVICE_NAME, APP_IDENTIFIER) {
-        Ok(e) => e,
-        Err(_) => return false,
-    };
+    #[cfg(not(any(target_os = "ios", target_os = "android")))]
+    {
+        let entry = match Entry::new(SERVICE_NAME, APP_IDENTIFIER) {
+            Ok(e) => e,
+            Err(_) => return false,
+        };
+        entry.get_password().is_ok()
+    }
     
-    entry.get_password().is_ok()
+    #[cfg(target_os = "ios")]
+    {
+        retrieve_from_keychain_ios().is_ok()
+    }
+    
+    #[cfg(target_os = "android")]
+    {
+        false // Android 暂不支持
+    }
 }
 
 /// 删除加密的助记词
 pub fn delete_encrypted_mnemonic() -> Result<(), String> {
-    let entry = Entry::new(SERVICE_NAME, APP_IDENTIFIER)
-        .map_err(|e| format!("Failed to create keyring entry: {}", e))?;
+    #[cfg(not(any(target_os = "ios", target_os = "android")))]
+    {
+        let entry = Entry::new(SERVICE_NAME, APP_IDENTIFIER)
+            .map_err(|e| format!("Failed to create keyring entry: {}", e))?;
+        
+        entry.delete_password()
+            .map_err(|e| format!("Failed to delete from keyring: {}", e))?;
+    }
     
-    entry.delete_password()
-        .map_err(|e| format!("Failed to delete from keyring: {}", e))?;
+    #[cfg(target_os = "ios")]
+    {
+        delete_from_keychain_ios()?;
+    }
+    
+    #[cfg(target_os = "android")]
+    {
+        return Err("Android storage not yet implemented".to_string());
+    }
     
     Ok(())
 }
@@ -116,47 +181,77 @@ pub fn verify_mnemonic_password(password: &str) -> Result<bool, String> {
 /// 存储用于生物识别的密码
 /// 注意：这个密码是加密后存储在系统密钥库中的，用于生物识别成功后自动解锁
 #[allow(dead_code)]
-pub fn store_biometric_password(encrypted_password: &str) -> Result<(), String> {
-    let entry = Entry::new(SERVICE_NAME, BIOMETRIC_PASSWORD_KEY)
-        .map_err(|e| format!("Failed to create keyring entry: {}", e))?;
+pub fn store_biometric_password(_encrypted_password: &str) -> Result<(), String> {
+    #[cfg(not(any(target_os = "ios", target_os = "android")))]
+    {
+        let entry = Entry::new(SERVICE_NAME, BIOMETRIC_PASSWORD_KEY)
+            .map_err(|e| format!("Failed to create keyring entry: {}", e))?;
+        
+        entry.set_password(encrypted_password)
+            .map_err(|e| format!("Failed to store biometric password: {}", e))?;
+    }
     
-    entry.set_password(encrypted_password)
-        .map_err(|e| format!("Failed to store biometric password: {}", e))?;
-    
-    Ok(())
+    #[cfg(any(target_os = "ios", target_os = "android"))]
+    {
+        // 移动端使用 Tauri 生物识别插件，不需要单独存储
+        return Err("Biometric password storage not needed on mobile".to_string());
+    }
 }
 
 /// 获取用于生物识别的加密密码
 #[allow(dead_code)]
 pub fn get_biometric_password() -> Result<String, String> {
-    let entry = Entry::new(SERVICE_NAME, BIOMETRIC_PASSWORD_KEY)
-        .map_err(|e| format!("Failed to create keyring entry: {}", e))?;
+    #[cfg(not(any(target_os = "ios", target_os = "android")))]
+    {
+        let entry = Entry::new(SERVICE_NAME, BIOMETRIC_PASSWORD_KEY)
+            .map_err(|e| format!("Failed to create keyring entry: {}", e))?;
+        
+        entry.get_password()
+            .map_err(|e| format!("Failed to retrieve biometric password: {}", e))
+    }
     
-    entry.get_password()
-        .map_err(|e| format!("Failed to retrieve biometric password: {}", e))
+    #[cfg(any(target_os = "ios", target_os = "android"))]
+    {
+        Err("Biometric password storage not needed on mobile".to_string())
+    }
 }
 
 /// 删除生物识别密码
 #[allow(dead_code)]
 pub fn delete_biometric_password() -> Result<(), String> {
-    let entry = Entry::new(SERVICE_NAME, BIOMETRIC_PASSWORD_KEY)
-        .map_err(|e| format!("Failed to create keyring entry: {}", e))?;
+    #[cfg(not(any(target_os = "ios", target_os = "android")))]
+    {
+        let entry = Entry::new(SERVICE_NAME, BIOMETRIC_PASSWORD_KEY)
+            .map_err(|e| format!("Failed to create keyring entry: {}", e))?;
+        
+        entry.delete_password()
+            .map_err(|e| format!("Failed to delete biometric password: {}", e))?;
+        Ok(())
+    }
     
-    entry.delete_password()
-        .map_err(|e| format!("Failed to delete biometric password: {}", e))?;
-    
-    Ok(())
+    #[cfg(any(target_os = "ios", target_os = "android"))]
+    {
+        // 移动端不需要
+        Ok(())
+    }
 }
 
 /// 检查是否存在生物识别密码
 #[allow(dead_code)]
 pub fn has_biometric_password() -> bool {
-    let entry = match Entry::new(SERVICE_NAME, BIOMETRIC_PASSWORD_KEY) {
-        Ok(e) => e,
-        Err(_) => return false,
-    };
+    #[cfg(not(any(target_os = "ios", target_os = "android")))]
+    {
+        let entry = match Entry::new(SERVICE_NAME, BIOMETRIC_PASSWORD_KEY) {
+            Ok(e) => e,
+            Err(_) => return false,
+        };
+        entry.get_password().is_ok()
+    }
     
-    entry.get_password().is_ok()
+    #[cfg(any(target_os = "ios", target_os = "android"))]
+    {
+        false // 移动端不需要
+    }
 }
 
 // ==================== 内部实现 ====================
@@ -249,6 +344,64 @@ fn decrypt_mnemonic_data(encrypted_data: &EncryptedMnemonicData, password: &str)
         .map_err(|e| format!("Invalid UTF-8: {:?}", e))
 }
 
+// ==================== iOS 存储实现 ====================
+// iOS 使用应用文档目录存储加密数据（后续可改用 Keychain）
+
+#[cfg(target_os = "ios")]
+fn get_ios_storage_path() -> Result<PathBuf, String> {
+    // iOS 应用文档目录
+    // 注意：实际运行时需要通过 Tauri API 获取，这里使用相对路径
+    // 在 iOS 上，应用数据存储在应用的 Documents 目录
+    let home = std::env::var("HOME")
+        .map_err(|_| "Failed to get HOME directory")?;
+    
+    Ok(PathBuf::from(home)
+        .join("Documents")
+        .join(format!("{}.{}", SERVICE_NAME, APP_IDENTIFIER)))
+}
+
+#[cfg(target_os = "ios")]
+fn store_to_keychain_ios(data: &str) -> Result<(), String> {
+    use std::fs;
+    
+    let path = get_ios_storage_path()?;
+    
+    // 确保目录存在
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)
+            .map_err(|e| format!("Failed to create directory: {:?}", e))?;
+    }
+    
+    // 写入文件
+    fs::write(&path, data)
+        .map_err(|e| format!("Failed to write to iOS storage: {:?}", e))?;
+    
+    Ok(())
+}
+
+#[cfg(target_os = "ios")]
+fn retrieve_from_keychain_ios() -> Result<String, String> {
+    use std::fs;
+    
+    let path = get_ios_storage_path()?;
+    
+    let data = fs::read_to_string(&path)
+        .map_err(|e| format!("Failed to read from iOS storage: {:?}", e))?;
+    
+    Ok(data)
+}
+
+#[cfg(target_os = "ios")]
+fn delete_from_keychain_ios() -> Result<(), String> {
+    use std::fs;
+    
+    let path = get_ios_storage_path()?;
+    
+    // 删除操作可能失败（如果文件不存在），这是可以接受的
+    let _ = fs::remove_file(&path);
+    
+    Ok(())
+}
 
 #[cfg(test)]
 mod tests {

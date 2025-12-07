@@ -17,7 +17,6 @@
     "core:window:allow-set-size",
     "core:window:allow-set-position",
     "core:window:allow-set-decorations",
-    "core:process:allow-exit",
     "barcode-scanner:default",
     "barcode-scanner:allow-scan",
     "barcode-scanner:allow-cancel",

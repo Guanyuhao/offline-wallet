@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Dialog, Toast, List } from 'antd-mobile';
 import { LockOutline, CloseCircleFill, ExclamationTriangleOutline } from 'antd-mobile-icons';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +13,16 @@ function SettingsPage() {
   const navigate = useNavigate();
   const { clearMnemonic, setUnlocked, reset } = useWalletStore();
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 检测平台
+  useEffect(() => {
+    const checkPlatform = async () => {
+      const platform = await detectPlatform();
+      setIsMobile(platform === 'ios' || platform === 'android');
+    };
+    checkPlatform();
+  }, []);
 
   const handleLock = () => {
     Dialog.confirm({
@@ -61,18 +71,9 @@ function SettingsPage() {
           // 清除内存中的敏感数据
           clearMnemonic();
 
-          // 检测平台，使用不同的退出方式
-          const currentPlatform = await detectPlatform();
-          const isMobile = currentPlatform === 'ios' || currentPlatform === 'android';
-
-          if (isMobile) {
-            // 移动端：使用 Rust 命令退出应用
-            await invoke('exit_app');
-          } else {
-            // 桌面端：关闭应用窗口
-            const appWindow = getCurrentWindow();
-            await appWindow.close();
-          }
+          // 桌面端：关闭应用窗口
+          const appWindow = getCurrentWindow();
+          await appWindow.close();
         } catch (error) {
           console.error('退出应用失败:', error);
           Toast.show({
@@ -96,14 +97,17 @@ function SettingsPage() {
           >
             锁定钱包
           </List.Item>
-          <List.Item
-            onClick={handleExit}
-            arrow
-            extra={<span style={{ color: '#999' }}>退出应用</span>}
-            prefix={<CloseCircleFill fontSize={20} style={{ color: '#1677ff' }} />}
-          >
-            退出应用
-          </List.Item>
+          {/* 仅在桌面端显示退出应用选项 */}
+          {!isMobile && (
+            <List.Item
+              onClick={handleExit}
+              arrow
+              extra={<span style={{ color: '#999' }}>退出应用</span>}
+              prefix={<CloseCircleFill fontSize={20} style={{ color: '#1677ff' }} />}
+            >
+              退出应用
+            </List.Item>
+          )}
         </List>
       </StandardCard>
 

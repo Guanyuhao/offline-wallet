@@ -42,7 +42,8 @@ fn setup_app() {
             qr_scanner::prepare_windowed_scan,
             // 二维码扫描配置（原生全屏模式）
             qr_scanner::prepare_native_scan,
-            // 应用退出
+            // 应用退出（仅桌面端）
+            #[cfg(not(any(target_os = "ios", target_os = "android")))]
             exit_app,
         ])
         .run(tauri::generate_context!())
@@ -162,6 +163,11 @@ fn generate_qrcode(data: String, size: u32) -> Result<String, String> {
 
 // ==================== 应用退出命令 ====================
 
+/// 退出应用（仅桌面端）
+/// 
+/// 注意：移动端（iOS/Android）不支持主动退出应用
+/// 用户需要通过系统方式退出
+#[cfg(not(any(target_os = "ios", target_os = "android")))]
 #[tauri::command]
 async fn exit_app(app: tauri::AppHandle) -> Result<(), String> {
     app.exit(0);
