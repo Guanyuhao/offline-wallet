@@ -4,7 +4,6 @@
  * 专业的二维码扫描框 UI，带扫描线动画
  */
 
-import React from 'react';
 import './ScanningFrame.css';
 
 export interface ScanningFrameProps {
