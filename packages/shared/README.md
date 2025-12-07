@@ -12,7 +12,7 @@ src/
 │   ├── QRCodeScanner.tsx # 二维码扫描组件
 │   └── index.ts        # 组件导出
 ├── utils/              # 工具函数
-│   ├── barcode-scanner.ts # 二维码扫描工具
+│   ├── scanQR.ts # 二维码扫描工具（统一入口，根据平台自动选择方案）
 │   ├── qrcode.ts       # 二维码相关工具
 │   └── index.ts        # 工具函数导出
 ├── types/              # 类型定义
@@ -33,7 +33,9 @@ import { AppLayout, SplashScreen, QRCodeScanner } from '@offline-wallet/shared/c
 import {
   createAddressQRCode,
   formatAddress,
-  loadBarcodeScanner,
+  scanQR,
+  checkMobileCameraPermission,
+  requestMobileCameraPermission,
 } from '@offline-wallet/shared/utils';
 
 // 导入类型
@@ -60,11 +62,18 @@ import { QRCodeProtocol, QRCodeType } from '@offline-wallet/shared/types';
 
 ## 工具函数说明
 
-### barcode-scanner.ts
+### scanQR.ts
 
-- `loadBarcodeScanner()`: 加载二维码扫描模块
-- `ensureCameraPermission()`: 检查并请求相机权限
-- `scanQRCode()`: 扫描二维码（带权限检查）
+二维码扫描工具，根据平台自动选择扫描方案：
+
+- **移动端（iOS/Android）**：使用 Tauri `barcode-scanner` 插件（原生方案，`windowed: true`）
+- **桌面端**：使用 Web API (`getUserMedia` + Canvas + `jsQR`)
+
+**函数**：
+
+- `scanQR(videoElement?, canvasElement?)`: 二维码扫描入口函数，根据平台自动选择方案
+- `checkMobileCameraPermission()`: 检查移动端相机权限
+- `requestMobileCameraPermission()`: 请求移动端相机权限
 
 ### qrcode.ts
 

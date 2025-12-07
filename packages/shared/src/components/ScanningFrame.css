@@ -1,0 +1,62 @@
+/**
+ * @Author liyongjie
+ * 扫描框样式
+ */
+
+.scanning-frame {
+  position: relative;
+}
+
+.scanning-frame-border {
+  box-shadow: 0 0 20px rgba(22, 119, 255, 0.3);
+}
+
+.scanning-frame-corner {
+  animation: corner-pulse 2s ease-in-out infinite;
+}
+
+.scanning-frame-corner-tl {
+  animation-delay: 0s;
+}
+
+.scanning-frame-corner-tr {
+  animation-delay: 0.5s;
+}
+
+.scanning-frame-corner-bl {
+  animation-delay: 1s;
+}
+
+.scanning-frame-corner-br {
+  animation-delay: 1.5s;
+}
+
+.scanning-frame-line {
+  box-shadow: 0 0 10px rgba(22, 119, 255, 0.6);
+}
+
+@keyframes scanning-line {
+  0% {
+    top: 0;
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes corner-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
