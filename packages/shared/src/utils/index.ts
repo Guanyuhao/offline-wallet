@@ -8,3 +8,5 @@ export * from './qr-detector';
 export * from './qrcode';
 export * from './scanQR';
 export * from './scanner';
+export * from './rust-scanner';
+export * from './platform';

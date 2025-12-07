@@ -115,4 +115,3 @@ const useScanStore = create<ScanState>((set) => ({
 }));
 
 export default useScanStore;
-

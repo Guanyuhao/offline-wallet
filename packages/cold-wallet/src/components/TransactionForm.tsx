@@ -184,7 +184,6 @@ function TransactionForm({
    * 处理扫描成功
    */
   const handleScanSuccess = async (scannedText: string) => {
-
     try {
       let scannedAddress = scannedText.trim();
 

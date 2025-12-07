@@ -7,6 +7,7 @@ edition = "2021"
 
 [lib]
 name = "hot_wallet_lib"
+path = "src/main.rs"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
@@ -15,8 +16,12 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
+tauri-plugin-os = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+
+# 共享代码库
+offline-wallet-shared = { path = "../../shared/src-tauri" }
 
 # HTTP 客户端（用于区块链交互）
 reqwest = { version = "0.12", features = ["json"] }
@@ -28,9 +33,6 @@ image = "0.24"
 
 # Base64 编码
 base64 = "0.22"
-
-# 二维码扫描（移动端）
-jsqr = "1.4"
 
 [target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
 tauri-plugin-barcode-scanner = "2"

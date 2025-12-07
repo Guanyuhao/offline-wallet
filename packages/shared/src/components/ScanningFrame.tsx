@@ -1,9 +1,7 @@
 /**
- * @Author liyongjie
  * 扫描框组件
- * 专业的二维码扫描框 UI，带扫描线动画
  */
-
+import React from 'react';
 import './ScanningFrame.css';
 
 export interface ScanningFrameProps {
@@ -46,6 +44,7 @@ export default function ScanningFrame({
         width: `${size}px`,
         height: `${size}px`,
         position: 'relative',
+        backgroundColor: 'transparent', // 确保背景透明，让相机画面可见
       }}
     >
       {/* 边框 */}
@@ -57,7 +56,7 @@ export default function ScanningFrame({
           border: `2px solid ${borderColor}`,
           borderRadius: '16px',
           position: 'relative',
-          backgroundColor: 'transparent',
+          backgroundColor: 'transparent', // 确保背景透明
         }}
       >
         {/* 四个角的装饰 */}

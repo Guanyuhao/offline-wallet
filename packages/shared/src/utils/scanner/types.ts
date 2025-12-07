@@ -3,10 +3,8 @@
  * 扫描器类型定义
  */
 
-/**
- * 平台类型
- */
-export type Platform = 'android' | 'ios' | 'macOS' | 'windows' | 'linux';
+// 平台类型已移动到 utils/platform.ts，这里重新导出以保持向后兼容
+export type { Platform } from '../platform';
 
 /**
  * 扫描器接口

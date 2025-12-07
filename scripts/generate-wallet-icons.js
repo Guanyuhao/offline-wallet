@@ -126,16 +126,24 @@ const hotWalletSVG = `<svg width="512" height="512" viewBox="0 0 512 512" fill="
 
 /**
  * 将 SVG 转换为 PNG
+ * @param {string} svg - SVG 字符串
+ * @param {number} size - 输出尺寸
+ * @param {string} outputPath - 输出路径
+ * @param {boolean} removeAlpha - 是否移除透明通道（iOS 营销图标需要）
  */
-async function svgToPng(svg, size, outputPath) {
+async function svgToPng(svg, size, outputPath, removeAlpha = false) {
   const buffer = Buffer.from(svg);
-  await sharp(buffer)
-    .resize(size, size, {
-      fit: 'contain',
-      background: { r: 0, g: 0, b: 0, alpha: 0 }
-    })
-    .png()
-    .toFile(outputPath);
+  let sharpInstance = sharp(buffer).resize(size, size, {
+    fit: 'contain',
+    background: removeAlpha ? { r: 255, g: 255, b: 255, alpha: 1 } : { r: 0, g: 0, b: 0, alpha: 0 }
+  });
+  
+  // 如果要求移除透明通道，使用 flatten 确保不透明
+  if (removeAlpha) {
+    sharpInstance = sharpInstance.flatten({ background: { r: 255, g: 255, b: 255 } });
+  }
+  
+  await sharpInstance.png().toFile(outputPath);
 }
 
 /**
@@ -260,8 +268,10 @@ async function generateIOSIcons(walletType, svg, rootDir) {
   // 生成所有 iOS 图标
   for (const { filename, size } of iosIcons) {
     const outputPath = path.join(iosAppIconDir, filename);
-    await svgToPng(svg, size, outputPath);
-    console.log(`  ✅ 生成 ${filename} (${size}x${size})`);
+    // iOS 营销图标（1024x1024）不能包含透明通道
+    const isMarketingIcon = filename === 'AppIcon-512@2x.png' && size === 1024;
+    await svgToPng(svg, size, outputPath, isMarketingIcon);
+    console.log(`  ✅ 生成 ${filename} (${size}x${size})${isMarketingIcon ? ' [无透明通道]' : ''}`);
   }
 
   console.log(`  ✅ iOS 图标生成完成: ${iosAppIconDir}`);

@@ -1,7 +1,7 @@
 /**
  * @Author liyongjie
  * 二维码扫描页面
- * 
+ *
  * 移动端使用独立页面，确保相机画面能正常显示
  */
 
@@ -133,22 +133,13 @@ const ScanQRPage: React.FC = () => {
   // 根据平台选择对应的扫描组件
   if (isMobile) {
     return (
-      <MobileQRCodeScanner
-        onScanSuccess={handleScanSuccess}
-        onCancel={handleCancel}
-        hint={hint}
-      />
+      <MobileQRCodeScanner onScanSuccess={handleScanSuccess} onCancel={handleCancel} hint={hint} />
     );
   }
 
   return (
-    <DesktopQRCodeScanner
-      onScanSuccess={handleScanSuccess}
-      onCancel={handleCancel}
-      hint={hint}
-    />
+    <DesktopQRCodeScanner onScanSuccess={handleScanSuccess} onCancel={handleCancel} hint={hint} />
   );
 };
 
 export default ScanQRPage;
-

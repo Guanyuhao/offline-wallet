@@ -4,7 +4,7 @@
  * 统一处理 SafeArea，所有页面自动适配安全区域
  */
 
-import { ReactNode } from 'react';
+import { ReactNode, Fragment } from 'react';
 import { SafeArea } from 'antd-mobile';
 
 export interface AppLayoutProps {
@@ -20,26 +20,18 @@ export interface AppLayoutProps {
  */
 export default function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%', // 继承父容器高度（#app 的 100%）
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden', // 防止整体滚动
-      }}
-    >
+    <Fragment>
       {/* 顶部安全区域 */}
       <SafeArea position="top" />
 
       {/* 页面内容 */}
       <div
+        className="layout-content"
         style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
           overflow: 'hidden',
-          minHeight: 0, // 确保 flex 子元素可以正确收缩
+          height: '100%',
+          width: '100%',
+          position: 'relative',
         }}
       >
         {children}
@@ -47,6 +39,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* 底部安全区域 */}
       <SafeArea position="bottom" />
-    </div>
+    </Fragment>
   );
 }

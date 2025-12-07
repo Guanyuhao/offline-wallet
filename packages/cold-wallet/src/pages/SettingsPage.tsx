@@ -60,11 +60,11 @@ function SettingsPage() {
         try {
           // 清除内存中的敏感数据
           clearMnemonic();
-          
+
           // 检测平台，使用不同的退出方式
           const currentPlatform = await detectPlatform();
           const isMobile = currentPlatform === 'ios' || currentPlatform === 'android';
-          
+
           if (isMobile) {
             // 移动端：使用 Rust 命令退出应用
             await invoke('exit_app');

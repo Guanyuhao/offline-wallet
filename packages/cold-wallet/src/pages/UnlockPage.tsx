@@ -76,9 +76,7 @@ function UnlockPage() {
   }
 
   return (
-    <PageLayout
-      showBack={false}
-    >
+    <PageLayout showBack={false}>
       <div
         style={{
           display: 'flex',

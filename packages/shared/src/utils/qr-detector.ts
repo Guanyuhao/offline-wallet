@@ -116,7 +116,13 @@ export function startContinuousQRScan(
         return;
       }
 
-      // 从视频帧检测二维码
+      // 确保视频尺寸有效
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
+        animationFrameId = requestAnimationFrame(scan);
+        return;
+      }
+
+      // 从视频帧检测二维码（这会绘制到 Canvas）
       const content = detectQRCodeFromVideo(
         video,
         canvas,
@@ -159,7 +165,7 @@ export function startContinuousQRScan(
   video.addEventListener('play', handlePlay, { once: true });
 
   // 如果视频已经在播放，立即开始扫描
-  if (video.readyState >= video.HAVE_CURRENT_DATA) {
+  if (video.readyState >= video.HAVE_CURRENT_DATA && video.videoWidth > 0) {
     scan();
   }
 

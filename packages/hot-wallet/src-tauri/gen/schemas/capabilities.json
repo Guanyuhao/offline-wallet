@@ -1,0 +1,19 @@
+{
+  "hot-wallet-capabilities": {
+    "identifier": "hot-wallet-capabilities",
+    "description": "Hot wallet capabilities - online transaction helper",
+    "local": true,
+    "windows": ["main"],
+    "permissions": [
+      "core:default",
+      "core:window:allow-close",
+      "core:window:allow-hide",
+      "core:window:allow-show",
+      "core:window:allow-minimize",
+      "core:window:allow-maximize",
+      "core:window:allow-unmaximize",
+      "core:window:allow-start-dragging",
+      "opener:default"
+    ]
+  }
+}

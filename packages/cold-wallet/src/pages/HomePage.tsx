@@ -62,8 +62,8 @@ function HomePage() {
           style={{
             width: '100%',
             maxWidth: '400px',
-          }}>
-
+          }}
+        >
           <div
             style={{
               display: 'flex',

@@ -161,14 +161,8 @@ async function validateFormValues(
 function SignTransactionPage() {
   const navigate = useNavigate();
   const { mnemonic, currentChain, isUnlocked } = useWalletStore();
-  const {
-    scanResult,
-    scanSuccess,
-    scanType,
-    returnMode,
-    setScanConfig,
-    clearScanState,
-  } = useScanStore();
+  const { scanResult, scanSuccess, scanType, returnMode, setScanConfig, clearScanState } =
+    useScanStore();
   const [form] = Form.useForm();
   const [mode, setMode] = useState<SignMode>(returnMode || 'scan');
   const [scannedData, setScannedData] = useState<Record<string, any> | null>(null);
@@ -180,75 +174,78 @@ function SignTransactionPage() {
   }
 
   // 处理扫描成功
-  const handleScanSuccess = useCallback(async (scannedText: string) => {
-    try {
-      const scannedTextTrimmed = scannedText.trim();
-      let qrData: UnsignedTransactionQRCode;
-
+  const handleScanSuccess = useCallback(
+    async (scannedText: string) => {
       try {
-        const decoded = QRCodeProtocol.decode(scannedTextTrimmed);
-        if (decoded.type !== QRCodeType.UNSIGNED_TRANSACTION) {
-          Toast.show({ content: '二维码类型错误，请扫描未签名交易二维码', position: 'top' });
+        const scannedTextTrimmed = scannedText.trim();
+        let qrData: UnsignedTransactionQRCode;
+
+        try {
+          const decoded = QRCodeProtocol.decode(scannedTextTrimmed);
+          if (decoded.type !== QRCodeType.UNSIGNED_TRANSACTION) {
+            Toast.show({ content: '二维码类型错误，请扫描未签名交易二维码', position: 'top' });
+            return;
+          }
+          qrData = decoded as UnsignedTransactionQRCode;
+        } catch (error: any) {
+          console.error('[二维码解析失败]', error);
+          Toast.show({
+            content: '二维码格式无效，请检查是否为有效的未签名交易二维码',
+            position: 'top',
+          });
           return;
         }
-        qrData = decoded as UnsignedTransactionQRCode;
+
+        // 验证链类型是否匹配
+        if (qrData.chain.toLowerCase() !== currentChain.toLowerCase()) {
+          Toast.show({
+            content: `链类型不匹配，二维码为 ${qrData.chain.toUpperCase()}，当前链为 ${currentChain.toUpperCase()}`,
+            position: 'top',
+          });
+          return;
+        }
+
+        // 解析未签名交易数据
+        let txData: any;
+        try {
+          txData = JSON.parse(qrData.unsignedTx);
+        } catch (error: any) {
+          console.error('[交易数据解析失败]', error);
+          Toast.show({ content: '交易数据格式无效', position: 'top' });
+          return;
+        }
+
+        // 填充表单
+        const formValues = fillFormValuesFromTxData(txData, currentChain as ChainType);
+        setScannedData(formValues);
+        form.setFieldsValue(formValues);
+
+        Toast.show({ content: '交易信息验证成功', position: 'top', icon: 'success' });
       } catch (error: any) {
-        console.error('[二维码解析失败]', error);
-        Toast.show({
-          content: '二维码格式无效，请检查是否为有效的未签名交易二维码',
-          position: 'top',
-        });
-        return;
+        const errorMessage = error?.message || error?.toString();
+        if (
+          errorMessage.includes('cancel') ||
+          errorMessage.includes('取消') ||
+          errorMessage.includes('User cancelled')
+        ) {
+          return;
+        }
+        if (
+          errorMessage.includes('not supported') ||
+          errorMessage.includes('不支持') ||
+          errorMessage.includes('not available') ||
+          errorMessage.includes('not found') ||
+          errorMessage.includes('Cannot find module') ||
+          errorMessage.includes('Failed to resolve')
+        ) {
+          Toast.show({ content: '当前设备不支持扫描功能', position: 'top' });
+          return;
+        }
+        Toast.show({ content: `扫描失败: ${errorMessage}`, position: 'top' });
       }
-
-      // 验证链类型是否匹配
-      if (qrData.chain.toLowerCase() !== currentChain.toLowerCase()) {
-        Toast.show({
-          content: `链类型不匹配，二维码为 ${qrData.chain.toUpperCase()}，当前链为 ${currentChain.toUpperCase()}`,
-          position: 'top',
-        });
-        return;
-      }
-
-      // 解析未签名交易数据
-      let txData: any;
-      try {
-        txData = JSON.parse(qrData.unsignedTx);
-      } catch (error: any) {
-        console.error('[交易数据解析失败]', error);
-        Toast.show({ content: '交易数据格式无效', position: 'top' });
-        return;
-      }
-
-      // 填充表单
-      const formValues = fillFormValuesFromTxData(txData, currentChain as ChainType);
-      setScannedData(formValues);
-      form.setFieldsValue(formValues);
-
-      Toast.show({ content: '交易信息验证成功', position: 'top', icon: 'success' });
-    } catch (error: any) {
-      const errorMessage = error?.message || error?.toString();
-      if (
-        errorMessage.includes('cancel') ||
-        errorMessage.includes('取消') ||
-        errorMessage.includes('User cancelled')
-      ) {
-        return;
-      }
-      if (
-        errorMessage.includes('not supported') ||
-        errorMessage.includes('不支持') ||
-        errorMessage.includes('not available') ||
-        errorMessage.includes('not found') ||
-        errorMessage.includes('Cannot find module') ||
-        errorMessage.includes('Failed to resolve')
-      ) {
-        Toast.show({ content: '当前设备不支持扫描功能', position: 'top' });
-        return;
-      }
-      Toast.show({ content: `扫描失败: ${errorMessage}`, position: 'top' });
-    }
-  }, [currentChain, form]);
+    },
+    [currentChain, form]
+  );
 
   // 恢复 tab 模式（从 store 中恢复）
   useEffect(() => {
@@ -260,11 +257,7 @@ function SignTransactionPage() {
 
   // 处理扫描结果（从 store 中读取）
   useEffect(() => {
-    if (
-      scanSuccess &&
-      scanResult &&
-      scanType === ScanType.UNSIGNED_TRANSACTION
-    ) {
+    if (scanSuccess && scanResult && scanType === ScanType.UNSIGNED_TRANSACTION) {
       console.log('[SignTransactionPage] 处理扫描结果');
       // 使用 requestAnimationFrame 确保 mode 先恢复，再处理结果
       requestAnimationFrame(() => {

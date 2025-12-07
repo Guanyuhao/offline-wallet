@@ -9,7 +9,6 @@
 ```
 scanner/
 ├── types.ts          # 类型定义（IScanner 接口、Platform 类型）
-├── platform.ts       # 平台检测工具
 ├── web-scanner.ts    # Web API 扫描器实现（桌面端）
 ├── native-scanner.ts # 原生扫描器实现（移动端）
 ├── factory.ts        # 扫描器工厂
