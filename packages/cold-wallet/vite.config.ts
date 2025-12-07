@@ -19,8 +19,8 @@ export default defineConfig(({ command, mode }) => {
     esbuild: {
       // 生产环境移除 console 和 debugger
       //  TODO: 调试
-      drop: [],
-      // drop: isProduction ? ['console', 'debugger'] : [],
+      // drop: [],
+      drop: isProduction ? ['console', 'debugger'] : [],
     },
     build: {
       target: 'es2020',

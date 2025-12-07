@@ -4,15 +4,16 @@
  * 支持编辑和只读两种状态
  */
 
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { Form, Input, Button, Toast } from 'antd-mobile';
 import { ScanningOutline, TextOutline } from 'antd-mobile-icons';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
 import { QRCodeProtocol, QRCodeType } from '@shared/types/qrcode';
-import { QRCodeScanner } from '@offline-wallet/shared/components';
 import { readFromClipboard } from '../utils';
 import { getChainFormConfig, isEVMChain, type ChainType } from '../config/chainConfig';
 import PrimaryButton from './PrimaryButton';
+import useScanStore, { ScanType } from '../stores/useScanStore';
 
 interface TransactionFormProps {
   /**
@@ -43,6 +44,10 @@ interface TransactionFormProps {
    * 是否显示提交按钮（footer）
    */
   showFooter?: boolean;
+  /**
+   * 返回时需要恢复的 tab 模式（用于 SignTransactionPage）
+   */
+  returnMode?: 'scan' | 'manual';
 }
 
 /**
@@ -56,9 +61,23 @@ function TransactionForm({
   onEnableEdit,
   onSubmit,
   showFooter = true,
+  returnMode,
 }: TransactionFormProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { scanResult, scanSuccess, scanType, setScanConfig, clearScanState } = useScanStore();
   const currentChain = chain;
-  const [showScanner, setShowScanner] = useState(false);
+
+  // 处理从扫描页面返回的结果（从 store 中读取）
+  useEffect(() => {
+    // 只处理地址类型的扫描结果
+    if (scanSuccess && scanResult && scanType === ScanType.ADDRESS) {
+      handleScanSuccess(scanResult);
+      // 清除扫描状态，避免重复处理
+      clearScanState();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scanSuccess, scanResult, scanType]);
 
   /**
    * 粘贴地址
@@ -147,17 +166,24 @@ function TransactionForm({
   };
 
   /**
-   * 扫描地址
+   * 扫描地址：跳转到扫描页面
    */
   const handleScanAddress = () => {
-    setShowScanner(true);
+    // 设置扫描配置到 store
+    setScanConfig({
+      scanType: ScanType.ADDRESS,
+      hint: '请将收款地址二维码对准扫描框',
+      returnPath: location.pathname, // 返回当前页面
+      returnMode: returnMode, // 传递返回时需要恢复的 tab 模式
+    });
+    // 跳转到扫描页面
+    navigate('/scan-qr');
   };
 
   /**
    * 处理扫描成功
    */
   const handleScanSuccess = async (scannedText: string) => {
-    setShowScanner(false);
 
     try {
       let scannedAddress = scannedText.trim();
@@ -261,15 +287,6 @@ function TransactionForm({
 
   return (
     <div>
-      {/* 扫描组件 */}
-      {showScanner && (
-        <QRCodeScanner
-          hint="请将收款地址二维码对准扫描框"
-          onScanSuccess={handleScanSuccess}
-          onCancel={() => setShowScanner(false)}
-        />
-      )}
-
       {/* 只读模式下的开启编辑按钮 */}
       {readOnly && showEditButton && (
         <div style={{ marginBottom: '16px', textAlign: 'center' }}>

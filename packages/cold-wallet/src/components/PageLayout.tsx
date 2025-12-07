@@ -17,6 +17,11 @@ interface PageLayoutProps {
    */
   showBack?: boolean;
   /**
+   * 是否显示 NavBar
+   * @default true（如果有 title 则显示，否则不显示）
+   */
+  showNavBar?: boolean;
+  /**
    * 返回按钮点击事件
    */
   onBack?: () => void;
@@ -42,20 +47,25 @@ function PageLayout({
   title,
   navBarProps,
   showBack = true,
+  showNavBar,
   onBack,
   children,
   contentStyle,
 }: PageLayoutProps) {
+  // 如果明确指定了 showNavBar，则使用该值；否则根据是否有 title 来决定
+  const shouldShowNavBar = showNavBar !== undefined ? showNavBar : !!title;
+
   return (
     <div
       style={{
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        position: 'relative',
       }}
     >
       {/* SafeArea 已在 AppLayout 中统一处理，这里不再需要 */}
-      {title && (
+      {shouldShowNavBar && title && (
         <NavBar backIcon={showBack} onBack={onBack} {...navBarProps}>
           {title}
         </NavBar>

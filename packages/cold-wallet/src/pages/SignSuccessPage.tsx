@@ -37,7 +37,7 @@ function SignSuccessPage() {
         <StandardCard style={{ marginTop: '16px' }}>
           <QRCodeCard
             data={qrCodeData}
-            size={280}
+            size={240}
             variant="enhanced"
             description={
               <>

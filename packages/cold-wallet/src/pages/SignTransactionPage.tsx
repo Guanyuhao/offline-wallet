@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button, Toast, Grid, Form, JumboTabs } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
 import useWalletStore from '../stores/useWalletStore';
+import useScanStore, { ScanType } from '../stores/useScanStore';
 import {
   QRCodeProtocol,
   QRCodeType,
@@ -14,7 +15,6 @@ import { isEVMChain, type ChainType } from '../config/chainConfig';
 import StandardCard from '../components/StandardCard';
 import TransactionForm from '../components/TransactionForm';
 import PrimaryButton from '../components/PrimaryButton';
-import { QRCodeScanner } from '@offline-wallet/shared/components';
 
 type SignMode = 'scan' | 'manual';
 
@@ -161,26 +161,26 @@ async function validateFormValues(
 function SignTransactionPage() {
   const navigate = useNavigate();
   const { mnemonic, currentChain, isUnlocked } = useWalletStore();
+  const {
+    scanResult,
+    scanSuccess,
+    scanType,
+    returnMode,
+    setScanConfig,
+    clearScanState,
+  } = useScanStore();
   const [form] = Form.useForm();
-  const [mode, setMode] = useState<SignMode>('scan');
+  const [mode, setMode] = useState<SignMode>(returnMode || 'scan');
   const [scannedData, setScannedData] = useState<Record<string, any> | null>(null);
   const [showScannedInfo, setShowScannedInfo] = useState(false);
-  const [showScanner, setShowScanner] = useState(false);
 
   if (!isUnlocked || !mnemonic) {
     navigate('/unlock');
     return null;
   }
 
-  // 扫码模式：扫描未签名交易二维码
-  const handleScanUnsignedTransaction = () => {
-    setShowScanner(true);
-  };
-
   // 处理扫描成功
-  const handleScanSuccess = async (scannedText: string) => {
-    setShowScanner(false);
-
+  const handleScanSuccess = useCallback(async (scannedText: string) => {
     try {
       const scannedTextTrimmed = scannedText.trim();
       let qrData: UnsignedTransactionQRCode;
@@ -248,6 +248,44 @@ function SignTransactionPage() {
       }
       Toast.show({ content: `扫描失败: ${errorMessage}`, position: 'top' });
     }
+  }, [currentChain, form]);
+
+  // 恢复 tab 模式（从 store 中恢复）
+  useEffect(() => {
+    if (returnMode && (returnMode === 'scan' || returnMode === 'manual')) {
+      console.log('[SignTransactionPage] 恢复 tab 模式:', returnMode);
+      setMode(returnMode);
+    }
+  }, [returnMode]);
+
+  // 处理扫描结果（从 store 中读取）
+  useEffect(() => {
+    if (
+      scanSuccess &&
+      scanResult &&
+      scanType === ScanType.UNSIGNED_TRANSACTION
+    ) {
+      console.log('[SignTransactionPage] 处理扫描结果');
+      // 使用 requestAnimationFrame 确保 mode 先恢复，再处理结果
+      requestAnimationFrame(() => {
+        handleScanSuccess(scanResult);
+        // 清除扫描状态，避免重复处理
+        clearScanState();
+      });
+    }
+  }, [scanSuccess, scanResult, scanType, handleScanSuccess, clearScanState]);
+
+  // 扫码模式：跳转到扫描页面
+  const handleScanUnsignedTransaction = () => {
+    // 设置扫描配置到 store
+    setScanConfig({
+      scanType: ScanType.UNSIGNED_TRANSACTION,
+      hint: '请将未签名交易二维码对准扫描框',
+      returnPath: '/sign',
+      returnMode: mode, // 记录当前的 tab 模式
+    });
+    // 跳转到扫描页面
+    navigate('/scan-qr');
   };
 
   // 签名交易
@@ -413,15 +451,6 @@ function SignTransactionPage() {
 
   return (
     <PageLayout title="签名交易" onBack={() => navigate('/wallet')}>
-      {/* 扫描组件 */}
-      {showScanner && (
-        <QRCodeScanner
-          hint="请将未签名交易二维码对准扫描框"
-          onScanSuccess={handleScanSuccess}
-          onCancel={() => setShowScanner(false)}
-        />
-      )}
-
       <StandardCard>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
@@ -552,6 +581,7 @@ function SignTransactionPage() {
                 readOnly={false}
                 showEditButton={false}
                 onSubmit={handleSign}
+                returnMode={mode} // 传递当前的 tab 模式，用于扫描后恢复
               />
             </JumboTabs.Tab>
           </JumboTabs>

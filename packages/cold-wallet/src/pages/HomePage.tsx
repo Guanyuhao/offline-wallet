@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Card, Button, Grid } from 'antd-mobile';
-import { NavBar } from 'antd-mobile';
+import { Button, Grid } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
 import useWalletStore from '../stores/useWalletStore';
+import PageLayout from '../components/PageLayout';
+import StandardCard from '../components/StandardCard';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -48,33 +49,21 @@ function HomePage() {
   }
 
   return (
-    <div
-      style={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        background: '#f5f5f7',
-      }}
-    >
-      {/* SafeArea 已在 AppLayout 中统一处理 */}
-      <NavBar backArrow={false}>冷钱包</NavBar>
-
+    <PageLayout>
       <div
         style={{
-          flex: 1,
-          overflow: 'auto',
-          padding: '20px',
           display: 'flex',
-          flexDirection: 'column',
           justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
         }}
       >
-        <Card
+        <StandardCard
           style={{
-            borderRadius: '16px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-          }}
-        >
+            width: '100%',
+            maxWidth: '400px',
+          }}>
+
           <div
             style={{
               display: 'flex',
@@ -159,9 +148,9 @@ function HomePage() {
               </ul>
             </div>
           </div>
-        </Card>
+        </StandardCard>
       </div>
-    </div>
+    </PageLayout>
   );
 }
 

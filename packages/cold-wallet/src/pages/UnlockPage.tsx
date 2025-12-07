@@ -6,6 +6,7 @@ import useWalletStore from '../stores/useWalletStore';
 import PasswordInput from '../components/PasswordInput';
 import StandardCard from '../components/StandardCard';
 import PrimaryButton from '../components/PrimaryButton';
+import PageLayout from '../components/PageLayout';
 
 function UnlockPage() {
   const navigate = useNavigate();
@@ -75,73 +76,73 @@ function UnlockPage() {
   }
 
   return (
-    <div
-      style={{
-        height: '100vh',
-        minHeight: '-webkit-fill-available',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px',
-        background: '#f5f5f7',
-      }}
+    <PageLayout
+      showBack={false}
     >
-      <StandardCard
+      <div
         style={{
-          width: '100%',
-          maxWidth: '400px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
         }}
       >
-        <div
+        <StandardCard
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '32px',
-            alignItems: 'center',
-            padding: '8px',
+            width: '100%',
+            maxWidth: '400px',
           }}
         >
           <div
             style={{
-              fontSize: '72px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '32px',
+              alignItems: 'center',
+              padding: '8px',
             }}
           >
-            🔒
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 600, color: '#1d1d1f' }}>
-              解锁钱包
-            </h1>
-            <p
+            <div
               style={{
-                marginTop: '8px',
-                color: '#86868b',
-                fontSize: '17px',
+                fontSize: '72px',
               }}
             >
-              请输入密码解锁您的钱包
-            </p>
+              🔒
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 600, color: '#1d1d1f' }}>
+                解锁钱包
+              </h1>
+              <p
+                style={{
+                  marginTop: '8px',
+                  color: '#86868b',
+                  fontSize: '17px',
+                }}
+              >
+                请输入密码解锁您的钱包
+              </p>
+            </div>
+
+            <PasswordInput
+              placeholder="请输入密码"
+              value={password}
+              onChange={(val) => setPassword(val)}
+              onEnterPress={handleUnlock}
+              style={{
+                width: '100%',
+                borderRadius: '12px',
+                fontSize: '17px',
+              }}
+            />
+
+            <PrimaryButton loading={loading} onClick={handleUnlock}>
+              解锁
+            </PrimaryButton>
           </div>
-
-          <PasswordInput
-            placeholder="请输入密码"
-            value={password}
-            onChange={(val) => setPassword(val)}
-            onEnterPress={handleUnlock}
-            style={{
-              width: '100%',
-              borderRadius: '12px',
-              fontSize: '17px',
-            }}
-          />
-
-          <PrimaryButton loading={loading} onClick={handleUnlock}>
-            解锁
-          </PrimaryButton>
-        </div>
-      </StandardCard>
-    </div>
+        </StandardCard>
+      </div>
+    </PageLayout>
   );
 }
 

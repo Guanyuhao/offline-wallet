@@ -4,6 +4,7 @@ import { LockOutline, CloseCircleFill, ExclamationTriangleOutline } from 'antd-m
 import { useNavigate } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { detectPlatform } from '@offline-wallet/shared/utils/platform';
 import useWalletStore from '../stores/useWalletStore';
 import PageLayout from '../components/PageLayout';
 import StandardCard from '../components/StandardCard';
@@ -59,9 +60,19 @@ function SettingsPage() {
         try {
           // 清除内存中的敏感数据
           clearMnemonic();
-          // 关闭应用窗口
-          const appWindow = getCurrentWindow();
-          await appWindow.close();
+          
+          // 检测平台，使用不同的退出方式
+          const currentPlatform = await detectPlatform();
+          const isMobile = currentPlatform === 'ios' || currentPlatform === 'android';
+          
+          if (isMobile) {
+            // 移动端：使用 Rust 命令退出应用
+            await invoke('exit_app');
+          } else {
+            // 桌面端：关闭应用窗口
+            const appWindow = getCurrentWindow();
+            await appWindow.close();
+          }
         } catch (error) {
           console.error('退出应用失败:', error);
           Toast.show({

@@ -12,6 +12,7 @@ const SignTransactionPage = lazy(() => import('./pages/SignTransactionPage'));
 const SignSuccessPage = lazy(() => import('./pages/SignSuccessPage'));
 const ReceivePage = lazy(() => import('./pages/ReceivePage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const ScanQRPage = lazy(() => import('./pages/ScanQRPage'));
 
 // 加载中组件
 const LoadingFallback = () => (
@@ -65,6 +66,7 @@ function App() {
               <Route path="/sign-success" element={<SignSuccessPage />} />
               <Route path="/receive" element={<ReceivePage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/scan-qr" element={<ScanQRPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>

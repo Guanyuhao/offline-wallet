@@ -4,18 +4,19 @@
 #![allow(dead_code)]
 
 mod crypto;
-mod qrcode;
 mod chains;
+mod qr_scanner;
 
 use crypto::{mnemonic, secure_storage};
 use chains::address_validation::{self, AddressValidationResult};
+// 使用共享库的插件注册函数
+use offline_wallet_shared::plugins::register_all_plugins;
 
 fn setup_app() {
     let builder = tauri::Builder::default();
     
-    // 仅在移动端注册二维码扫描插件
-    #[cfg(any(target_os = "android", target_os = "ios"))]
-    let builder = builder.plugin(tauri_plugin_barcode_scanner::init());
+    // 注册所有插件（OS 插件 + 移动端插件）
+    let builder = register_all_plugins(builder);
     
     builder
         .invoke_handler(tauri::generate_handler![
@@ -37,6 +38,12 @@ fn setup_app() {
             sign_transaction,
             // 二维码生成
             generate_qrcode,
+            // 二维码扫描配置（窗口模式）
+            qr_scanner::prepare_windowed_scan,
+            // 二维码扫描配置（原生全屏模式）
+            qr_scanner::prepare_native_scan,
+            // 应用退出
+            exit_app,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -150,6 +157,14 @@ fn sign_transaction(chain: String, mnemonic: String, tx_data: String) -> Result<
 
 #[tauri::command]
 fn generate_qrcode(data: String, size: u32) -> Result<String, String> {
-    qrcode::generate_qrcode(&data, size)
+    offline_wallet_shared::qrcode::generate_qrcode(&data, size)
+}
+
+// ==================== 应用退出命令 ====================
+
+#[tauri::command]
+async fn exit_app(app: tauri::AppHandle) -> Result<(), String> {
+    app.exit(0);
+    Ok(())
 }
 

@@ -1,18 +1,27 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "identifier": "cold-wallet-capabilities-mobile",
-  "description": "Cold wallet capabilities for mobile (iOS/Android) - includes barcode scanner",
+  "description": "Cold wallet capabilities for mobile (iOS/Android) - includes barcode scanner with windowed mode support",
   "windows": ["main"],
   "platforms": ["iOS", "android"],
   "permissions": [
     "core:default",
-    "core:window:allow-close",
-    "core:window:allow-hide",
+    "core:window:default",
+    "core:window:allow-create",
     "core:window:allow-show",
-    "core:window:allow-minimize",
-    "core:window:allow-maximize",
-    "core:window:allow-unmaximize",
-    "core:window:allow-start-dragging",
-    "barcode-scanner:default"
+    "core:window:allow-hide",
+    "core:window:allow-close",
+    "core:window:allow-set-focus",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-set-background-color",
+    "core:window:allow-set-size",
+    "core:window:allow-set-position",
+    "core:window:allow-set-decorations",
+    "core:process:allow-exit",
+    "barcode-scanner:default",
+    "barcode-scanner:allow-scan",
+    "barcode-scanner:allow-cancel",
+    "barcode-scanner:allow-check-permissions",
+    "barcode-scanner:allow-request-permissions"
   ]
 }
