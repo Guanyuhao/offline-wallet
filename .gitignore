@@ -36,6 +36,18 @@ build/
 **/src-tauri/target/
 **/src-tauri/WixTools/
 
+# ==================== 代码签名密钥 ====================
+# 签名密钥文件（敏感信息，不要提交）
+# 根目录 signing 文件夹（统一管理）
+signing/*.key
+signing/*.p12
+signing/*.pem
+signing/*.pfx
+signing/*.pub
+signing/*.password.txt
+!signing/.gitkeep
+
+
 # ==================== 测试覆盖率 ====================
 coverage/
 *.lcov
