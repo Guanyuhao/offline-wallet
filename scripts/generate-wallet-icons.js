@@ -323,6 +323,92 @@ async function generateIOSAssetsIcons(walletType, svg, rootDir) {
 }
 
 /**
+ * 生成 Android 图标
+ */
+async function generateAndroidIcons(walletType, svg, rootDir) {
+  // Android res 目录路径
+  const androidResDir = path.join(
+    rootDir,
+    'packages',
+    `${walletType}-wallet`,
+    'src-tauri',
+    'gen',
+    'android',
+    'app',
+    'src',
+    'main',
+    'res'
+  );
+
+  // 如果目录不存在，跳过（Android 项目可能还未初始化）
+  if (!fs.existsSync(path.dirname(androidResDir))) {
+    console.log(`  ⚠️  Android 项目目录不存在，跳过 Android 图标生成`);
+    return;
+  }
+
+  console.log(`\n🤖 生成 ${walletType} 钱包 Android 图标...`);
+
+  // Android 图标尺寸配置
+  const androidSizes = {
+    'mipmap-mdpi': 48,
+    'mipmap-hdpi': 72,
+    'mipmap-xhdpi': 96,
+    'mipmap-xxhdpi': 144,
+    'mipmap-xxxhdpi': 192
+  };
+
+  // 为每个密度生成图标
+  for (const [density, size] of Object.entries(androidSizes)) {
+    const densityDir = path.join(androidResDir, density);
+    
+    // 确保目录存在
+    if (!fs.existsSync(densityDir)) {
+      fs.mkdirSync(densityDir, { recursive: true });
+    }
+
+    console.log(`  📱 生成 ${density} (${size}x${size})...`);
+
+    // 将 SVG 字符串转换为 Buffer
+    const svgBuffer = Buffer.from(svg);
+
+    // 生成 ic_launcher.png (主图标)
+    const launcherPath = path.join(densityDir, 'ic_launcher.png');
+    await sharp(svgBuffer)
+      .resize(size, size, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      })
+      .png()
+      .toFile(launcherPath);
+    console.log(`    ✅ ic_launcher.png`);
+
+    // 生成 ic_launcher_round.png (圆形图标)
+    const launcherRoundPath = path.join(densityDir, 'ic_launcher_round.png');
+    await sharp(svgBuffer)
+      .resize(size, size, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      })
+      .png()
+      .toFile(launcherRoundPath);
+    console.log(`    ✅ ic_launcher_round.png`);
+
+    // 生成 ic_launcher_foreground.png (前景图标)
+    const foregroundPath = path.join(densityDir, 'ic_launcher_foreground.png');
+    await sharp(svgBuffer)
+      .resize(size, size, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      })
+      .png()
+      .toFile(foregroundPath);
+    console.log(`    ✅ ic_launcher_foreground.png`);
+  }
+
+  console.log(`  ✅ Android 图标生成完成: ${androidResDir}`);
+}
+
+/**
  * 主函数
  */
 async function main() {
@@ -342,11 +428,13 @@ async function main() {
     await generateIcons('cold', coldWalletSVG, coldWalletIconDir);
     await generateIOSIcons('cold', coldWalletSVG, rootDir);
     await generateIOSAssetsIcons('cold', coldWalletSVG, rootDir);
+    await generateAndroidIcons('cold', coldWalletSVG, rootDir);
     
     // 生成热钱包图标
     await generateIcons('hot', hotWalletSVG, hotWalletIconDir);
     await generateIOSIcons('hot', hotWalletSVG, rootDir);
     await generateIOSAssetsIcons('hot', hotWalletSVG, rootDir);
+    await generateAndroidIcons('hot', hotWalletSVG, rootDir);
 
     console.log('\n✨ 所有图标生成完成！');
     console.log('\n📂 图标位置:');
@@ -354,6 +442,7 @@ async function main() {
     console.log(`   热钱包: ${hotWalletIconDir}`);
     console.log('\n💡 提示:');
     console.log('   - iOS 图标已自动生成到 gen/apple/Assets.xcassets/AppIcon.appiconset/');
+    console.log('   - Android 图标已自动生成到 gen/android/app/src/main/res/mipmap-*/');
     console.log('   - .icns 文件已生成，可用于 macOS');
     console.log('   - .ico 文件已生成，可直接用于 Windows');
     

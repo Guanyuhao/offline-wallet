@@ -20,6 +20,8 @@ node scripts/generate-wallet-icons.js
 
 脚本会为冷钱包和热钱包分别生成以下图标文件：
 
+**桌面平台图标**（位于 `src-tauri/icons/`）：
+
 - `32x32.png` - 小尺寸图标
 - `128x128.png` - 标准尺寸图标
 - `128x128@2x.png` - 高分辨率图标（256x256）
@@ -28,6 +30,24 @@ node scripts/generate-wallet-icons.js
 - `icon.ico` - Windows 图标文件
 - `{cold|hot}-icon.svg` - SVG 源文件
 
+**iOS 图标**（位于 `gen/apple/Assets.xcassets/AppIcon.appiconset/`）：
+
+- 所有 iOS 设备所需的图标尺寸（iPhone、iPad、Marketing）
+
+**Android 图标**（位于 `gen/android/app/src/main/res/mipmap-*/`）：
+
+- `mipmap-mdpi` (48x48)
+- `mipmap-hdpi` (72x72)
+- `mipmap-xhdpi` (96x96)
+- `mipmap-xxhdpi` (144x144)
+- `mipmap-xxxhdpi` (192x192)
+
+每个密度包含：
+
+- `ic_launcher.png` - 主图标
+- `ic_launcher_round.png` - 圆形图标
+- `ic_launcher_foreground.png` - 前景图标
+
 ### 图标设计
 
 - **冷钱包图标**：蓝色/冷色调，保险箱风格，带有离线指示器和安全盾牌装饰
@@ -35,8 +55,21 @@ node scripts/generate-wallet-icons.js
 
 ### 输出位置
 
-- 冷钱包图标：`packages/cold-wallet/src-tauri/icons/`
-- 热钱包图标：`packages/hot-wallet/src-tauri/icons/`
+- **冷钱包图标**：
+  - 桌面图标：`packages/cold-wallet/src-tauri/icons/`
+  - iOS 图标：`packages/cold-wallet/src-tauri/gen/apple/Assets.xcassets/AppIcon.appiconset/`
+  - Android 图标：`packages/cold-wallet/src-tauri/gen/android/app/src/main/res/mipmap-*/`
+
+- **热钱包图标**：
+  - 桌面图标：`packages/hot-wallet/src-tauri/icons/`
+  - iOS 图标：`packages/hot-wallet/src-tauri/gen/apple/Assets.xcassets/AppIcon.appiconset/`
+  - Android 图标：`packages/hot-wallet/src-tauri/gen/android/app/src/main/res/mipmap-*/`
+
+### 注意事项
+
+- 如果 iOS 或 Android 项目目录不存在，脚本会自动跳过相应平台的图标生成
+- 首次运行前需要先初始化 iOS/Android 项目（`tauri ios init` 或 `tauri android init`）
+- 脚本会自动检测项目目录，只生成已初始化平台的图标
 
 ---
 
