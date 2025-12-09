@@ -25,10 +25,10 @@ const LoadingFallback = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#f5f5f7',
+        background: 'var(--adm-color-fill-content)',
       }}
     >
-      <div style={{ fontSize: '16px', color: '#86868b' }}>{t.common.loading}</div>
+      <div style={{ fontSize: '16px', color: 'var(--app-subtitle-color)' }}>{t.common.loading}</div>
     </div>
   );
 };

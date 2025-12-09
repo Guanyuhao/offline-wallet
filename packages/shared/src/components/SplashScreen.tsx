@@ -3,6 +3,7 @@
  * 开屏动画组件
  * 使用应用 icon 展示友好的启动动画
  * 极简风格，适配苹果设计语言
+ * 支持深色/浅色主题
  */
 
 import { useEffect, useState } from 'react';
@@ -29,9 +30,13 @@ export interface SplashScreenProps {
    */
   subtitle?: string;
   /**
-   * Icon 路径
+   * Icon 路径（浅色模式）
    */
   iconPath?: string;
+  /**
+   * Icon 路径（深色模式，可选）
+   */
+  iconPathDark?: string;
 }
 
 export default function SplashScreen({
@@ -41,9 +46,31 @@ export default function SplashScreen({
   appName = '冷钱包',
   subtitle = 'COLD WALLET',
   iconPath = '/icon.png',
+  iconPathDark,
 }: SplashScreenProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [animationPhase, setAnimationPhase] = useState<'enter' | 'show' | 'exit'>('enter');
+  const [isDark, setIsDark] = useState(false);
+
+  // 检测当前主题
+  useEffect(() => {
+    const checkTheme = () => {
+      const root = document.documentElement;
+      const theme = root.getAttribute('data-prefers-color-scheme');
+      setIsDark(theme === 'dark');
+    };
+
+    checkTheme();
+
+    // 监听主题变化
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-prefers-color-scheme'],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     // 第一阶段：进入动画（0-600ms）
@@ -75,6 +102,14 @@ export default function SplashScreen({
     return null;
   }
 
+  // 根据主题选择图标
+  const currentIcon = isDark && iconPathDark ? iconPathDark : iconPath;
+
+  // 主题颜色
+  const backgroundColor = isDark ? '#1a1a1a' : '#ffffff';
+  const titleColor = isDark ? '#ffffff' : '#1d1d1f';
+  const subtitleColor = isDark ? '#a0a0a0' : '#86868b';
+
   return (
     <div
       style={{
@@ -84,8 +119,8 @@ export default function SplashScreen({
         right: 0,
         bottom: 0,
         width: '100vw',
-        height: '100vh', // 使用 100vh 占满屏幕
-        backgroundColor: '#ffffff',
+        height: '100vh',
+        backgroundColor,
         zIndex: 99999,
         display: 'flex',
         flexDirection: 'column',
@@ -115,7 +150,7 @@ export default function SplashScreen({
       >
         {/* Icon 图片 - 极简风格 */}
         <img
-          src={iconPath}
+          src={currentIcon}
           alt={appName}
           style={{
             width: '100%',
@@ -123,11 +158,11 @@ export default function SplashScreen({
             objectFit: 'contain',
           }}
           onError={(e) => {
-            // 如果 icon.png 加载失败，尝试使用其他路径
+            // 如果加载失败，尝试使用其他路径
             const target = e.target as HTMLImageElement;
             target.src = '/src-tauri/icons/icon.png';
             target.onerror = () => {
-              // 如果还是失败，显示默认图标
+              // 如果还是失败，隐藏图标
               target.style.display = 'none';
             };
           }}
@@ -140,7 +175,7 @@ export default function SplashScreen({
           marginTop: '32px',
           fontSize: '28px',
           fontWeight: 300,
-          color: '#1d1d1f',
+          color: titleColor,
           letterSpacing: '0.5px',
           opacity: animationPhase === 'enter' ? 0 : animationPhase === 'exit' ? 0 : 1,
           transform:
@@ -162,7 +197,7 @@ export default function SplashScreen({
             marginTop: '8px',
             fontSize: '15px',
             fontWeight: 300,
-            color: '#86868b',
+            color: subtitleColor,
             letterSpacing: '1px',
             opacity: animationPhase === 'enter' ? 0 : animationPhase === 'exit' ? 0 : 1,
             transform:

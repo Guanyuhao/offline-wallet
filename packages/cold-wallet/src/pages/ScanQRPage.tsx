@@ -45,7 +45,7 @@ const ScanQRPage: React.FC = () => {
               style={{
                 fontSize: '48px',
                 marginBottom: '20px',
-                color: '#ff4d4f',
+                color: 'var(--adm-color-danger)',
               }}
             >
               ⚠️
@@ -55,7 +55,7 @@ const ScanQRPage: React.FC = () => {
                 margin: 0,
                 fontSize: '20px',
                 fontWeight: 600,
-                color: '#1d1d1f',
+                color: 'var(--app-title-color)',
                 marginBottom: '12px',
               }}
             >
@@ -65,7 +65,7 @@ const ScanQRPage: React.FC = () => {
               style={{
                 margin: 0,
                 fontSize: '15px',
-                color: '#86868b',
+                color: 'var(--app-subtitle-color)',
                 marginBottom: '32px',
                 lineHeight: '1.5',
               }}

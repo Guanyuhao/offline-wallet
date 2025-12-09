@@ -61,7 +61,6 @@ export default {
     passwordDescription: '密码用于加密存储助记词，请牢记。忘记密码将无法恢复钱包。',
     passwordInputPlaceholder: '请输入密码（至少8位）',
     confirmPasswordInputPlaceholder: '请再次输入密码',
-    encrypting: '正在加密保存助记词...',
   },
 
   // 导入钱包
@@ -78,7 +77,6 @@ export default {
     importButton: '导入钱包',
     invalidWordCount: '助记词应为12或24个单词',
     verificationFailed: '验证失败:',
-    encryptingMessage: '正在加密保存助记词，首次保存需要约30-60秒，请耐心等待...',
     importFailed: '导入失败:',
   },
 
@@ -88,7 +86,6 @@ export default {
     passwordPlaceholder: '请输入密码',
     unlockButton: '解锁',
     passwordError: '密码错误或解锁失败',
-    loadingMessage: '正在验证密码并加载钱包...（首次加载可能需要 30-60 秒）',
     keyMismatch: '密钥不匹配：密码错误或 vault 文件与当前参数不兼容',
     enterPasswordPrompt: '请输入密码解锁您的钱包',
     enterPassword: '请输入密码',

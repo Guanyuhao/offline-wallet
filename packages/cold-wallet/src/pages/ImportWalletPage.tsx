@@ -70,13 +70,6 @@ function ImportWalletPage() {
     try {
       setLoading(true);
 
-      // 提示用户首次保存需要较长时间（Argon2id 加密算法的安全特性）
-      Toast.show({
-        content: t.importWallet.encryptingMessage,
-        position: 'top',
-        duration: 3000,
-      });
-
       // 使用 Stronghold 存储加密的助记词
       await storeMnemonic(mnemonic.trim(), password);
 
@@ -113,7 +106,7 @@ function ImportWalletPage() {
           }}
         >
           <h2>{t.importWallet.title}</h2>
-          <p style={{ color: '#666' }}>{t.importWallet.importDescription}</p>
+          <p style={{ color: 'var(--app-subtitle-color)' }}>{t.importWallet.importDescription}</p>
 
           <TextArea
             placeholder={t.importWallet.mnemonicInputPlaceholder}

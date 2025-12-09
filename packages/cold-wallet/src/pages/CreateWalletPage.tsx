@@ -82,13 +82,6 @@ function CreateWalletPage() {
     try {
       setLoading(true);
 
-      // 提示用户正在保存
-      Toast.show({
-        content: t.createWallet.encrypting,
-        position: 'top',
-        duration: 2000,
-      });
-
       // 使用 Stronghold 存储加密的助记词
       await storeMnemonic(mnemonic, password);
 
@@ -125,13 +118,20 @@ function CreateWalletPage() {
             }}
           >
             <div>
-              <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: '#1d1d1f' }}>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: '24px',
+                  fontWeight: 600,
+                  color: 'var(--app-title-color)',
+                }}
+              >
                 {t.createWallet.createNewWallet}
               </h2>
               <p
                 style={{
                   marginTop: '8px',
-                  color: '#86868b',
+                  color: 'var(--app-subtitle-color)',
                   fontSize: '15px',
                   lineHeight: '1.5',
                 }}
@@ -151,7 +151,7 @@ function CreateWalletPage() {
                 style={{
                   fontSize: '15px',
                   fontWeight: 500,
-                  color: '#1d1d1f',
+                  color: 'var(--app-title-color)',
                   marginBottom: '8px',
                 }}
               >
@@ -170,8 +170,14 @@ function CreateWalletPage() {
                     style={{
                       padding: '16px',
                       borderRadius: '12px',
-                      background: wordCount === 12 ? '#f0f9ff' : '#f5f5f7',
-                      border: wordCount === 12 ? '2px solid #1677ff' : '2px solid transparent',
+                      background:
+                        wordCount === 12
+                          ? 'var(--app-highlight-background)'
+                          : 'var(--adm-color-fill-content)',
+                      border:
+                        wordCount === 12
+                          ? '2px solid var(--adm-color-primary)'
+                          : '2px solid transparent',
                     }}
                   >
                     <div
@@ -184,7 +190,7 @@ function CreateWalletPage() {
                       <span style={{ fontSize: '17px', fontWeight: 500 }}>
                         {t.createWallet.wordCount12}
                       </span>
-                      <span style={{ fontSize: '14px', color: '#86868b' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--app-subtitle-color)' }}>
                         {t.createWallet.wordCount12Desc}
                       </span>
                     </div>
@@ -194,8 +200,14 @@ function CreateWalletPage() {
                     style={{
                       padding: '16px',
                       borderRadius: '12px',
-                      background: wordCount === 24 ? '#f0f9ff' : '#f5f5f7',
-                      border: wordCount === 24 ? '2px solid #1677ff' : '2px solid transparent',
+                      background:
+                        wordCount === 24
+                          ? 'var(--app-highlight-background)'
+                          : 'var(--adm-color-fill-content)',
+                      border:
+                        wordCount === 24
+                          ? '2px solid var(--adm-color-primary)'
+                          : '2px solid transparent',
                     }}
                   >
                     <div
@@ -208,7 +220,7 @@ function CreateWalletPage() {
                       <span style={{ fontSize: '17px', fontWeight: 500 }}>
                         {t.createWallet.wordCount24}
                       </span>
-                      <span style={{ fontSize: '14px', color: '#86868b' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--app-subtitle-color)' }}>
                         {t.createWallet.wordCount24Desc}
                       </span>
                     </div>
@@ -234,13 +246,20 @@ function CreateWalletPage() {
             }}
           >
             <div>
-              <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: '#1d1d1f' }}>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: '24px',
+                  fontWeight: 600,
+                  color: 'var(--app-title-color)',
+                }}
+              >
                 {t.createWallet.backupMnemonic}
               </h2>
               <p
                 style={{
                   marginTop: '8px',
-                  color: '#ff3141',
+                  color: 'var(--adm-color-danger)',
                   fontSize: '15px',
                   lineHeight: '1.5',
                 }}
@@ -251,7 +270,7 @@ function CreateWalletPage() {
 
             <div
               style={{
-                background: '#f5f5f7',
+                background: 'var(--adm-color-fill-content)',
                 padding: '20px',
                 borderRadius: '12px',
                 fontFamily: 'monospace',
@@ -275,20 +294,20 @@ function CreateWalletPage() {
                       alignItems: 'center',
                       gap: '8px',
                       padding: '8px',
-                      background: '#ffffff',
+                      background: 'var(--adm-color-box)',
                       borderRadius: '8px',
                     }}
                   >
                     <span
                       style={{
-                        color: '#86868b',
+                        color: 'var(--app-subtitle-color)',
                         fontSize: '14px',
                         minWidth: '24px',
                       }}
                     >
                       {index + 1}.
                     </span>
-                    <span style={{ color: '#1d1d1f', fontWeight: 500 }}>{word}</span>
+                    <span style={{ color: 'var(--app-title-color)', fontWeight: 500 }}>{word}</span>
                   </div>
                 ))}
               </div>
@@ -313,7 +332,7 @@ function CreateWalletPage() {
                 alignItems: 'flex-start',
                 gap: '12px',
                 padding: '16px',
-                background: '#fff3cd',
+                background: 'var(--app-warning-background)',
                 borderRadius: '12px',
               }}
             >
@@ -327,7 +346,7 @@ function CreateWalletPage() {
               <label
                 style={{
                   fontSize: '15px',
-                  color: '#856404',
+                  color: 'var(--app-warning-color)',
                   lineHeight: '1.5',
                   cursor: 'pointer',
                   flex: 1,
@@ -355,13 +374,20 @@ function CreateWalletPage() {
             }}
           >
             <div>
-              <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: '#1d1d1f' }}>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: '24px',
+                  fontWeight: 600,
+                  color: 'var(--app-title-color)',
+                }}
+              >
                 {t.createWallet.setPassword}
               </h2>
               <p
                 style={{
                   marginTop: '8px',
-                  color: '#86868b',
+                  color: 'var(--app-subtitle-color)',
                   fontSize: '15px',
                   lineHeight: '1.5',
                 }}

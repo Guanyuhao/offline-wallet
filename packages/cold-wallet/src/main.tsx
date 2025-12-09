@@ -20,11 +20,12 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
       const root = document.documentElement;
 
       if (effectiveTheme === 'dark') {
-        root.setAttribute('data-theme', 'dark');
+        // 使用 antd-mobile 官方推荐的深色模式属性
+        root.setAttribute('data-prefers-color-scheme', 'dark');
         root.classList.add('dark');
         root.classList.remove('light');
       } else {
-        root.setAttribute('data-theme', 'light');
+        root.setAttribute('data-prefers-color-scheme', 'light');
         root.classList.add('light');
         root.classList.remove('dark');
       }

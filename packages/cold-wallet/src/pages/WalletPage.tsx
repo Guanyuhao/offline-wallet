@@ -125,7 +125,9 @@ function WalletPage() {
                   gap: '8px',
                 }}
               >
-                <span style={{ color: '#86868b', fontSize: '15px' }}>{t.wallet.address}</span>
+                <span style={{ color: 'var(--app-subtitle-color)', fontSize: '15px' }}>
+                  {t.wallet.address}
+                </span>
                 <AddressDisplay address={address} />
               </div>
 

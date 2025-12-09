@@ -1,55 +1,35 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- 背景渐变 -->
   <defs>
-    <linearGradient id="hotGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="hotBg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#DC2626;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#F97316;stop-opacity:1" />
     </linearGradient>
-    <linearGradient id="hotShine" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.3" />
-      <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0" />
-    </linearGradient>
-    <filter id="shadow">
-      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
-    </filter>
   </defs>
   
-  <!-- 背景圆角矩形 -->
-  <rect width="512" height="512" rx="120" fill="url(#hotGradient)"/>
+  <!-- 背景 -->
+  <rect width="512" height="512" rx="112" fill="url(#hotBg)"/>
   
-  <!-- 高光效果 -->
-  <rect width="512" height="512" rx="120" fill="url(#hotShine)"/>
+  <!-- 钱包外形 -->
+  <rect x="96" y="160" width="320" height="220" rx="32" fill="#FFFFFF" opacity="0.95"/>
   
-  <!-- 钱包主体（现代钱包风格） -->
-  <rect x="96" y="160" width="320" height="240" rx="24" fill="#FFFFFF" opacity="0.95" filter="url(#shadow)"/>
-  <rect x="96" y="160" width="320" height="240" rx="24" stroke="#DC2626" stroke-width="4" opacity="0.2"/>
-  
-  <!-- 钱包开口 -->
-  <path d="M 96 200 Q 96 180 116 180 L 396 180 Q 416 180 416 200 L 416 400 Q 416 420 396 420 L 116 420 Q 96 420 96 400 Z" fill="#FEF2F2"/>
-  <path d="M 96 200 Q 96 180 116 180 L 396 180 Q 416 180 416 200" stroke="#DC2626" stroke-width="4" stroke-linecap="round"/>
-  
-  <!-- 卡片 -->
-  <rect x="128" y="240" width="256" height="120" rx="12" fill="#FFFFFF" opacity="0.9"/>
-  <rect x="128" y="240" width="256" height="120" rx="12" stroke="#F97316" stroke-width="2" opacity="0.5"/>
+  <!-- 钱包折叠处 -->
+  <path d="M96 200 L416 200" stroke="#DC2626" stroke-width="8" opacity="0.3"/>
   
   <!-- 卡片芯片 -->
-  <rect x="152" y="280" width="48" height="32" rx="4" fill="#F97316"/>
-  <rect x="156" y="284" width="40" height="24" rx="2" fill="#DC2626"/>
+  <rect x="136" y="240" width="64" height="48" rx="8" fill="#F97316" opacity="0.9"/>
+  <rect x="144" y="248" width="48" height="32" rx="4" fill="#DC2626"/>
+  <line x1="156" y1="256" x2="180" y2="256" stroke="#FFFFFF" stroke-width="2" opacity="0.6"/>
+  <line x1="156" y1="264" x2="180" y2="264" stroke="#FFFFFF" stroke-width="2" opacity="0.6"/>
+  <line x1="156" y1="272" x2="180" y2="272" stroke="#FFFFFF" stroke-width="2" opacity="0.6"/>
   
-  <!-- 卡片线条 -->
-  <line x1="216" y1="280" x2="360" y2="280" stroke="#F97316" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-  <line x1="216" y1="300" x2="344" y2="300" stroke="#F97316" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
-  <line x1="216" y1="320" x2="328" y2="320" stroke="#F97316" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+  <!-- 交易线条 -->
+  <line x1="224" y1="260" x2="376" y2="260" stroke="#F97316" stroke-width="12" stroke-linecap="round" opacity="0.4"/>
+  <line x1="224" y1="300" x2="340" y2="300" stroke="#F97316" stroke-width="12" stroke-linecap="round" opacity="0.3"/>
+  <line x1="224" y1="340" x2="300" y2="340" stroke="#F97316" stroke-width="12" stroke-linecap="round" opacity="0.2"/>
   
-  <!-- 在线指示器（WiFi 图标） -->
-  <g transform="translate(400, 200)">
-    <circle cx="0" cy="0" r="20" fill="#10B981" opacity="0.9"/>
-    <path d="M -8 -4 Q 0 -12 8 -4 M -12 -8 Q 0 -16 12 -8 M -8 -4 Q 0 -8 8 -4" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-  </g>
-  
-  <!-- 交易箭头装饰 -->
-  <g transform="translate(112, 200)">
-    <circle cx="12" cy="12" r="16" fill="#F97316" opacity="0.6"/>
-    <path d="M 6 12 L 12 6 L 18 12 M 12 6 L 12 18" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  </g>
+  <!-- 在线标识 (WiFi) -->
+  <circle cx="400" cy="112" r="36" fill="#10B981" opacity="0.95"/>
+  <path d="M380 120 Q400 100 420 120" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M388 112 Q400 100 412 112" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="400" cy="120" r="6" fill="#FFFFFF"/>
 </svg>

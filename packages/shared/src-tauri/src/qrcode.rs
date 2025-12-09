@@ -4,7 +4,7 @@
 
 use serde::{Deserialize, Serialize};
 use qrcode::{QrCode, Color};
-use image::{RgbImage, Rgb};
+use image::{RgbImage, RgbaImage, Rgb, Rgba, imageops};
 use base64::{Engine as _, engine::general_purpose};
 
 /// 二维码数据类型
@@ -129,6 +129,162 @@ pub fn generate_qrcode(data: &str, size: u32) -> Result<String, String> {
                 img.width(),
                 img.height(),
                 image::ColorType::Rgb8,
+            )
+            .map_err(|e| format!("Failed to encode PNG: {}", e))?;
+    }
+    
+    Ok(general_purpose::STANDARD.encode(&png_bytes))
+}
+
+/// 生成带 logo 的二维码图片（Base64编码）
+/// 
+/// # Arguments
+/// * `data` - 要编码的数据（JSON字符串）
+/// * `size` - 二维码尺寸（像素）
+/// * `logo_base64` - logo 图片的 base64 编码（PNG/JPEG 格式）
+/// * `logo_size_ratio` - logo 占二维码的比例（0.0-0.3，推荐 0.2）
+/// 
+/// # Returns
+/// Base64编码的PNG图片数据
+pub fn generate_qrcode_with_logo(
+    data: &str, 
+    size: u32, 
+    logo_base64: &str,
+    logo_size_ratio: f32,
+) -> Result<String, String> {
+    // 生成二维码（使用高纠错级别以容纳 logo）
+    let qr = QrCode::with_error_correction_level(data.as_bytes(), qrcode::EcLevel::H)
+        .map_err(|e| format!("Failed to generate QR code: {}", e))?;
+    
+    // 计算每个模块的像素大小
+    let qr_size = qr.width();
+    let module_size = size / (qr_size as u32 + 2); // 留出边距
+    let image_size = module_size * (qr_size as u32 + 2);
+    
+    // 创建 RGBA 图像（支持透明度）
+    let mut img = RgbaImage::new(image_size, image_size);
+    
+    // 填充白色背景
+    for pixel in img.pixels_mut() {
+        *pixel = Rgba([255, 255, 255, 255]);
+    }
+    
+    // 绘制二维码
+    for y in 0..qr_size {
+        for x in 0..qr_size {
+            let is_dark = matches!(qr[(x, y)], Color::Dark);
+            let color = if is_dark {
+                Rgba([0, 0, 0, 255]) // 黑色
+            } else {
+                Rgba([255, 255, 255, 255]) // 白色
+            };
+            
+            // 绘制模块
+            let start_x = (x as u32 + 1) * module_size;
+            let start_y = (y as u32 + 1) * module_size;
+            
+            for py in 0..module_size {
+                for px in 0..module_size {
+                    if start_x + px < image_size && start_y + py < image_size {
+                        img.put_pixel(start_x + px, start_y + py, color);
+                    }
+                }
+            }
+        }
+    }
+    
+    // 解码 logo（移除可能的 data URI 前缀）
+    let logo_data = if logo_base64.contains(',') {
+        logo_base64.split(',').last().unwrap_or(logo_base64)
+    } else {
+        logo_base64
+    };
+    
+    let logo_bytes = general_purpose::STANDARD
+        .decode(logo_data)
+        .map_err(|e| format!("Failed to decode logo: {}", e))?;
+    
+    let logo_img = image::load_from_memory(&logo_bytes)
+        .map_err(|e| format!("Failed to load logo image: {}", e))?;
+    
+    // 计算 logo 尺寸（限制比例在合理范围内）
+    let ratio = logo_size_ratio.clamp(0.1, 0.3);
+    let logo_target_size = (image_size as f32 * ratio) as u32;
+    
+    // 缩放 logo
+    let resized_logo = imageops::resize(
+        &logo_img,
+        logo_target_size,
+        logo_target_size,
+        imageops::FilterType::Lanczos3,
+    );
+    
+    // 计算 logo 位置（居中）
+    let logo_x = (image_size - logo_target_size) / 2;
+    let logo_y = (image_size - logo_target_size) / 2;
+    
+    // 绘制白色背景圆角矩形（稍大于 logo）
+    let padding = 4u32;
+    let bg_size = logo_target_size + padding * 2;
+    let bg_x = logo_x.saturating_sub(padding);
+    let bg_y = logo_y.saturating_sub(padding);
+    let corner_radius = 8u32;
+    
+    for py in 0..bg_size {
+        for px in 0..bg_size {
+            let x = bg_x + px;
+            let y = bg_y + py;
+            if x < image_size && y < image_size {
+                // 简单的圆角检测
+                let in_corner = (px < corner_radius && py < corner_radius) ||
+                               (px >= bg_size - corner_radius && py < corner_radius) ||
+                               (px < corner_radius && py >= bg_size - corner_radius) ||
+                               (px >= bg_size - corner_radius && py >= bg_size - corner_radius);
+                
+                if in_corner {
+                    // 检查是否在圆角内
+                    let cx = if px < corner_radius { corner_radius } else { bg_size - corner_radius };
+                    let cy = if py < corner_radius { corner_radius } else { bg_size - corner_radius };
+                    let dx = px as i32 - cx as i32;
+                    let dy = py as i32 - cy as i32;
+                    if (dx * dx + dy * dy) as u32 <= corner_radius * corner_radius {
+                        img.put_pixel(x, y, Rgba([255, 255, 255, 255]));
+                    }
+                } else {
+                    img.put_pixel(x, y, Rgba([255, 255, 255, 255]));
+                }
+            }
+        }
+    }
+    
+    // 叠加 logo
+    for (lx, ly, pixel) in resized_logo.enumerate_pixels() {
+        let x = logo_x + lx;
+        let y = logo_y + ly;
+        if x < image_size && y < image_size {
+            // Alpha 混合
+            let alpha = pixel[3] as f32 / 255.0;
+            if alpha > 0.0 {
+                let bg = img.get_pixel(x, y);
+                let new_r = (pixel[0] as f32 * alpha + bg[0] as f32 * (1.0 - alpha)) as u8;
+                let new_g = (pixel[1] as f32 * alpha + bg[1] as f32 * (1.0 - alpha)) as u8;
+                let new_b = (pixel[2] as f32 * alpha + bg[2] as f32 * (1.0 - alpha)) as u8;
+                img.put_pixel(x, y, Rgba([new_r, new_g, new_b, 255]));
+            }
+        }
+    }
+    
+    // 编码为 PNG
+    let mut png_bytes = Vec::new();
+    {
+        let encoder = image::codecs::png::PngEncoder::new(&mut png_bytes);
+        #[allow(deprecated)]
+        encoder
+            .encode(
+                img.as_raw(),
+                img.width(),
+                img.height(),
+                image::ColorType::Rgba8,
             )
             .map_err(|e| format!("Failed to encode PNG: {}", e))?;
     }

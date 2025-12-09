@@ -456,12 +456,21 @@ function SignTransactionPage() {
       <StandardCard>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: '#1d1d1f' }}>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: '24px',
+                fontWeight: 600,
+                color: 'var(--app-title-color)',
+              }}
+            >
               {t.signTransaction.title}
             </h2>
-            <p style={{ marginTop: '8px', color: '#86868b', fontSize: '15px' }}>
+            <p style={{ marginTop: '8px', color: 'var(--app-subtitle-color)', fontSize: '15px' }}>
               {t.signTransaction.currentChain}:{' '}
-              <strong style={{ color: '#1677ff' }}>{currentChain.toUpperCase()}</strong>
+              <strong style={{ color: 'var(--adm-color-primary)' }}>
+                {currentChain.toUpperCase()}
+              </strong>
             </p>
           </div>
 
@@ -476,7 +485,7 @@ function SignTransactionPage() {
                   <div
                     style={{
                       padding: '16px',
-                      backgroundColor: '#f0f7ff',
+                      backgroundColor: 'var(--app-highlight-background)',
                       borderRadius: '8px',
                       textAlign: 'center',
                     }}
@@ -485,7 +494,7 @@ function SignTransactionPage() {
                       style={{
                         margin: 0,
                         fontSize: '14px',
-                        color: '#1677ff',
+                        color: 'var(--adm-color-primary)',
                         marginBottom: '12px',
                       }}
                     >
@@ -500,7 +509,7 @@ function SignTransactionPage() {
                     <div
                       style={{
                         padding: '16px',
-                        backgroundColor: '#f0f9ff',
+                        backgroundColor: 'var(--app-highlight-background)',
                         borderRadius: '8px',
                         textAlign: 'center',
                       }}
@@ -509,14 +518,16 @@ function SignTransactionPage() {
                         style={{
                           margin: 0,
                           fontSize: '16px',
-                          color: '#1677ff',
+                          color: 'var(--adm-color-primary)',
                           fontWeight: 600,
                           marginBottom: '4px',
                         }}
                       >
                         {t.signTransaction.verifiedSuccess}
                       </p>
-                      <p style={{ margin: 0, fontSize: '12px', color: '#86868b' }}>
+                      <p
+                        style={{ margin: 0, fontSize: '12px', color: 'var(--app-subtitle-color)' }}
+                      >
                         {t.signTransaction.reviewAndSign}
                       </p>
                     </div>
@@ -541,7 +552,7 @@ function SignTransactionPage() {
 
                     <div
                       style={{
-                        border: '1px solid #e5e5e5',
+                        border: '1px solid var(--adm-color-border)',
                         borderRadius: '8px',
                         overflow: 'hidden',
                       }}
@@ -550,22 +561,28 @@ function SignTransactionPage() {
                         onClick={() => setShowScannedInfo(!showScannedInfo)}
                         style={{
                           padding: '12px 16px',
-                          backgroundColor: '#fafafa',
+                          backgroundColor: 'var(--adm-color-fill-content)',
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
                           cursor: 'pointer',
                         }}
                       >
-                        <span style={{ fontSize: '14px', fontWeight: 500, color: '#1d1d1f' }}>
+                        <span
+                          style={{
+                            fontSize: '14px',
+                            fontWeight: 500,
+                            color: 'var(--app-title-color)',
+                          }}
+                        >
                           {t.signTransaction.viewInfo}
                         </span>
-                        <span style={{ fontSize: '12px', color: '#86868b' }}>
+                        <span style={{ fontSize: '12px', color: 'var(--app-subtitle-color)' }}>
                           {showScannedInfo ? '▼' : '▶'}
                         </span>
                       </div>
                       {showScannedInfo && (
-                        <div style={{ padding: '16px', backgroundColor: '#fff' }}>
+                        <div style={{ padding: '16px', backgroundColor: 'var(--adm-color-box)' }}>
                           <TransactionForm
                             chain={currentChain as ChainType}
                             form={form}

@@ -285,7 +285,7 @@ function TransactionForm({
           >
             {t.transactionForm.enableEditMode}
           </Button>
-          <p style={{ marginTop: '8px', fontSize: '12px', color: '#86868b' }}>
+          <p style={{ marginTop: '8px', fontSize: '12px', color: 'var(--app-subtitle-color)' }}>
             {t.transactionForm.editModeHint}
           </p>
         </div>
@@ -407,7 +407,13 @@ function TransactionForm({
           label={
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <span>{t.transactionForm.amount}</span>
-              <span style={{ fontSize: '12px', color: '#86868b', fontWeight: 'normal' }}>
+              <span
+                style={{
+                  fontSize: '12px',
+                  color: 'var(--app-subtitle-color)',
+                  fontWeight: 'normal',
+                }}
+              >
                 {t.transactionForm.amountUnit}: {currentChain.toUpperCase()}
               </span>
             </div>
@@ -477,7 +483,13 @@ function TransactionForm({
             label={
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <span>{t.transactionForm.gasPrice}</span>
-                <span style={{ fontSize: '12px', color: '#86868b', fontWeight: 'normal' }}>
+                <span
+                  style={{
+                    fontSize: '12px',
+                    color: 'var(--app-subtitle-color)',
+                    fontWeight: 'normal',
+                  }}
+                >
                   {t.transactionForm.gasPriceUnit}
                 </span>
               </div>
@@ -555,7 +567,13 @@ function TransactionForm({
             label={
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <span>{t.transactionForm.gasLimit}</span>
-                <span style={{ fontSize: '12px', color: '#86868b', fontWeight: 'normal' }}>
+                <span
+                  style={{
+                    fontSize: '12px',
+                    color: 'var(--app-subtitle-color)',
+                    fontWeight: 'normal',
+                  }}
+                >
                   {t.transactionForm.gasLimitSuggestion}
                 </span>
               </div>

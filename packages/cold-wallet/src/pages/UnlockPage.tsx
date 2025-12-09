@@ -49,20 +49,8 @@ function UnlockPage() {
     try {
       setLoading(true);
 
-      // 提示用户正在加载（注意：由于 tauri-plugin-stronghold 的已知性能问题，
-      // Stronghold.load() 可能需要 30-60 秒，这是正常的）
-      // GitHub issue: https://github.com/tauri-apps/plugins-workspace/issues/2048
-      const loadingToast = Toast.show({
-        content: t.unlock.loadingMessage,
-        position: 'top',
-        duration: 0, // 持续显示直到手动关闭
-      });
-
       // 使用 Stronghold 验证密码并获取助记词
       const mnemonic = await retrieveMnemonic(password);
-
-      // 关闭加载提示
-      Toast.clear();
 
       // 设置状态
       setMnemonic(mnemonic);
@@ -132,13 +120,20 @@ function UnlockPage() {
               🔒
             </div>
             <div style={{ textAlign: 'center' }}>
-              <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 600, color: '#1d1d1f' }}>
+              <h1
+                style={{
+                  margin: 0,
+                  fontSize: '28px',
+                  fontWeight: 600,
+                  color: 'var(--app-title-color)',
+                }}
+              >
                 {t.unlock.title}
               </h1>
               <p
                 style={{
                   marginTop: '8px',
-                  color: '#86868b',
+                  color: 'var(--app-subtitle-color)',
                   fontSize: '17px',
                 }}
               >

@@ -6,7 +6,7 @@
 
 html {
   width: 100%;
-  height: 100vh; /* 使用 100vh 占满屏幕 */
+  height: 100vh;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -15,23 +15,23 @@ html {
 
 body {
   width: 100%;
-  height: 100%; /* 继承 html 的 100vh */
+  height: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   overflow-x: hidden;
-  overflow-y: hidden; /* 防止垂直滚动 */
+  overflow-y: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
     'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-
+  /* 注意：不设置 background-color，因为扫描二维码时相机界面 z-index 是 -1，需要透明 */
 }
 
 #app {
   width: 100%;
-  height: 100%; /* 继承 body 的高度 */
-  overflow: hidden; /* 防止滚动 */
+  height: 100%;
+  overflow: hidden;
 }
 
 /* 隐藏数字输入框右侧的上下箭头 */
@@ -45,7 +45,6 @@ input[type='number'] {
   -moz-appearance: textfield;
 }
 
-/* 针对 antd-mobile Input 组件的数字输入框 */
 .adm-input-element[type='number']::-webkit-inner-spin-button,
 .adm-input-element[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -56,27 +55,22 @@ input[type='number'] {
   -moz-appearance: textfield;
 }
 
-/* 深色模式支持 */
+/* 
+ * 自定义 CSS 变量（用于页面内联样式）
+ * antd-mobile 组件会自动响应 data-prefers-color-scheme 属性
+ */
 :root {
-  --adm-color-background: #ffffff;
-  --adm-color-text: #333333;
-  --adm-color-border: #eeeeee;
+  --app-title-color: var(--adm-color-text);
+  --app-subtitle-color: var(--adm-color-text-secondary);
+  --app-page-background: var(--adm-color-fill-content);
+  --app-card-background: var(--adm-color-box);
+  --app-warning-color: #856404;
+  --app-warning-background: #fff3cd;
+  --app-highlight-background: #f0f9ff;
 }
 
-[data-theme='dark'] {
-  --adm-color-background: #1a1a1a;
-  --adm-color-text: #ffffff;
-  --adm-color-border: #333333;
+[data-prefers-color-scheme='dark'] {
+  --app-warning-color: #d4a106;
+  --app-warning-background: #3d3000;
+  --app-highlight-background: #1a3a5c;
 }
-
-/* 深色模式下的背景色 */
-[data-theme='dark'] body {
-  background-color: #1a1a1a;
-  color: #ffffff;
-}
-
-[data-theme='dark'] #app {
-  background-color: #1a1a1a;
-  color: #ffffff;
-}
-

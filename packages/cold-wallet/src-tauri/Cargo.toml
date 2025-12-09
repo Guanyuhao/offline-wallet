@@ -7,8 +7,11 @@ edition = "2021"
 
 [lib]
 name = "cold_wallet_lib"
-path = "src/main.rs"
 crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "cold-wallet"
+path = "src/main.rs"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

@@ -49,7 +49,7 @@ function PasswordInput({ defaultVisible = false, style, ...props }: PasswordInpu
           justifyContent: 'center',
           width: '24px',
           height: '24px',
-          color: '#86868b',
+          color: 'var(--app-subtitle-color)',
         }}
         onClick={() => setVisible(!visible)}
       >

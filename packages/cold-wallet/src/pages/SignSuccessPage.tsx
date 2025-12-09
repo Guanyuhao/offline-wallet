@@ -11,11 +11,20 @@ import StandardCard from '../components/StandardCard';
 import QRCodeCard from '../components/QRCodeCard';
 import { useI18n } from '../hooks/useI18n';
 
+// 计算响应式二维码尺寸（签名数据量大，需要更大尺寸）
+function getQRCodeSize() {
+  const screenWidth = window.innerWidth;
+  // 页面 padding 约 32px，卡片 padding 约 48px，留出余量
+  const maxSize = Math.min(screenWidth - 100, 300);
+  return Math.max(maxSize, 200); // 最小 200px，最大 300px
+}
+
 function SignSuccessPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { signedTx, qrCodeData, currentChain } = (location.state as any) || {};
   const t = useI18n();
+  const qrSize = getQRCodeSize();
 
   const handleReset = () => {
     navigate('/sign');
@@ -39,8 +48,8 @@ function SignSuccessPage() {
         <StandardCard style={{ marginTop: '16px' }}>
           <QRCodeCard
             data={qrCodeData}
-            size={240}
-            variant="enhanced"
+            size={qrSize}
+            variant="simple"
             description={
               <>
                 {t.signSuccess.scanHint}
@@ -52,7 +61,7 @@ function SignSuccessPage() {
         </StandardCard>
       ) : (
         <StandardCard style={{ marginTop: '16px' }}>
-          <div style={{ padding: '20px', textAlign: 'center', color: '#ff4d4f' }}>
+          <div style={{ padding: '20px', textAlign: 'center', color: 'var(--adm-color-danger)' }}>
             <p>{t.signSuccess.qrError}</p>
             <p style={{ fontSize: '12px', marginTop: '8px' }}>
               {t.signSuccess.signedData} {signedTx?.substring(0, 100)}...

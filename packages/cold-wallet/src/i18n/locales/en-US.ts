@@ -65,7 +65,6 @@ export default {
       'Password is used to encrypt and store the mnemonic. Please remember it. Forgotten passwords cannot recover the wallet.',
     passwordInputPlaceholder: 'Enter password (at least 8 characters)',
     confirmPasswordInputPlaceholder: 'Confirm password',
-    encrypting: 'Encrypting and saving mnemonic...',
   },
 
   // Import Wallet
@@ -82,8 +81,6 @@ export default {
     importButton: 'Import Wallet',
     invalidWordCount: 'Mnemonic should be 12 or 24 words',
     verificationFailed: 'Verification failed:',
-    encryptingMessage:
-      'Encrypting and saving mnemonic, first save takes about 30-60 seconds, please wait...',
     importFailed: 'Import failed:',
   },
 
@@ -93,7 +90,6 @@ export default {
     passwordPlaceholder: 'Enter password',
     unlockButton: 'Unlock',
     passwordError: 'Incorrect password or unlock failed',
-    loadingMessage: 'Verifying password and loading wallet... (First load may take 30-60 seconds)',
     keyMismatch:
       'Key mismatch: Incorrect password or vault file incompatible with current parameters',
     enterPasswordPrompt: 'Please enter password to unlock your wallet',

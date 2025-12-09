@@ -75,7 +75,7 @@ function PageLayout({
           flex: 1,
           overflow: 'auto',
           padding: '20px',
-          background: '#f5f5f7',
+          background: 'var(--adm-color-fill-content)',
           ...contentStyle,
         }}
       >

@@ -45,6 +45,22 @@ const MobileQRCodeScanner: React.FC<MobileQRCodeScannerProps> = ({
   const [isCameraReady, setIsCameraReady] = useState(false);
   const scanAbortedRef = useRef(false);
 
+  // 保存原始 html 背景色
+  const originalBgColorRef = useRef<string>('');
+
+  // 设置 html 背景色为透明（让相机视图可见）
+  const setHtmlBackgroundTransparent = () => {
+    const html = document.documentElement;
+    originalBgColorRef.current = html.style.backgroundColor || '';
+    html.style.backgroundColor = 'transparent';
+  };
+
+  // 还原 html 背景色
+  const restoreHtmlBackground = () => {
+    const html = document.documentElement;
+    html.style.backgroundColor = originalBgColorRef.current;
+  };
+
   // 检查并请求相机权限
   const checkAndRequestPermission = async (): Promise<boolean> => {
     let permission = await checkMobileCameraPermission();
@@ -77,8 +93,9 @@ const MobileQRCodeScanner: React.FC<MobileQRCodeScannerProps> = ({
 
         // 优先使用窗口模式（windowed: true）
         try {
-          // 启动扫描后，相机应该已经准备好，移除背景色
+          // 启动扫描后，相机应该已经准备好，设置背景透明
           setIsCameraReady(true);
+          setHtmlBackgroundTransparent();
 
           const content = await scanQRCodeWindowed({
             windowed: true,
@@ -86,6 +103,7 @@ const MobileQRCodeScanner: React.FC<MobileQRCodeScannerProps> = ({
           });
           if (isMounted && !scanAbortedRef.current) {
             setIsScanning(false);
+            restoreHtmlBackground();
             onScanSuccess(content);
           }
         } catch (error: any) {
@@ -98,10 +116,12 @@ const MobileQRCodeScanner: React.FC<MobileQRCodeScannerProps> = ({
 
           // 降级到原生扫描，相机也应该已经准备好
           setIsCameraReady(true);
+          setHtmlBackgroundTransparent();
 
           const content = await scanQR();
           if (isMounted && !scanAbortedRef.current) {
             setIsScanning(false);
+            restoreHtmlBackground();
             onScanSuccess(content);
           }
         }
@@ -134,6 +154,9 @@ const MobileQRCodeScanner: React.FC<MobileQRCodeScannerProps> = ({
       setIsScanning(false);
       setIsCameraReady(false);
 
+      // 还原 html 背景色
+      restoreHtmlBackground();
+
       // 组件卸载时取消扫描，关闭相机
       cancelScanQR().catch((error) => {
         console.error('[MobileQRCodeScanner] 组件卸载时取消扫描失败:', error);
@@ -145,6 +168,9 @@ const MobileQRCodeScanner: React.FC<MobileQRCodeScannerProps> = ({
     scanAbortedRef.current = true;
     setIsScanning(false);
     setIsCameraReady(false);
+
+    // 还原 html 背景色
+    restoreHtmlBackground();
 
     // 取消正在进行的扫描，关闭相机
     try {

@@ -77,13 +77,20 @@ function HomePage() {
           >
             <div style={{ fontSize: '72px' }}>🔒</div>
             <div style={{ textAlign: 'center' }}>
-              <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 600, color: '#1d1d1f' }}>
+              <h1
+                style={{
+                  margin: 0,
+                  fontSize: '28px',
+                  fontWeight: 600,
+                  color: 'var(--app-title-color)',
+                }}
+              >
                 {t.home.title}
               </h1>
               <p
                 style={{
                   marginTop: '8px',
-                  color: '#86868b',
+                  color: 'var(--app-subtitle-color)',
                   fontSize: '17px',
                   lineHeight: '1.5',
                 }}
@@ -136,14 +143,21 @@ function HomePage() {
               style={{
                 width: '100%',
                 padding: '16px',
-                background: '#f5f5f7',
+                background: 'var(--adm-color-fill-content)',
                 borderRadius: '12px',
                 fontSize: '15px',
-                color: '#86868b',
+                color: 'var(--app-subtitle-color)',
                 lineHeight: '1.6',
               }}
             >
-              <p style={{ margin: 0, fontWeight: 600, color: '#1d1d1f', marginBottom: '8px' }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontWeight: 600,
+                  color: 'var(--app-title-color)',
+                  marginBottom: '8px',
+                }}
+              >
                 {t.home.securityTitle}
               </p>
               <ul style={{ margin: 0, paddingLeft: '20px' }}>

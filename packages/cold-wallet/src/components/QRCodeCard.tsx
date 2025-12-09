@@ -14,7 +14,16 @@ interface QRCodeCardProps {
   variant?: 'simple' | 'enhanced';
   /** 自定义容器样式 */
   containerStyle?: React.CSSProperties;
+  /** 是否显示中心 logo */
+  showLogo?: boolean;
+  /** 自定义 logo URL（默认使用 App icon） */
+  logoUrl?: string;
+  /** logo 占二维码的比例（0.1-0.3，默认 0.2） */
+  logoSizeRatio?: number;
 }
+
+// 默认使用 App icon
+const DEFAULT_LOGO = '/icon.png';
 
 /**
  * 二维码卡片组件
@@ -27,8 +36,12 @@ function QRCodeCard({
   description,
   variant = 'enhanced',
   containerStyle,
+  showLogo = true,
+  logoUrl,
+  logoSizeRatio = 0.2,
 }: QRCodeCardProps) {
   const isEnhanced = variant === 'enhanced';
+  const logo = showLogo ? logoUrl || DEFAULT_LOGO : undefined;
 
   const wrapperStyle: React.CSSProperties = {
     display: 'flex',
@@ -42,10 +55,10 @@ function QRCodeCard({
   const qrCodeContainerStyle: React.CSSProperties = isEnhanced
     ? {
         padding: '32px',
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%)',
+        background: 'var(--adm-color-fill-content)',
         borderRadius: '24px',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-        border: '2px solid #e5e5e7',
+        border: '2px solid var(--adm-color-border)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -53,16 +66,16 @@ function QRCodeCard({
       }
     : {
         padding: '24px',
-        background: '#ffffff',
+        background: 'var(--adm-color-box)',
         borderRadius: '20px',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-        border: '1px solid #e5e5e7',
+        border: '1px solid var(--adm-color-border)',
       };
 
   const innerContainerStyle: React.CSSProperties = isEnhanced
     ? {
         padding: '16px',
-        background: '#ffffff',
+        background: 'var(--adm-color-box)',
         borderRadius: '16px',
         boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
       }
@@ -71,7 +84,7 @@ function QRCodeCard({
   const descriptionStyle: React.CSSProperties = {
     margin: 0,
     fontSize: '14px',
-    color: '#86868b',
+    color: 'var(--app-subtitle-color)',
     textAlign: 'center',
     lineHeight: '1.5',
   };
@@ -90,7 +103,7 @@ function QRCodeCard({
               margin: 0,
               fontSize: '24px',
               fontWeight: 600,
-              color: '#1d1d1f',
+              color: 'var(--app-title-color)',
               marginBottom: '8px',
             }}
           >
@@ -102,10 +115,10 @@ function QRCodeCard({
       <div style={qrCodeContainerStyle}>
         {isEnhanced ? (
           <div style={innerContainerStyle}>
-            <QRCodeDisplay data={data} size={size} />
+            <QRCodeDisplay data={data} size={size} logo={logo} logoSizeRatio={logoSizeRatio} />
           </div>
         ) : (
-          <QRCodeDisplay data={data} size={size} />
+          <QRCodeDisplay data={data} size={size} logo={logo} logoSizeRatio={logoSizeRatio} />
         )}
       </div>
 

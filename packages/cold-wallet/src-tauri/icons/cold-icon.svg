@@ -1,51 +1,26 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- 背景渐变 -->
   <defs>
-    <linearGradient id="coldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1E3A8A;stop-opacity:1" />
+    <linearGradient id="coldBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E40AF;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
     </linearGradient>
-    <linearGradient id="coldShine" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.3" />
-      <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0" />
-    </linearGradient>
-    <filter id="shadow">
-      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
-    </filter>
   </defs>
   
-  <!-- 背景圆角矩形 -->
-  <rect width="512" height="512" rx="120" fill="url(#coldGradient)"/>
+  <!-- 背景 -->
+  <rect width="512" height="512" rx="112" fill="url(#coldBg)"/>
   
-  <!-- 高光效果 -->
-  <rect width="512" height="512" rx="120" fill="url(#coldShine)"/>
+  <!-- 盾牌外框 -->
+  <path d="M256 80 L400 140 L400 280 Q400 380 256 440 Q112 380 112 280 L112 140 Z" 
+        fill="none" stroke="#FFFFFF" stroke-width="24" stroke-linejoin="round" opacity="0.9"/>
   
-  <!-- 钱包主体（保险箱风格） -->
-  <rect x="96" y="160" width="320" height="240" rx="24" fill="#FFFFFF" opacity="0.95" filter="url(#shadow)"/>
-  <rect x="96" y="160" width="320" height="240" rx="24" stroke="#1E3A8A" stroke-width="4" opacity="0.2"/>
+  <!-- 锁图标 -->
+  <rect x="196" y="240" width="120" height="100" rx="16" fill="#FFFFFF" opacity="0.95"/>
+  <path d="M216 240 L216 200 Q216 160 256 160 Q296 160 296 200 L296 240" 
+        fill="none" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" opacity="0.95"/>
+  <circle cx="256" cy="290" r="16" fill="#1E40AF"/>
+  <rect x="250" y="290" width="12" height="28" rx="4" fill="#1E40AF"/>
   
-  <!-- 保险箱门 -->
-  <rect x="120" y="184" width="272" height="192" rx="16" fill="#EFF6FF"/>
-  <rect x="120" y="184" width="272" height="192" rx="16" stroke="#3B82F6" stroke-width="3"/>
-  
-  <!-- 锁孔 -->
-  <circle cx="256" cy="280" r="24" fill="#1E3A8A" opacity="0.8"/>
-  <circle cx="256" cy="280" r="16" fill="#3B82F6"/>
-  <rect x="252" y="280" width="8" height="20" fill="#1E3A8A"/>
-  
-  <!-- 装饰线条（表示离线/安全） -->
-  <line x1="160" y1="320" x2="352" y2="320" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
-  <line x1="160" y1="340" x2="320" y2="340" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
-  
-  <!-- 离线指示器（WiFi 断开图标） -->
-  <g transform="translate(400, 200)">
-    <circle cx="0" cy="0" r="20" fill="#EF4444" opacity="0.9"/>
-    <path d="M -8 -8 L 8 8 M 8 -8 L -8 8" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
-  </g>
-  
-  <!-- 安全盾牌装饰 -->
-  <g transform="translate(112, 200)">
-    <path d="M 0 0 L 12 -8 L 24 0 L 24 16 L 12 24 L 0 16 Z" fill="#3B82F6" opacity="0.6"/>
-    <path d="M 6 4 L 10 8 L 18 0" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  </g>
+  <!-- 离线标识 (断开的圆) -->
+  <circle cx="400" cy="112" r="36" fill="#EF4444" opacity="0.95"/>
+  <path d="M384 96 L416 128 M416 96 L384 128" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
 </svg>

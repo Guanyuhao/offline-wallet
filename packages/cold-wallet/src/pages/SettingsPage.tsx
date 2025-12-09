@@ -116,7 +116,7 @@ function SettingsPage() {
             onClick={() => setLanguageVisible(true)}
             arrow
             extra={
-              <span style={{ color: '#999' }}>
+              <span style={{ color: 'var(--app-subtitle-color)' }}>
                 {languageOptions.find((opt) => opt.value === locale)?.label}
               </span>
             }
@@ -139,7 +139,7 @@ function SettingsPage() {
             onClick={() => setThemeVisible(true)}
             arrow
             extra={
-              <span style={{ color: '#999' }}>
+              <span style={{ color: 'var(--app-subtitle-color)' }}>
                 {themeOptions.find((opt) => opt.value === theme)?.label}
               </span>
             }
@@ -160,8 +160,12 @@ function SettingsPage() {
           <List.Item
             onClick={handleLock}
             arrow
-            extra={<span style={{ color: '#999' }}>{t.settings.lockWalletDesc}</span>}
-            prefix={<LockOutline fontSize={20} style={{ color: '#1677ff' }} />}
+            extra={
+              <span style={{ color: 'var(--app-subtitle-color)' }}>
+                {t.settings.lockWalletDesc}
+              </span>
+            }
+            prefix={<LockOutline fontSize={20} style={{ color: 'var(--adm-color-primary)' }} />}
           >
             {t.settings.lockWallet}
           </List.Item>
@@ -170,8 +174,12 @@ function SettingsPage() {
             <List.Item
               onClick={handleExit}
               arrow
-              extra={<span style={{ color: '#999' }}>{t.settings.exitAppDesc}</span>}
-              prefix={<CloseCircleFill fontSize={20} style={{ color: '#1677ff' }} />}
+              extra={
+                <span style={{ color: 'var(--app-subtitle-color)' }}>{t.settings.exitAppDesc}</span>
+              }
+              prefix={
+                <CloseCircleFill fontSize={20} style={{ color: 'var(--adm-color-primary)' }} />
+              }
             >
               {t.settings.exitApp}
             </List.Item>
@@ -183,15 +191,15 @@ function SettingsPage() {
         <div
           style={{
             padding: '16px',
-            background: '#fff3cd',
+            background: 'var(--app-warning-background)',
             borderRadius: '8px',
             marginBottom: '16px',
           }}
         >
-          <h3 style={{ margin: '0 0 8px 0', color: '#856404' }}>
+          <h3 style={{ margin: '0 0 8px 0', color: 'var(--app-warning-color)' }}>
             <ExclamationTriangleOutline /> {t.settings.dangerZone}
           </h3>
-          <p style={{ margin: 0, fontSize: '14px', color: '#856404' }}>
+          <p style={{ margin: 0, fontSize: '14px', color: 'var(--app-warning-color)' }}>
             {t.settings.dangerZoneDesc}
           </p>
         </div>
@@ -205,7 +213,7 @@ function SettingsPage() {
           style={{
             padding: '16px',
             textAlign: 'center',
-            color: '#999',
+            color: 'var(--app-subtitle-color)',
             fontSize: '12px',
           }}
         >
