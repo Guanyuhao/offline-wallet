@@ -1,85 +1,173 @@
 # @Author liyongjie
-# 主发布工作流 - 协调所有平台构建并创建 GitHub Release
+# 桌面端构建和发布工作流
 
-name: Release
+name: Release Desktop
 
 on:
   push:
     branches: [main]
     tags: ['v*']
   workflow_dispatch:
-    inputs:
-      build_desktop:
-        description: 'Build Desktop (Windows + macOS)'
-        type: boolean
-        default: true
-      build_mobile:
-        description: 'Build Mobile (iOS + Android)'
-        type: boolean
-        default: false
-      create_release:
-        description: 'Create GitHub Release'
-        type: boolean
-        default: true
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # ============================================
-  # 桌面端构建
-  # ============================================
-  
   build-windows:
     name: 🪟 Windows
-    if: github.event_name != 'workflow_dispatch' || inputs.build_desktop
-    uses: ./.github/workflows/build-windows.yml
-    secrets:
-      TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_COLD_WALLET }}
-      TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD_COLD_WALLET }}
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  build-macos:
-    name: 🍎 macOS
-    if: github.event_name != 'workflow_dispatch' || inputs.build_desktop
-    uses: ./.github/workflows/build-macos.yml
-    secrets:
-      TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_COLD_WALLET }}
-      TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD_COLD_WALLET }}
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
-  # ============================================
-  # 移动端构建（可选）
-  # ============================================
-  
-  build-mobile:
-    name: 📱 Mobile
-    if: github.event_name == 'workflow_dispatch' && inputs.build_mobile
-    uses: ./.github/workflows/build-mobile.yml
-    secrets:
-      APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-      APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-      APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
-      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
 
-  # ============================================
-  # 创建 GitHub Release
-  # ============================================
-  
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/cold-wallet/src-tauri
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+
+      - name: Build Frontend
+        working-directory: packages/cold-wallet
+        run: pnpm build
+
+      - name: Build Tauri App
+        working-directory: packages/cold-wallet
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_COLD_WALLET }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD_COLD_WALLET }}
+        run: pnpm tauri build --target x86_64-pc-windows-msvc
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cold-wallet-windows-x64
+          path: |
+            packages/cold-wallet/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+            packages/cold-wallet/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+          retention-days: 7
+
+  build-macos-intel:
+    name: 🍎 macOS Intel
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-apple-darwin
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/cold-wallet/src-tauri
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+
+      - name: Build Frontend
+        working-directory: packages/cold-wallet
+        run: pnpm build
+
+      - name: Build Tauri App
+        working-directory: packages/cold-wallet
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_COLD_WALLET }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD_COLD_WALLET }}
+        run: pnpm tauri build --target x86_64-apple-darwin
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cold-wallet-macos-x64
+          path: packages/cold-wallet/src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
+          retention-days: 7
+
+  build-macos-arm:
+    name: 🍎 macOS ARM
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/cold-wallet/src-tauri
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+
+      - name: Build Frontend
+        working-directory: packages/cold-wallet
+        run: pnpm build
+
+      - name: Build Tauri App
+        working-directory: packages/cold-wallet
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_COLD_WALLET }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD_COLD_WALLET }}
+        run: pnpm tauri build --target aarch64-apple-darwin
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cold-wallet-macos-arm64
+          path: packages/cold-wallet/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+          retention-days: 7
+
   create-release:
     name: 🚀 Create Release
-    needs: [build-windows, build-macos]
-    if: |
-      always() &&
-      !contains(needs.*.result, 'failure') &&
-      (startsWith(github.ref, 'refs/tags/v') || 
-       (github.event_name == 'workflow_dispatch' && inputs.create_release) ||
-       github.ref == 'refs/heads/main')
+    needs: [build-windows, build-macos-intel, build-macos-arm]
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -93,7 +181,6 @@ jobs:
             VERSION="v$(node -p "require('./package.json').version")-$(git rev-parse --short HEAD)"
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "📦 Version: $VERSION"
 
       - name: Download All Artifacts
         uses: actions/download-artifact@v4
@@ -101,9 +188,7 @@ jobs:
           path: ./artifacts
 
       - name: List Artifacts
-        run: |
-          echo "📁 Downloaded artifacts:"
-          find ./artifacts -type f -name "*.msi" -o -name "*.exe" -o -name "*.dmg" -o -name "*.apk" -o -name "*.ipa" | head -20
+        run: find ./artifacts -type f | head -20
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -111,35 +196,11 @@ jobs:
           tag_name: ${{ steps.version.outputs.version }}
           name: Cold Wallet ${{ steps.version.outputs.version }}
           draft: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-          prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+          prerelease: false
           generate_release_notes: true
           files: |
             artifacts/**/*.msi
             artifacts/**/*.exe
             artifacts/**/*.dmg
-            artifacts/**/*.apk
-            artifacts/**/*.ipa
-          body: |
-            ## 🔐 Cold Wallet ${{ steps.version.outputs.version }}
-            
-            ### 📥 下载
-            
-            | 平台 | 架构 | 下载 |
-            |------|------|------|
-            | Windows | x64 | `.msi` / `.exe` |
-            | macOS | Intel (x64) | `.dmg` |
-            | macOS | Apple Silicon (arm64) | `.dmg` |
-            
-            ### ⚡ 快速开始
-            
-            1. 下载对应平台的安装包
-            2. 安装并运行
-            3. 创建或导入钱包
-            
-            ### 🔒 安全提示
-            
-            - 请仅从官方渠道下载
-            - 验证文件完整性后再安装
-            - 妥善保管助记词
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
