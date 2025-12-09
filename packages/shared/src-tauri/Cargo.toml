@@ -1,6 +1,6 @@
 [package]
 name = "offline-wallet-shared"
-version = "0.1.0"
+version = "1.0.0"
 description = "Shared Rust code for offline-wallet (cold-wallet and hot-wallet)"
 authors = ["you"]
 edition = "2021"

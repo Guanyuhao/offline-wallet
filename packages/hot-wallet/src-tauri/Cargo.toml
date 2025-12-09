@@ -1,6 +1,6 @@
 [package]
 name = "hot-wallet"
-version = "0.1.0"
+version = "1.0.0"
 description = "Hot Wallet - Online transaction helper for cold wallet"
 authors = ["you"]
 edition = "2021"

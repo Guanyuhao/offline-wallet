@@ -1103,7 +1103,7 @@ dependencies = [
 
 [[package]]
 name = "cold-wallet"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "aes-gcm",
  "argon2",
@@ -3274,7 +3274,7 @@ dependencies = [
 
 [[package]]
 name = "hot-wallet"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "base64 0.22.1",
  "image 0.24.9",
@@ -4936,7 +4936,7 @@ dependencies = [
 
 [[package]]
 name = "offline-wallet-shared"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "argon2",
  "base64 0.22.1",
