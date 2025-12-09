@@ -17,6 +17,10 @@ on:
         type: boolean
         default: true
 
+permissions:
+  contents: write
+  packages: write
+
 concurrency:
   group: mobile-${{ github.ref }}
   cancel-in-progress: true
@@ -63,35 +67,63 @@ jobs:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           # 创建临时钥匙串
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
           KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
           
+          echo "🔐 创建临时钥匙串..."
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           
           # 导入证书
+          echo "📜 导入证书..."
           echo "$APPLE_CERTIFICATE" | base64 --decode > $RUNNER_TEMP/certificate.p12
-          security import $RUNNER_TEMP/certificate.p12 -P "$APPLE_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security import $RUNNER_TEMP/certificate.p12 \
+            -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12 \
+            -k $KEYCHAIN_PATH
+          
           security list-keychain -d user -s $KEYCHAIN_PATH
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           
           # 安装 Provisioning Profile
+          echo "📱 安装 Provisioning Profile..."
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$APPLE_PROVISIONING_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          
+          # 获取 Profile UUID
+          PROFILE_PATH=$RUNNER_TEMP/profile.mobileprovision
+          echo "$APPLE_PROVISIONING_PROFILE" | base64 --decode > $PROFILE_PATH
+          PROFILE_UUID=$(grep -a -A1 UUID $PROFILE_PATH | grep -o '[-A-Z0-9]\{36\}' | head -1)
+          
+          cp $PROFILE_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
+          
+          echo "✅ 证书和配置文件已安装"
+          echo "Team ID: $APPLE_TEAM_ID"
+          echo "Profile UUID: $PROFILE_UUID"
 
       - name: Build iOS App
-        working-directory: packages/cold-wallet
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
+          cd packages/cold-wallet
+          
           # 确保已初始化 iOS 项目
           pnpm tauri ios init || true
-          # 构建 iOS（移除 --open 避免打开 Xcode）
-          pnpm tauri ios build || {
-            echo "⚠️ iOS 构建失败"
+          
+          # 构建 iOS（使用开发签名）
+          echo "🏗️ 开始构建 iOS 应用..."
+          pnpm tauri ios build --verbose || {
+            echo "❌ iOS 构建失败"
+            echo "请检查："
+            echo "1. APPLE_CERTIFICATE 是否正确（iOS Development 证书的 .p12）"
+            echo "2. APPLE_CERTIFICATE_PASSWORD 是否正确"
+            echo "3. APPLE_PROVISIONING_PROFILE 是否匹配 Bundle ID: com.offlinewallet.cold"
+            echo "4. APPLE_TEAM_ID 是否正确"
             exit 1
           }
 
@@ -226,7 +258,12 @@ jobs:
         continue-on-error: true
 
       - name: List Artifacts
-        run: find ./artifacts -type f 2>/dev/null | head -20 || echo "No artifacts found"
+        run: |
+          echo "📦 Downloaded Artifacts:"
+          find ./artifacts -type f 2>/dev/null || echo "No artifacts found"
+          echo ""
+          echo "📋 File details:"
+          ls -lhR ./artifacts/ 2>/dev/null || true
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/v')
@@ -237,9 +274,7 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            artifacts/**/*.apk
-            artifacts/**/*.aab
-            artifacts/**/*.ipa
+            artifacts/**/*
           body: |
             ## 📱 Cold Wallet Mobile Release
             
