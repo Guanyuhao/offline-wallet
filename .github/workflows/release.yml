@@ -50,19 +50,20 @@ jobs:
         run: pnpm build
 
       - name: Build Tauri App
-        working-directory: packages/cold-wallet
         env:
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_COLD_WALLET }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD_COLD_WALLET }}
-        run: pnpm tauri build --target x86_64-pc-windows-msvc
+        run: |
+          cd packages/cold-wallet
+          pnpm tauri build --target x86_64-pc-windows-msvc
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: cold-wallet-windows-x64
           path: |
-            packages/cold-wallet/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
-            packages/cold-wallet/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+            target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+            target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
           retention-days: 7
 
   build-macos-intel:
@@ -101,17 +102,18 @@ jobs:
         run: pnpm build
 
       - name: Build Tauri App
-        working-directory: packages/cold-wallet
         env:
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_COLD_WALLET }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD_COLD_WALLET }}
-        run: pnpm tauri build --target x86_64-apple-darwin
+        run: |
+          cd packages/cold-wallet
+          pnpm tauri build --target x86_64-apple-darwin
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: cold-wallet-macos-x64
-          path: packages/cold-wallet/src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
+          path: target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
           retention-days: 7
 
   build-macos-arm:
@@ -150,17 +152,18 @@ jobs:
         run: pnpm build
 
       - name: Build Tauri App
-        working-directory: packages/cold-wallet
         env:
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_COLD_WALLET }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD_COLD_WALLET }}
-        run: pnpm tauri build --target aarch64-apple-darwin
+        run: |
+          cd packages/cold-wallet
+          pnpm tauri build --target aarch64-apple-darwin
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: cold-wallet-macos-arm64
-          path: packages/cold-wallet/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+          path: target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
           retention-days: 7
 
   create-release:
