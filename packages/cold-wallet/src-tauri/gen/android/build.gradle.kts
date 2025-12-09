@@ -1,5 +1,9 @@
 buildscript {
     repositories {
+        // 阿里云镜像 - 解决中国网络问题
+        maven { url = uri("https://maven.aliyun.com/repository/public") }
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
         google()
         mavenCentral()
     }
@@ -11,6 +15,10 @@ buildscript {
 
 allprojects {
     repositories {
+        // 阿里云镜像 - 解决中国网络问题
+        maven { url = uri("https://maven.aliyun.com/repository/public") }
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
         google()
         mavenCentral()
     }

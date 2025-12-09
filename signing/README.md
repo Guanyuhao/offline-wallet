@@ -6,13 +6,26 @@
 
 ```
 signing/
-├── .gitkeep                    # 保持目录结构
-├── cold-wallet.key             # 冷钱包私钥
-├── cold-wallet.pub             # 冷钱包公钥
-├── cold-wallet.password.txt    # 冷钱包密钥密码（随机生成）
-├── hot-wallet.key              # 热钱包私钥（如需要）
-├── hot-wallet.pub              # 热钱包公钥（如需要）
-└── hot-wallet.password.txt     # 热钱包密钥密码（如需要）
+├── .gitkeep                         # 保持目录结构
+│
+├── # 桌面端 Tauri 签名
+├── cold-wallet.key                  # 冷钱包私钥
+├── cold-wallet.pub                  # 冷钱包公钥
+├── cold-wallet.password.txt         # 冷钱包密钥密码
+├── hot-wallet.key                   # 热钱包私钥
+├── hot-wallet.pub                   # 热钱包公钥
+├── hot-wallet.password.txt          # 热钱包密钥密码
+│
+├── # Android 签名
+├── android-release.keystore         # Android 签名密钥库
+├── android-release.keystore.base64  # Base64 编码（用于 CI）
+├── android-keystore.password.txt    # 密钥库密码
+├── android-key.password.txt         # 密钥密码（PKCS12 与 store 相同）
+│
+└── # iOS 签名（需手动导出）
+    # ios-distribution.p12           # iOS 发布证书
+    # ios-distribution.password.txt  # 证书密码
+    # ios-app.mobileprovision        # 配置描述文件
 ```
 
 ## 🔐 密钥命名规则
@@ -77,6 +90,56 @@ signing/
 2. **不要泄露**: 密钥和密码都是敏感信息，不要泄露
 3. **权限**: 确保密钥文件权限正确（600）
 4. **更新**: 如需重新生成密钥，先删除旧文件
+
+## 📱 移动端签名配置
+
+### Android 签名
+
+Android 签名已自动生成，GitHub Secrets 配置：
+
+| Secret 名称                 | 值来源                                             |
+| --------------------------- | -------------------------------------------------- |
+| `ANDROID_KEYSTORE_BASE64`   | `signing/android-release.keystore.base64` 文件内容 |
+| `ANDROID_KEYSTORE_PASSWORD` | `signing/android-keystore.password.txt` 文件内容   |
+| `ANDROID_KEY_ALIAS`         | `cold-wallet`                                      |
+| `ANDROID_KEY_PASSWORD`      | 与 `ANDROID_KEYSTORE_PASSWORD` 相同                |
+
+### iOS 签名
+
+iOS 签名需要从 Keychain 导出证书：
+
+1. **导出开发/发布证书**：
+
+   ```bash
+   # 打开钥匙串访问
+   open -a "Keychain Access"
+   # 找到 "Apple Development: xxx" 或 "Apple Distribution: xxx"
+   # 右键 → 导出 → 保存为 .p12 文件到 signing/ios-distribution.p12
+   ```
+
+2. **下载 Provisioning Profile**：
+   - 访问 https://developer.apple.com/account/resources/profiles/list
+   - 下载对应的 `.mobileprovision` 文件
+   - 保存到 `signing/ios-app.mobileprovision`
+
+3. **配置 GitHub Secrets**：
+
+   ```bash
+   # 证书 Base64
+   base64 -i signing/ios-distribution.p12 | pbcopy
+   # 粘贴到 APPLE_CERTIFICATE
+
+   # 描述文件 Base64
+   base64 -i signing/ios-app.mobileprovision | pbcopy
+   # 粘贴到 APPLE_PROVISIONING_PROFILE
+   ```
+
+| Secret 名称                  | 说明                                   |
+| ---------------------------- | -------------------------------------- |
+| `APPLE_CERTIFICATE`          | 证书 .p12 的 Base64                    |
+| `APPLE_CERTIFICATE_PASSWORD` | 导出证书时设置的密码                   |
+| `APPLE_PROVISIONING_PROFILE` | 描述文件的 Base64                      |
+| `APPLE_TEAM_ID`              | Apple 开发者团队 ID（如 `ZZAL7KSM56`） |
 
 ## 🔄 迁移旧密钥
 

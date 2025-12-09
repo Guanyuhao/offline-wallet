@@ -41,11 +41,19 @@ build/
 # 根目录 signing 文件夹（统一管理）
 signing/*.key
 signing/*.p12
+signing/*.p12.base64
 signing/*.pem
 signing/*.pfx
 signing/*.pub
 signing/*.password.txt
+signing/*.keystore
+signing/*.keystore.base64
+signing/*.mobileprovision
+signing/*.mobileprovision.base64
+signing/*.cer
+signing/*.csr
 !signing/.gitkeep
+!signing/README.md
 
 
 # ==================== 测试覆盖率 ====================
