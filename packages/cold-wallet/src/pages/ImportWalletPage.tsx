@@ -7,6 +7,8 @@ import PasswordInput from '../components/PasswordInput';
 import PageLayout from '../components/PageLayout';
 import StandardCard from '../components/StandardCard';
 import PrimaryButton from '../components/PrimaryButton';
+import { storeMnemonic } from '../utils/stronghold';
+import { useI18n } from '../hooks/useI18n';
 
 function ImportWalletPage() {
   const navigate = useNavigate();
@@ -15,13 +17,14 @@ function ImportWalletPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const t = useI18n();
 
   const handleImport = async () => {
     // 验证助记词
     const words = mnemonic.trim().split(/\s+/);
     if (words.length !== 12 && words.length !== 24) {
       Toast.show({
-        content: '助记词应为12或24个单词',
+        content: t.importWallet.invalidWordCount,
         position: 'top',
       });
       return;
@@ -35,14 +38,14 @@ function ImportWalletPage() {
 
       if (!isValid) {
         Toast.show({
-          content: '助记词格式无效',
+          content: t.importWallet.invalidMnemonic,
           position: 'top',
         });
         return;
       }
     } catch (error) {
       Toast.show({
-        content: `验证失败: ${error}`,
+        content: `${t.importWallet.verificationFailed} ${error}`,
         position: 'top',
       });
       return;
@@ -50,7 +53,7 @@ function ImportWalletPage() {
 
     if (!password || password.length < 8) {
       Toast.show({
-        content: '密码至少8位',
+        content: t.createWallet.passwordTooShort,
         position: 'top',
       });
       return;
@@ -58,7 +61,7 @@ function ImportWalletPage() {
 
     if (password !== confirmPassword) {
       Toast.show({
-        content: '两次密码不一致',
+        content: t.createWallet.passwordMismatch,
         position: 'top',
       });
       return;
@@ -66,26 +69,32 @@ function ImportWalletPage() {
 
     try {
       setLoading(true);
-      // 存储加密的助记词
-      await invoke('store_encrypted_mnemonic', {
-        mnemonic: mnemonic.trim(),
-        password,
+
+      // 提示用户首次保存需要较长时间（Argon2id 加密算法的安全特性）
+      Toast.show({
+        content: t.importWallet.encryptingMessage,
+        position: 'top',
+        duration: 3000,
       });
+
+      // 使用 Stronghold 存储加密的助记词
+      await storeMnemonic(mnemonic.trim(), password);
 
       // 设置钱包状态
       setHasWallet(true);
       setMnemonic(mnemonic.trim());
 
       Toast.show({
-        content: '钱包导入成功',
+        content: t.importWallet.importSuccess,
         position: 'top',
         icon: 'success',
       });
 
       navigate('/wallet');
     } catch (error) {
+      console.error('导入失败:', error);
       Toast.show({
-        content: `导入失败: ${error}`,
+        content: `${t.importWallet.importFailed} ${error instanceof Error ? error.message : String(error)}`,
         position: 'top',
       });
     } finally {
@@ -94,7 +103,7 @@ function ImportWalletPage() {
   };
 
   return (
-    <PageLayout title="导入钱包" onBack={() => navigate(-1)}>
+    <PageLayout title={t.importWallet.title} onBack={() => navigate(-1)}>
       <StandardCard>
         <div
           style={{
@@ -103,11 +112,11 @@ function ImportWalletPage() {
             gap: '16px',
           }}
         >
-          <h2>导入钱包</h2>
-          <p style={{ color: '#666' }}>输入您的12或24个助记词</p>
+          <h2>{t.importWallet.title}</h2>
+          <p style={{ color: '#666' }}>{t.importWallet.importDescription}</p>
 
           <TextArea
-            placeholder="请输入助记词，用空格分隔"
+            placeholder={t.importWallet.mnemonicInputPlaceholder}
             value={mnemonic}
             onChange={(val) => setMnemonicLocal(val)}
             rows={4}
@@ -115,7 +124,7 @@ function ImportWalletPage() {
           />
 
           <PasswordInput
-            placeholder="设置密码（至少8位）"
+            placeholder={t.importWallet.passwordInputPlaceholder}
             value={password}
             onChange={(val) => setPassword(val)}
             style={{
@@ -125,7 +134,7 @@ function ImportWalletPage() {
           />
 
           <PasswordInput
-            placeholder="请再次输入密码"
+            placeholder={t.createWallet.confirmPasswordInputPlaceholder}
             value={confirmPassword}
             onChange={(val) => setConfirmPassword(val)}
             style={{
@@ -135,7 +144,7 @@ function ImportWalletPage() {
           />
 
           <PrimaryButton loading={loading} onClick={handleImport}>
-            导入钱包
+            {t.importWallet.importButton}
           </PrimaryButton>
         </div>
       </StandardCard>

@@ -9,11 +9,13 @@ import { CloseOutline } from 'antd-mobile-icons';
 import PageLayout from '../components/PageLayout';
 import StandardCard from '../components/StandardCard';
 import QRCodeCard from '../components/QRCodeCard';
+import { useI18n } from '../hooks/useI18n';
 
 function SignSuccessPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { signedTx, qrCodeData, currentChain } = (location.state as any) || {};
+  const t = useI18n();
 
   const handleReset = () => {
     navigate('/sign');
@@ -21,15 +23,15 @@ function SignSuccessPage() {
 
   return (
     <PageLayout
-      title="签名成功"
+      title={t.signSuccess.title}
       onBack={() => navigate('/sign')}
       navBarProps={{ backIcon: <CloseOutline /> }}
     >
       <StandardCard>
         <Result
           status="success"
-          title="签名成功"
-          description="签名后的交易已生成，请使用热钱包扫描二维码广播交易"
+          title={t.signSuccess.title}
+          description={t.signSuccess.description}
         />
       </StandardCard>
 
@@ -41,9 +43,9 @@ function SignSuccessPage() {
             variant="enhanced"
             description={
               <>
-                使用热钱包扫描此二维码
+                {t.signSuccess.scanHint}
                 <br />
-                将签名后的交易广播到 {currentChain?.toUpperCase() || ''} 网络
+                {t.signSuccess.broadcastHint.replace('{chain}', currentChain?.toUpperCase() || '')}
               </>
             }
           />
@@ -51,9 +53,9 @@ function SignSuccessPage() {
       ) : (
         <StandardCard style={{ marginTop: '16px' }}>
           <div style={{ padding: '20px', textAlign: 'center', color: '#ff4d4f' }}>
-            <p>二维码生成失败，请检查控制台日志</p>
+            <p>{t.signSuccess.qrError}</p>
             <p style={{ fontSize: '12px', marginTop: '8px' }}>
-              签名数据: {signedTx?.substring(0, 100)}...
+              {t.signSuccess.signedData} {signedTx?.substring(0, 100)}...
             </p>
           </div>
         </StandardCard>
@@ -61,15 +63,19 @@ function SignSuccessPage() {
 
       <StandardCard style={{ marginTop: '16px' }}>
         <Steps direction="vertical">
-          <Steps.Step title="签名完成" description="交易已在冷钱包中完成签名" status="process" />
           <Steps.Step
-            title="热钱包扫描广播交易"
-            description="使用热钱包扫描上方二维码，将签名后的交易广播到区块链"
+            title={t.signSuccess.stepComplete}
+            description={t.signSuccess.stepCompleteDesc}
+            status="process"
+          />
+          <Steps.Step
+            title={t.signSuccess.stepBroadcast}
+            description={t.signSuccess.stepBroadcastDesc}
             status="wait"
           />
           <Steps.Step
-            title="交易成功"
-            description="交易被成功广播并确认后，将显示在区块链上"
+            title={t.signSuccess.stepSuccess}
+            description={t.signSuccess.stepSuccessDesc}
             status="wait"
           />
         </Steps>
@@ -77,7 +83,7 @@ function SignSuccessPage() {
 
       <StandardCard style={{ marginTop: '16px' }}>
         <Button color="default" block onClick={handleReset}>
-          重新签名
+          {t.signSuccess.resignButton}
         </Button>
       </StandardCard>
     </PageLayout>

@@ -17,3 +17,9 @@ qrcode = "0.14"
 image = "0.24"
 base64 = "0.22"
 
+# 性能优化：为 scrypt crate（iota-crypto 的依赖）启用优化
+# 解决 Stronghold.load() 在开发模式下缓慢的问题
+# GitHub issue: https://github.com/tauri-apps/plugins-workspace/issues/2048
+[profile.dev.package.scrypt]
+opt-level = 3
+

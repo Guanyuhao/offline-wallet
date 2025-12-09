@@ -1,19 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Button, Dialog, Toast, List } from 'antd-mobile';
+import { Button, Dialog, Toast, List, Picker } from 'antd-mobile';
 import { LockOutline, CloseCircleFill, ExclamationTriangleOutline } from 'antd-mobile-icons';
 import { useNavigate } from 'react-router-dom';
-import { invoke } from '@tauri-apps/api/core';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { detectPlatform } from '@offline-wallet/shared/utils/platform';
 import useWalletStore from '../stores/useWalletStore';
+import useI18nStore, { Locale } from '../stores/useI18nStore';
+import useThemeStore, { Theme } from '../stores/useThemeStore';
 import PageLayout from '../components/PageLayout';
 import StandardCard from '../components/StandardCard';
+import { deleteMnemonic } from '../utils/stronghold';
+import { useI18n } from '../hooks/useI18n';
 
 function SettingsPage() {
   const navigate = useNavigate();
+  const t = useI18n();
   const { clearMnemonic, setUnlocked, reset } = useWalletStore();
+  const { locale, setLocale } = useI18nStore();
+  const { theme, setTheme } = useThemeStore();
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [languageVisible, setLanguageVisible] = useState(false);
+  const [themeVisible, setThemeVisible] = useState(false);
 
   // 检测平台
   useEffect(() => {
@@ -26,7 +34,7 @@ function SettingsPage() {
 
   const handleLock = () => {
     Dialog.confirm({
-      content: '确定要锁定钱包吗？锁定后需要重新输入密码解锁。',
+      content: t.settings.lockWalletDesc + '？' + t.settings.lockWalletConfirm,
       onConfirm: () => {
         clearMnemonic();
         setUnlocked(false);
@@ -37,23 +45,24 @@ function SettingsPage() {
 
   const handleDeleteWallet = () => {
     Dialog.confirm({
-      content: '删除钱包将清除所有数据，此操作不可恢复！请确保已备份助记词。',
-      confirmText: '确定删除',
-      cancelText: '取消',
+      content: t.settings.deleteWalletDesc,
+      confirmText: t.settings.confirmDelete,
+      cancelText: t.common.cancel,
       onConfirm: async () => {
         try {
           setLoading(true);
-          await invoke('delete_encrypted_mnemonic');
+          await deleteMnemonic();
           reset();
           Toast.show({
-            content: '钱包已删除',
+            content: t.settings.deleteSuccess,
             position: 'top',
             icon: 'success',
           });
           navigate('/');
         } catch (error) {
+          console.error('删除失败:', error);
           Toast.show({
-            content: `删除失败: ${error}`,
+            content: `${t.settings.deleteFailed}: ${error instanceof Error ? error.message : String(error)}`,
             position: 'top',
           });
         } finally {
@@ -65,7 +74,7 @@ function SettingsPage() {
 
   const handleExit = () => {
     Dialog.confirm({
-      content: '确定要退出应用吗？',
+      content: t.settings.confirmExit,
       onConfirm: async () => {
         try {
           // 清除内存中的敏感数据
@@ -77,7 +86,7 @@ function SettingsPage() {
         } catch (error) {
           console.error('退出应用失败:', error);
           Toast.show({
-            content: '退出失败，请手动关闭应用',
+            content: t.settings.exitFailed,
             position: 'top',
           });
         }
@@ -85,27 +94,86 @@ function SettingsPage() {
     });
   };
 
+  // 语言选项
+  const languageOptions = [
+    { label: t.language.zhCN, value: 'zh-CN' },
+    { label: t.language.enUS, value: 'en-US' },
+  ];
+
+  // 主题选项
+  const themeOptions = [
+    { label: t.theme.light, value: 'light' },
+    { label: t.theme.dark, value: 'dark' },
+    { label: t.theme.auto, value: 'auto' },
+  ];
+
   return (
-    <PageLayout title="设置" onBack={() => navigate(-1)}>
+    <PageLayout title={t.settings.title} onBack={() => navigate(-1)}>
       <StandardCard>
         <List>
+          {/* 语言设置 */}
+          <List.Item
+            onClick={() => setLanguageVisible(true)}
+            arrow
+            extra={
+              <span style={{ color: '#999' }}>
+                {languageOptions.find((opt) => opt.value === locale)?.label}
+              </span>
+            }
+          >
+            {t.settings.language}
+          </List.Item>
+          <Picker
+            visible={languageVisible}
+            onClose={() => setLanguageVisible(false)}
+            value={[locale]}
+            columns={[languageOptions]}
+            onConfirm={(value) => {
+              setLocale(value[0] as Locale);
+              setLanguageVisible(false);
+            }}
+          />
+
+          {/* 主题设置 */}
+          <List.Item
+            onClick={() => setThemeVisible(true)}
+            arrow
+            extra={
+              <span style={{ color: '#999' }}>
+                {themeOptions.find((opt) => opt.value === theme)?.label}
+              </span>
+            }
+          >
+            {t.settings.theme}
+          </List.Item>
+          <Picker
+            visible={themeVisible}
+            onClose={() => setThemeVisible(false)}
+            value={[theme]}
+            columns={[themeOptions]}
+            onConfirm={(value) => {
+              setTheme(value[0] as Theme);
+              setThemeVisible(false);
+            }}
+          />
+
           <List.Item
             onClick={handleLock}
             arrow
-            extra={<span style={{ color: '#999' }}>锁定钱包</span>}
+            extra={<span style={{ color: '#999' }}>{t.settings.lockWalletDesc}</span>}
             prefix={<LockOutline fontSize={20} style={{ color: '#1677ff' }} />}
           >
-            锁定钱包
+            {t.settings.lockWallet}
           </List.Item>
           {/* 仅在桌面端显示退出应用选项 */}
           {!isMobile && (
             <List.Item
               onClick={handleExit}
               arrow
-              extra={<span style={{ color: '#999' }}>退出应用</span>}
+              extra={<span style={{ color: '#999' }}>{t.settings.exitAppDesc}</span>}
               prefix={<CloseCircleFill fontSize={20} style={{ color: '#1677ff' }} />}
             >
-              退出应用
+              {t.settings.exitApp}
             </List.Item>
           )}
         </List>
@@ -121,14 +189,14 @@ function SettingsPage() {
           }}
         >
           <h3 style={{ margin: '0 0 8px 0', color: '#856404' }}>
-            <ExclamationTriangleOutline /> 危险操作
+            <ExclamationTriangleOutline /> {t.settings.dangerZone}
           </h3>
           <p style={{ margin: 0, fontSize: '14px', color: '#856404' }}>
-            删除钱包将永久清除所有数据，请确保已备份助记词。
+            {t.settings.dangerZoneDesc}
           </p>
         </div>
         <Button color="danger" block loading={loading} onClick={handleDeleteWallet}>
-          删除钱包
+          {t.settings.deleteWallet}
         </Button>
       </StandardCard>
 
@@ -141,8 +209,8 @@ function SettingsPage() {
             fontSize: '12px',
           }}
         >
-          <p style={{ margin: 0 }}>冷钱包 v0.1.0</p>
-          <p style={{ margin: '8px 0 0 0' }}>完全离线，安全第一</p>
+          <p style={{ margin: 0 }}>{t.settings.appVersion}</p>
+          <p style={{ margin: '8px 0 0 0' }}>{t.settings.appSlogan}</p>
         </div>
       </StandardCard>
     </PageLayout>

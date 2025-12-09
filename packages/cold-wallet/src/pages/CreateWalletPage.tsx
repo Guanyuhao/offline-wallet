@@ -8,6 +8,8 @@ import PasswordInput from '../components/PasswordInput';
 import PageLayout from '../components/PageLayout';
 import StandardCard from '../components/StandardCard';
 import PrimaryButton from '../components/PrimaryButton';
+import { storeMnemonic } from '../utils/stronghold';
+import { useI18n } from '../hooks/useI18n';
 
 function CreateWalletPage() {
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ function CreateWalletPage() {
   const [backupConfirmed, setBackupConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [wordCount, setWordCount] = useState<12 | 24>(12);
+  const t = useI18n();
 
   const handleGenerate = async () => {
     try {
@@ -30,7 +33,7 @@ function CreateWalletPage() {
       setStep('backup');
     } catch (error) {
       Toast.show({
-        content: `生成失败: ${error}`,
+        content: `${t.createWallet.generateFailed} ${error}`,
         position: 'top',
       });
     } finally {
@@ -41,7 +44,7 @@ function CreateWalletPage() {
   const handleBackupComplete = () => {
     if (!backupConfirmed) {
       Toast.show({
-        content: '请确认已安全备份助记词',
+        content: t.createWallet.confirmBackup,
         position: 'top',
       });
       return;
@@ -53,7 +56,7 @@ function CreateWalletPage() {
     const success = await copyToClipboard(mnemonic);
     if (success) {
       Toast.show({
-        content: '已复制到剪贴板',
+        content: t.createWallet.copiedToClipboard,
         position: 'top',
       });
     }
@@ -62,7 +65,7 @@ function CreateWalletPage() {
   const handleCreateWallet = async () => {
     if (!password || password.length < 8) {
       Toast.show({
-        content: '密码至少8位',
+        content: t.createWallet.passwordTooShort,
         position: 'top',
       });
       return;
@@ -70,7 +73,7 @@ function CreateWalletPage() {
 
     if (password !== confirmPassword) {
       Toast.show({
-        content: '两次密码不一致',
+        content: t.createWallet.passwordMismatch,
         position: 'top',
       });
       return;
@@ -78,18 +81,23 @@ function CreateWalletPage() {
 
     try {
       setLoading(true);
-      // 存储加密的助记词
-      await invoke('store_encrypted_mnemonic', {
-        mnemonic,
-        password,
+
+      // 提示用户正在保存
+      Toast.show({
+        content: t.createWallet.encrypting,
+        position: 'top',
+        duration: 2000,
       });
+
+      // 使用 Stronghold 存储加密的助记词
+      await storeMnemonic(mnemonic, password);
 
       // 设置钱包状态
       setHasWallet(true);
       setMnemonic(mnemonic);
 
       Toast.show({
-        content: '钱包创建成功',
+        content: t.createWallet.createSuccess,
         position: 'top',
         icon: 'success',
       });
@@ -106,7 +114,7 @@ function CreateWalletPage() {
   };
 
   return (
-    <PageLayout title="创建钱包" onBack={() => navigate(-1)}>
+    <PageLayout title={t.createWallet.title} onBack={() => navigate(-1)}>
       {step === 'generate' && (
         <StandardCard>
           <div
@@ -118,7 +126,7 @@ function CreateWalletPage() {
           >
             <div>
               <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: '#1d1d1f' }}>
-                创建新钱包
+                {t.createWallet.createNewWallet}
               </h2>
               <p
                 style={{
@@ -128,7 +136,7 @@ function CreateWalletPage() {
                   lineHeight: '1.5',
                 }}
               >
-                请选择助记词数量，请妥善保管，丢失将无法恢复
+                {t.createWallet.selectWordCount}
               </p>
             </div>
 
@@ -147,7 +155,7 @@ function CreateWalletPage() {
                   marginBottom: '8px',
                 }}
               >
-                助记词数量
+                {t.createWallet.wordCount}
               </div>
               <div
                 style={{
@@ -173,9 +181,11 @@ function CreateWalletPage() {
                         gap: '4px',
                       }}
                     >
-                      <span style={{ fontSize: '17px', fontWeight: 500 }}>12 个助记词</span>
+                      <span style={{ fontSize: '17px', fontWeight: 500 }}>
+                        {t.createWallet.wordCount12}
+                      </span>
                       <span style={{ fontSize: '14px', color: '#86868b' }}>
-                        推荐，更易备份和记忆
+                        {t.createWallet.wordCount12Desc}
                       </span>
                     </div>
                   </Radio>
@@ -195,9 +205,11 @@ function CreateWalletPage() {
                         gap: '4px',
                       }}
                     >
-                      <span style={{ fontSize: '17px', fontWeight: 500 }}>24 个助记词</span>
+                      <span style={{ fontSize: '17px', fontWeight: 500 }}>
+                        {t.createWallet.wordCount24}
+                      </span>
                       <span style={{ fontSize: '14px', color: '#86868b' }}>
-                        更高安全性，适合大额资产
+                        {t.createWallet.wordCount24Desc}
                       </span>
                     </div>
                   </Radio>
@@ -206,7 +218,7 @@ function CreateWalletPage() {
             </div>
 
             <PrimaryButton loading={loading} onClick={handleGenerate} style={{ marginTop: '8px' }}>
-              生成助记词
+              {t.createWallet.generateMnemonic}
             </PrimaryButton>
           </div>
         </StandardCard>
@@ -223,7 +235,7 @@ function CreateWalletPage() {
           >
             <div>
               <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: '#1d1d1f' }}>
-                备份助记词
+                {t.createWallet.backupMnemonic}
               </h2>
               <p
                 style={{
@@ -233,7 +245,7 @@ function CreateWalletPage() {
                   lineHeight: '1.5',
                 }}
               >
-                ⚠️ 请用纸笔抄写，不要截图或复制到网络
+                {t.createWallet.backupWarning}
               </p>
             </div>
 
@@ -292,7 +304,7 @@ function CreateWalletPage() {
                 fontSize: '16px',
               }}
             >
-              复制助记词
+              {t.createWallet.copyMnemonic}
             </Button>
 
             <div
@@ -322,12 +334,12 @@ function CreateWalletPage() {
                 }}
                 onClick={() => setBackupConfirmed(!backupConfirmed)}
               >
-                我已安全备份助记词，理解丢失助记词将无法恢复钱包
+                {t.createWallet.backupConfirmation}
               </label>
             </div>
 
             <PrimaryButton disabled={!backupConfirmed} onClick={handleBackupComplete}>
-              我已备份完成
+              {t.createWallet.backupCompleted}
             </PrimaryButton>
           </div>
         </StandardCard>
@@ -344,7 +356,7 @@ function CreateWalletPage() {
           >
             <div>
               <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: '#1d1d1f' }}>
-                设置密码
+                {t.createWallet.setPassword}
               </h2>
               <p
                 style={{
@@ -354,12 +366,12 @@ function CreateWalletPage() {
                   lineHeight: '1.5',
                 }}
               >
-                密码用于加密存储助记词，请牢记。忘记密码将无法恢复钱包。
+                {t.createWallet.passwordDescription}
               </p>
             </div>
 
             <PasswordInput
-              placeholder="请输入密码（至少8位）"
+              placeholder={t.createWallet.passwordInputPlaceholder}
               value={password}
               onChange={(val) => setPassword(val)}
               style={{
@@ -369,7 +381,7 @@ function CreateWalletPage() {
             />
 
             <PasswordInput
-              placeholder="请再次输入密码"
+              placeholder={t.createWallet.confirmPasswordInputPlaceholder}
               value={confirmPassword}
               onChange={(val) => setConfirmPassword(val)}
               style={{
@@ -379,7 +391,7 @@ function CreateWalletPage() {
             />
 
             <PrimaryButton loading={loading} onClick={handleCreateWallet}>
-              创建钱包
+              {t.createWallet.title}
             </PrimaryButton>
           </div>
         </StandardCard>

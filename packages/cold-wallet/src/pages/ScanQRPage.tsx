@@ -14,6 +14,7 @@ import DesktopQRCodeScanner from '@offline-wallet/shared/components/QRCodeScanne
 import useScanStore from '../stores/useScanStore';
 import PageLayout from '../components/PageLayout';
 import StandardCard from '../components/StandardCard';
+import { useI18n } from '../hooks/useI18n';
 
 /**
  * 二维码扫描页面
@@ -23,11 +24,12 @@ const ScanQRPage: React.FC = () => {
   const { scanType, hint, returnPath, setScanResult, clearScanState } = useScanStore();
   const [platform, setPlatform] = React.useState<string | null>(null);
   const [isMobile, setIsMobile] = React.useState<boolean>(false);
+  const t = useI18n();
 
   // 如果没有扫描配置，显示友好提示
   if (!scanType) {
     return (
-      <PageLayout title="扫描二维码" onBack={() => navigate(-1)}>
+      <PageLayout title={t.scanQR.title} onBack={() => navigate(-1)}>
         <StandardCard>
           <div
             style={{
@@ -57,7 +59,7 @@ const ScanQRPage: React.FC = () => {
                 marginBottom: '12px',
               }}
             >
-              扫描配置错误
+              {t.scanQR.configError}
             </h2>
             <p
               style={{
@@ -68,9 +70,9 @@ const ScanQRPage: React.FC = () => {
                 lineHeight: '1.5',
               }}
             >
-              请从正确的入口进入扫描页面
+              {t.scanQR.enterCorrectly}
               <br />
-              或返回上一页重试
+              {t.scanQR.orRetry}
             </p>
             <Button
               color="primary"
@@ -78,7 +80,7 @@ const ScanQRPage: React.FC = () => {
               onClick={() => navigate(-1)}
               style={{ maxWidth: '200px', borderRadius: '8px' }}
             >
-              返回上一页
+              {t.scanQR.goBack}
             </Button>
           </div>
         </StandardCard>

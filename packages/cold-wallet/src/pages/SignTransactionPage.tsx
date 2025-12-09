@@ -15,6 +15,7 @@ import { isEVMChain, type ChainType } from '../config/chainConfig';
 import StandardCard from '../components/StandardCard';
 import TransactionForm from '../components/TransactionForm';
 import PrimaryButton from '../components/PrimaryButton';
+import { useI18n } from '../hooks/useI18n';
 
 type SignMode = 'scan' | 'manual';
 
@@ -88,14 +89,15 @@ function buildTransactionData(
 async function validateFormValues(
   values: any,
   chain: ChainType,
-  form: any
+  form: any,
+  t: any
 ): Promise<{ valid: boolean; error?: string }> {
   const { to, value, gasPrice, gasLimit, nonce } = values;
 
   // 1. 地址验证
   const trimmedTo = typeof to === 'string' ? to.trim() : '';
   if (!trimmedTo) {
-    form.setFields([{ name: 'to', errors: ['收款地址不能为空'] }]);
+    form.setFields([{ name: 'to', errors: [t.transactionForm.recipientAddressRequired] }]);
     return { valid: false };
   }
 
@@ -106,51 +108,51 @@ async function validateFormValues(
     );
 
     if (!result.is_valid) {
-      form.setFields([{ name: 'to', errors: ['地址无效'] }]);
+      form.setFields([{ name: 'to', errors: [t.transactionForm.addressInvalid] }]);
       return { valid: false };
     }
   } catch (error: any) {
     console.error('[地址验证失败]', error);
-    form.setFields([{ name: 'to', errors: ['地址无效'] }]);
+    form.setFields([{ name: 'to', errors: [t.transactionForm.addressInvalid] }]);
     return { valid: false };
   }
 
   // 2. 金额验证
   const numValue = parseFloat(value);
   if (isNaN(numValue) || numValue <= 0) {
-    form.setFields([{ name: 'value', errors: ['金额必须是大于0的有效数字'] }]);
+    form.setFields([{ name: 'value', errors: [t.transactionForm.amountInvalid] }]);
     return { valid: false };
   }
 
   // 3. EVM 链字段验证
   if (isEVMChain(chain)) {
     if (!gasPrice) {
-      form.setFields([{ name: 'gasPrice', errors: ['请输入 Gas Price'] }]);
+      form.setFields([{ name: 'gasPrice', errors: [t.transactionForm.gasPriceRequired] }]);
       return { valid: false };
     }
     const numGasPrice = parseFloat(gasPrice);
     if (isNaN(numGasPrice) || numGasPrice <= 0) {
-      form.setFields([{ name: 'gasPrice', errors: ['Gas Price 必须是大于0的有效数字'] }]);
+      form.setFields([{ name: 'gasPrice', errors: [t.transactionForm.gasPriceMustBePositive] }]);
       return { valid: false };
     }
 
     if (!gasLimit) {
-      form.setFields([{ name: 'gasLimit', errors: ['请输入 Gas Limit'] }]);
+      form.setFields([{ name: 'gasLimit', errors: [t.transactionForm.gasLimitRequired] }]);
       return { valid: false };
     }
     const intGasLimit = parseInt(gasLimit, 10);
     if (isNaN(intGasLimit) || intGasLimit <= 0) {
-      form.setFields([{ name: 'gasLimit', errors: ['Gas Limit 必须是大于0的有效整数'] }]);
+      form.setFields([{ name: 'gasLimit', errors: [t.transactionForm.gasLimitMustBePositive] }]);
       return { valid: false };
     }
 
     if (!nonce) {
-      form.setFields([{ name: 'nonce', errors: ['请输入 Nonce'] }]);
+      form.setFields([{ name: 'nonce', errors: [t.transactionForm.nonceRequired] }]);
       return { valid: false };
     }
     const intNonce = parseInt(String(nonce), 10);
     if (isNaN(intNonce) || intNonce < 0) {
-      form.setFields([{ name: 'nonce', errors: ['Nonce 必须是非负整数'] }]);
+      form.setFields([{ name: 'nonce', errors: [t.transactionForm.nonceMustBeNonNegative] }]);
       return { valid: false };
     }
   }
@@ -167,6 +169,7 @@ function SignTransactionPage() {
   const [mode, setMode] = useState<SignMode>(returnMode || 'scan');
   const [scannedData, setScannedData] = useState<Record<string, any> | null>(null);
   const [showScannedInfo, setShowScannedInfo] = useState(false);
+  const t = useI18n();
 
   if (!isUnlocked || !mnemonic) {
     navigate('/unlock');
@@ -183,14 +186,14 @@ function SignTransactionPage() {
         try {
           const decoded = QRCodeProtocol.decode(scannedTextTrimmed);
           if (decoded.type !== QRCodeType.UNSIGNED_TRANSACTION) {
-            Toast.show({ content: '二维码类型错误，请扫描未签名交易二维码', position: 'top' });
+            Toast.show({ content: t.signTransaction.qrTypeError, position: 'top' });
             return;
           }
           qrData = decoded as UnsignedTransactionQRCode;
         } catch (error: any) {
           console.error('[二维码解析失败]', error);
           Toast.show({
-            content: '二维码格式无效，请检查是否为有效的未签名交易二维码',
+            content: t.signTransaction.qrParseError,
             position: 'top',
           });
           return;
@@ -199,7 +202,9 @@ function SignTransactionPage() {
         // 验证链类型是否匹配
         if (qrData.chain.toLowerCase() !== currentChain.toLowerCase()) {
           Toast.show({
-            content: `链类型不匹配，二维码为 ${qrData.chain.toUpperCase()}，当前链为 ${currentChain.toUpperCase()}`,
+            content: t.signTransaction.chainMismatch
+              .replace('{qrChain}', qrData.chain.toUpperCase())
+              .replace('{currentChain}', currentChain.toUpperCase()),
             position: 'top',
           });
           return;
@@ -211,7 +216,7 @@ function SignTransactionPage() {
           txData = JSON.parse(qrData.unsignedTx);
         } catch (error: any) {
           console.error('[交易数据解析失败]', error);
-          Toast.show({ content: '交易数据格式无效', position: 'top' });
+          Toast.show({ content: t.signTransaction.txDataParseError, position: 'top' });
           return;
         }
 
@@ -220,7 +225,11 @@ function SignTransactionPage() {
         setScannedData(formValues);
         form.setFieldsValue(formValues);
 
-        Toast.show({ content: '交易信息验证成功', position: 'top', icon: 'success' });
+        Toast.show({
+          content: t.signTransaction.txVerifiedSuccess,
+          position: 'top',
+          icon: 'success',
+        });
       } catch (error: any) {
         const errorMessage = error?.message || error?.toString();
         if (
@@ -238,13 +247,13 @@ function SignTransactionPage() {
           errorMessage.includes('Cannot find module') ||
           errorMessage.includes('Failed to resolve')
         ) {
-          Toast.show({ content: '当前设备不支持扫描功能', position: 'top' });
+          Toast.show({ content: t.signTransaction.scanNotSupported, position: 'top' });
           return;
         }
-        Toast.show({ content: `扫描失败: ${errorMessage}`, position: 'top' });
+        Toast.show({ content: `${t.signTransaction.scanFailed} ${errorMessage}`, position: 'top' });
       }
     },
-    [currentChain, form]
+    [currentChain, form, t]
   );
 
   // 恢复 tab 模式（从 store 中恢复）
@@ -273,7 +282,7 @@ function SignTransactionPage() {
     // 设置扫描配置到 store
     setScanConfig({
       scanType: ScanType.UNSIGNED_TRANSACTION,
-      hint: '请将未签名交易二维码对准扫描框',
+      hint: t.signTransaction.scanHint,
       returnPath: '/sign',
       returnMode: mode, // 记录当前的 tab 模式
     });
@@ -333,7 +342,7 @@ function SignTransactionPage() {
         );
 
         // 尝试多种方式获取错误信息
-        let errorMessage = '表单验证失败，请检查输入';
+        let errorMessage = t.signTransaction.formValidationFailed;
 
         if (validationError?.errorFields && Array.isArray(validationError.errorFields)) {
           const firstErrorField = validationError.errorFields[0];
@@ -359,7 +368,7 @@ function SignTransactionPage() {
       }
 
       // 业务逻辑验证
-      const validation = await validateFormValues(values, currentChain as ChainType, form);
+      const validation = await validateFormValues(values, currentChain as ChainType, form, t);
       if (!validation.valid) {
         console.log('[业务验证失败]', validation.error);
         // 验证失败时，validateFormValues 已经设置了表单错误，这里不需要额外提示
@@ -382,7 +391,7 @@ function SignTransactionPage() {
       console.log('[签名接口返回] signed length:', signed?.length);
 
       if (!signed) {
-        throw new Error('签名返回为空');
+        throw new Error(t.signTransaction.signEmpty);
       }
 
       console.log('[设置签名结果] signedTx:', signed.substring(0, 100));
@@ -422,9 +431,9 @@ function SignTransactionPage() {
       });
 
       // 显示错误提示
-      const errorMessage = error?.message || error?.toString() || '未知错误';
+      const errorMessage = error?.message || error?.toString() || t.signTransaction.unknownError;
       Toast.show({
-        content: `签名失败: ${errorMessage}`,
+        content: `${t.signTransaction.signError} ${errorMessage}`,
         position: 'top',
       });
     }
@@ -443,20 +452,25 @@ function SignTransactionPage() {
   };
 
   return (
-    <PageLayout title="签名交易" onBack={() => navigate('/wallet')}>
+    <PageLayout title={t.signTransaction.title} onBack={() => navigate('/wallet')}>
       <StandardCard>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
             <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: '#1d1d1f' }}>
-              签名交易
+              {t.signTransaction.title}
             </h2>
             <p style={{ marginTop: '8px', color: '#86868b', fontSize: '15px' }}>
-              当前链: <strong style={{ color: '#1677ff' }}>{currentChain.toUpperCase()}</strong>
+              {t.signTransaction.currentChain}:{' '}
+              <strong style={{ color: '#1677ff' }}>{currentChain.toUpperCase()}</strong>
             </p>
           </div>
 
           <JumboTabs activeKey={mode} onChange={handleTabChange}>
-            <JumboTabs.Tab title="扫描二维码" description="扫码观察端的二维码" key="scan">
+            <JumboTabs.Tab
+              title={t.signTransaction.scanQRTab}
+              description={t.signTransaction.scanQRDescription}
+              key="scan"
+            >
               <div style={{ marginTop: '16px' }}>
                 {!scannedData ? (
                   <div
@@ -475,10 +489,10 @@ function SignTransactionPage() {
                         marginBottom: '12px',
                       }}
                     >
-                      请扫描热钱包生成的未签名交易二维码
+                      {t.signTransaction.scanHint}
                     </p>
                     <Button color="primary" onClick={handleScanUnsignedTransaction}>
-                      扫描二维码
+                      {t.signTransaction.scanButton}
                     </Button>
                   </div>
                 ) : (
@@ -500,10 +514,10 @@ function SignTransactionPage() {
                           marginBottom: '4px',
                         }}
                       >
-                        ✓ 交易信息验证成功
+                        {t.signTransaction.verifiedSuccess}
                       </p>
                       <p style={{ margin: 0, fontSize: '12px', color: '#86868b' }}>
-                        请查看交易信息并确认签名
+                        {t.signTransaction.reviewAndSign}
                       </p>
                     </div>
 
@@ -515,12 +529,12 @@ function SignTransactionPage() {
                           onClick={handleEdit}
                           style={{ borderRadius: '8px' }}
                         >
-                          编辑
+                          {t.signTransaction.edit}
                         </Button>
                       </Grid.Item>
                       <Grid.Item>
                         <PrimaryButton block onClick={handleSign} style={{ borderRadius: '8px' }}>
-                          签名交易
+                          {t.signTransaction.sign}
                         </PrimaryButton>
                       </Grid.Item>
                     </Grid>
@@ -544,7 +558,7 @@ function SignTransactionPage() {
                         }}
                       >
                         <span style={{ fontSize: '14px', fontWeight: 500, color: '#1d1d1f' }}>
-                          查看信息
+                          {t.signTransaction.viewInfo}
                         </span>
                         <span style={{ fontSize: '12px', color: '#86868b' }}>
                           {showScannedInfo ? '▼' : '▶'}
@@ -567,7 +581,11 @@ function SignTransactionPage() {
                 )}
               </div>
             </JumboTabs.Tab>
-            <JumboTabs.Tab title="手动输入" description="专业模式手动输入" key="manual">
+            <JumboTabs.Tab
+              title={t.signTransaction.manualInputTab}
+              description={t.signTransaction.manualInputDescription}
+              key="manual"
+            >
               <TransactionForm
                 chain={currentChain as ChainType}
                 form={form}

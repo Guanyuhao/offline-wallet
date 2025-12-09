@@ -56,3 +56,27 @@ input[type='number'] {
   -moz-appearance: textfield;
 }
 
+/* 深色模式支持 */
+:root {
+  --adm-color-background: #ffffff;
+  --adm-color-text: #333333;
+  --adm-color-border: #eeeeee;
+}
+
+[data-theme='dark'] {
+  --adm-color-background: #1a1a1a;
+  --adm-color-text: #ffffff;
+  --adm-color-border: #333333;
+}
+
+/* 深色模式下的背景色 */
+[data-theme='dark'] body {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+[data-theme='dark'] #app {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+

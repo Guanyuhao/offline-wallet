@@ -1,113 +1,4 @@
 {
-  "barcode-scanner": {
-    "default_permission": {
-      "identifier": "default",
-      "description": "This permission set configures which\nbarcode scanning features are by default exposed.\n\n#### Granted Permissions\n\nIt allows all barcode related features.\n\n",
-      "permissions": [
-        "allow-cancel",
-        "allow-check-permissions",
-        "allow-open-app-settings",
-        "allow-request-permissions",
-        "allow-scan",
-        "allow-vibrate"
-      ]
-    },
-    "permissions": {
-      "allow-cancel": {
-        "identifier": "allow-cancel",
-        "description": "Enables the cancel command without any pre-configured scope.",
-        "commands": { "allow": ["cancel"], "deny": [] }
-      },
-      "allow-check-permissions": {
-        "identifier": "allow-check-permissions",
-        "description": "Enables the check_permissions command without any pre-configured scope.",
-        "commands": { "allow": ["check_permissions"], "deny": [] }
-      },
-      "allow-open-app-settings": {
-        "identifier": "allow-open-app-settings",
-        "description": "Enables the open_app_settings command without any pre-configured scope.",
-        "commands": { "allow": ["open_app_settings"], "deny": [] }
-      },
-      "allow-request-permissions": {
-        "identifier": "allow-request-permissions",
-        "description": "Enables the request_permissions command without any pre-configured scope.",
-        "commands": { "allow": ["request_permissions"], "deny": [] }
-      },
-      "allow-scan": {
-        "identifier": "allow-scan",
-        "description": "Enables the scan command without any pre-configured scope.",
-        "commands": { "allow": ["scan"], "deny": [] }
-      },
-      "allow-vibrate": {
-        "identifier": "allow-vibrate",
-        "description": "Enables the vibrate command without any pre-configured scope.",
-        "commands": { "allow": ["vibrate"], "deny": [] }
-      },
-      "deny-cancel": {
-        "identifier": "deny-cancel",
-        "description": "Denies the cancel command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["cancel"] }
-      },
-      "deny-check-permissions": {
-        "identifier": "deny-check-permissions",
-        "description": "Denies the check_permissions command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["check_permissions"] }
-      },
-      "deny-open-app-settings": {
-        "identifier": "deny-open-app-settings",
-        "description": "Denies the open_app_settings command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["open_app_settings"] }
-      },
-      "deny-request-permissions": {
-        "identifier": "deny-request-permissions",
-        "description": "Denies the request_permissions command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["request_permissions"] }
-      },
-      "deny-scan": {
-        "identifier": "deny-scan",
-        "description": "Denies the scan command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["scan"] }
-      },
-      "deny-vibrate": {
-        "identifier": "deny-vibrate",
-        "description": "Denies the vibrate command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["vibrate"] }
-      }
-    },
-    "permission_sets": {},
-    "global_scope_schema": null
-  },
-  "biometric": {
-    "default_permission": {
-      "identifier": "default",
-      "description": "This permission set configures which\nbiometric features are by default exposed.\n\n#### Granted Permissions\n\nIt allows acccess to all biometric commands.\n\n",
-      "permissions": ["allow-authenticate", "allow-status"]
-    },
-    "permissions": {
-      "allow-authenticate": {
-        "identifier": "allow-authenticate",
-        "description": "Enables the authenticate command without any pre-configured scope.",
-        "commands": { "allow": ["authenticate"], "deny": [] }
-      },
-      "allow-status": {
-        "identifier": "allow-status",
-        "description": "Enables the status command without any pre-configured scope.",
-        "commands": { "allow": ["status"], "deny": [] }
-      },
-      "deny-authenticate": {
-        "identifier": "deny-authenticate",
-        "description": "Denies the authenticate command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["authenticate"] }
-      },
-      "deny-status": {
-        "identifier": "deny-status",
-        "description": "Denies the status command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["status"] }
-      }
-    },
-    "permission_sets": {},
-    "global_scope_schema": null
-  },
   "core": {
     "default_permission": {
       "identifier": "default",
@@ -2001,6 +1892,136 @@
         "identifier": "deny-version",
         "description": "Denies the version command without any pre-configured scope.",
         "commands": { "allow": [], "deny": ["version"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
+  "stronghold": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "This permission set configures what kind of\noperations are available from the stronghold plugin.\n\n#### Granted Permissions\n\nAll non-destructive operations are enabled by default.\n\n",
+      "permissions": [
+        "allow-create-client",
+        "allow-get-store-record",
+        "allow-initialize",
+        "allow-execute-procedure",
+        "allow-load-client",
+        "allow-save-secret",
+        "allow-save-store-record",
+        "allow-save"
+      ]
+    },
+    "permissions": {
+      "allow-create-client": {
+        "identifier": "allow-create-client",
+        "description": "Enables the create_client command without any pre-configured scope.",
+        "commands": { "allow": ["create_client"], "deny": [] }
+      },
+      "allow-destroy": {
+        "identifier": "allow-destroy",
+        "description": "Enables the destroy command without any pre-configured scope.",
+        "commands": { "allow": ["destroy"], "deny": [] }
+      },
+      "allow-execute-procedure": {
+        "identifier": "allow-execute-procedure",
+        "description": "Enables the execute_procedure command without any pre-configured scope.",
+        "commands": { "allow": ["execute_procedure"], "deny": [] }
+      },
+      "allow-get-store-record": {
+        "identifier": "allow-get-store-record",
+        "description": "Enables the get_store_record command without any pre-configured scope.",
+        "commands": { "allow": ["get_store_record"], "deny": [] }
+      },
+      "allow-initialize": {
+        "identifier": "allow-initialize",
+        "description": "Enables the initialize command without any pre-configured scope.",
+        "commands": { "allow": ["initialize"], "deny": [] }
+      },
+      "allow-load-client": {
+        "identifier": "allow-load-client",
+        "description": "Enables the load_client command without any pre-configured scope.",
+        "commands": { "allow": ["load_client"], "deny": [] }
+      },
+      "allow-remove-secret": {
+        "identifier": "allow-remove-secret",
+        "description": "Enables the remove_secret command without any pre-configured scope.",
+        "commands": { "allow": ["remove_secret"], "deny": [] }
+      },
+      "allow-remove-store-record": {
+        "identifier": "allow-remove-store-record",
+        "description": "Enables the remove_store_record command without any pre-configured scope.",
+        "commands": { "allow": ["remove_store_record"], "deny": [] }
+      },
+      "allow-save": {
+        "identifier": "allow-save",
+        "description": "Enables the save command without any pre-configured scope.",
+        "commands": { "allow": ["save"], "deny": [] }
+      },
+      "allow-save-secret": {
+        "identifier": "allow-save-secret",
+        "description": "Enables the save_secret command without any pre-configured scope.",
+        "commands": { "allow": ["save_secret"], "deny": [] }
+      },
+      "allow-save-store-record": {
+        "identifier": "allow-save-store-record",
+        "description": "Enables the save_store_record command without any pre-configured scope.",
+        "commands": { "allow": ["save_store_record"], "deny": [] }
+      },
+      "deny-create-client": {
+        "identifier": "deny-create-client",
+        "description": "Denies the create_client command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["create_client"] }
+      },
+      "deny-destroy": {
+        "identifier": "deny-destroy",
+        "description": "Denies the destroy command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["destroy"] }
+      },
+      "deny-execute-procedure": {
+        "identifier": "deny-execute-procedure",
+        "description": "Denies the execute_procedure command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["execute_procedure"] }
+      },
+      "deny-get-store-record": {
+        "identifier": "deny-get-store-record",
+        "description": "Denies the get_store_record command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["get_store_record"] }
+      },
+      "deny-initialize": {
+        "identifier": "deny-initialize",
+        "description": "Denies the initialize command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["initialize"] }
+      },
+      "deny-load-client": {
+        "identifier": "deny-load-client",
+        "description": "Denies the load_client command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["load_client"] }
+      },
+      "deny-remove-secret": {
+        "identifier": "deny-remove-secret",
+        "description": "Denies the remove_secret command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["remove_secret"] }
+      },
+      "deny-remove-store-record": {
+        "identifier": "deny-remove-store-record",
+        "description": "Denies the remove_store_record command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["remove_store_record"] }
+      },
+      "deny-save": {
+        "identifier": "deny-save",
+        "description": "Denies the save command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["save"] }
+      },
+      "deny-save-secret": {
+        "identifier": "deny-save-secret",
+        "description": "Denies the save_secret command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["save_secret"] }
+      },
+      "deny-save-store-record": {
+        "identifier": "deny-save-store-record",
+        "description": "Denies the save_store_record command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["save_store_record"] }
       }
     },
     "permission_sets": {},

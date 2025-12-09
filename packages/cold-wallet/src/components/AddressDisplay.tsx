@@ -1,6 +1,7 @@
 import { Button, Toast } from 'antd-mobile';
 import { formatAddress } from '@offline-wallet/shared/utils';
 import { copyToClipboard } from '../utils';
+import { useI18n } from '../hooks/useI18n';
 
 interface AddressDisplayProps {
   /**
@@ -34,11 +35,13 @@ function AddressDisplay({
   showCopy = true,
   style,
 }: AddressDisplayProps) {
+  const t = useI18n();
+
   const handleCopy = async () => {
     const success = await copyToClipboard(address);
     if (success) {
       Toast.show({
-        content: '已复制',
+        content: t.wallet.addressCopied,
         position: 'top',
       });
     }
@@ -65,7 +68,7 @@ function AddressDisplay({
       </span>
       {showCopy && (
         <Button size="small" onClick={handleCopy}>
-          复制
+          {t.common.copy}
         </Button>
       )}
     </div>

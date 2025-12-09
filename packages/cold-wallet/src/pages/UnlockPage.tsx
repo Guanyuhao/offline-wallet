@@ -7,6 +7,8 @@ import PasswordInput from '../components/PasswordInput';
 import StandardCard from '../components/StandardCard';
 import PrimaryButton from '../components/PrimaryButton';
 import PageLayout from '../components/PageLayout';
+import { retrieveMnemonic, hasMnemonic } from '../utils/stronghold';
+import { useI18n } from '../hooks/useI18n';
 
 function UnlockPage() {
   const navigate = useNavigate();
@@ -14,6 +16,7 @@ function UnlockPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [hasWallet, setHasWalletLocal] = useState(false);
+  const t = useI18n();
 
   useEffect(() => {
     checkWalletExists();
@@ -22,7 +25,7 @@ function UnlockPage() {
 
   const checkWalletExists = async () => {
     try {
-      const exists = await invoke<boolean>('has_encrypted_mnemonic');
+      const exists = await hasMnemonic();
       setHasWalletLocal(exists);
       setHasWallet(exists);
       if (!exists) {
@@ -37,7 +40,7 @@ function UnlockPage() {
   const handleUnlock = async () => {
     if (!password) {
       Toast.show({
-        content: '请输入密码',
+        content: t.unlock.enterPassword,
         position: 'top',
       });
       return;
@@ -45,25 +48,46 @@ function UnlockPage() {
 
     try {
       setLoading(true);
-      // 验证密码并获取助记词
-      const mnemonic = await invoke<string>('retrieve_encrypted_mnemonic', {
-        password,
+
+      // 提示用户正在加载（注意：由于 tauri-plugin-stronghold 的已知性能问题，
+      // Stronghold.load() 可能需要 30-60 秒，这是正常的）
+      // GitHub issue: https://github.com/tauri-apps/plugins-workspace/issues/2048
+      const loadingToast = Toast.show({
+        content: t.unlock.loadingMessage,
+        position: 'top',
+        duration: 0, // 持续显示直到手动关闭
       });
+
+      // 使用 Stronghold 验证密码并获取助记词
+      const mnemonic = await retrieveMnemonic(password);
+
+      // 关闭加载提示
+      Toast.clear();
 
       // 设置状态
       setMnemonic(mnemonic);
       setUnlocked(true);
 
       Toast.show({
-        content: '解锁成功',
+        content: t.unlock.unlockSuccess,
         position: 'top',
         icon: 'success',
       });
 
       navigate('/wallet');
     } catch (error) {
+      console.error('解锁失败:', error);
+
+      // 关闭加载提示
+      Toast.clear();
+
+      // 检查是否是密钥不匹配错误（BadFileKey）
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isBadFileKey =
+        errorMessage.includes('BadFileKey') || errorMessage.includes('密钥不匹配');
+
       Toast.show({
-        content: '密码错误',
+        content: isBadFileKey ? t.unlock.keyMismatch : t.unlock.passwordError,
         position: 'top',
       });
     } finally {
@@ -109,7 +133,7 @@ function UnlockPage() {
             </div>
             <div style={{ textAlign: 'center' }}>
               <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 600, color: '#1d1d1f' }}>
-                解锁钱包
+                {t.unlock.title}
               </h1>
               <p
                 style={{
@@ -118,12 +142,12 @@ function UnlockPage() {
                   fontSize: '17px',
                 }}
               >
-                请输入密码解锁您的钱包
+                {t.unlock.enterPasswordPrompt}
               </p>
             </div>
 
             <PasswordInput
-              placeholder="请输入密码"
+              placeholder={t.unlock.passwordPlaceholder}
               value={password}
               onChange={(val) => setPassword(val)}
               onEnterPress={handleUnlock}
@@ -135,7 +159,7 @@ function UnlockPage() {
             />
 
             <PrimaryButton loading={loading} onClick={handleUnlock}>
-              解锁
+              {t.unlock.unlockButton}
             </PrimaryButton>
           </div>
         </StandardCard>

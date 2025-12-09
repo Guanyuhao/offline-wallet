@@ -31,11 +31,15 @@ bech32 = "0.11"
 kaspa-addresses = "0.15"
 bip39 = "2.0"
 tiny-hderive = "0.3"
-rand = "0.8"
 
 # OS 插件（所有平台都需要）
 tauri-plugin-os = "2"
 tauri = { version = "2", features = [] }
+# Stronghold 插件（所有平台都需要，用于安全存储）
+tauri-plugin-stronghold = "2"
+# Argon2 密码哈希（用于自定义密码哈希函数以添加性能日志）
+argon2 = "0.5"
+rand = "0.8"
 
 # 移动端 Tauri 插件（仅在移动端编译）
 # 注意：这些插件需要在应用的 main.rs 中注册才能使用

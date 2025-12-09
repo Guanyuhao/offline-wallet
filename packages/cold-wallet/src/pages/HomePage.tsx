@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Button, Grid } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
-import { invoke } from '@tauri-apps/api/core';
 import useWalletStore from '../stores/useWalletStore';
 import PageLayout from '../components/PageLayout';
 import StandardCard from '../components/StandardCard';
+import { hasMnemonic } from '../utils/stronghold';
+import { useI18n } from '../hooks/useI18n';
 
 function HomePage() {
   const navigate = useNavigate();
   const { setHasWallet } = useWalletStore();
   const [checking, setChecking] = useState(true);
+  const t = useI18n();
 
   useEffect(() => {
     checkWallet();
@@ -18,7 +20,7 @@ function HomePage() {
 
   const checkWallet = async () => {
     try {
-      const exists = await invoke<boolean>('has_encrypted_mnemonic');
+      const exists = await hasMnemonic();
       setHasWallet(exists);
       if (exists) {
         // 使用 setTimeout 延迟导航，避免闪动
@@ -43,7 +45,7 @@ function HomePage() {
           justifyContent: 'center',
         }}
       >
-        检查中...
+        {t.home.checking}
       </div>
     );
   }
@@ -76,7 +78,7 @@ function HomePage() {
             <div style={{ fontSize: '72px' }}>🔒</div>
             <div style={{ textAlign: 'center' }}>
               <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 600, color: '#1d1d1f' }}>
-                冷钱包
+                {t.home.title}
               </h1>
               <p
                 style={{
@@ -86,9 +88,12 @@ function HomePage() {
                   lineHeight: '1.5',
                 }}
               >
-                完全离线的加密货币钱包
-                <br />
-                确保您的私钥绝对安全
+                {t.home.description.split('\n').map((line, index) => (
+                  <span key={index}>
+                    {line}
+                    {index < t.home.description.split('\n').length - 1 && <br />}
+                  </span>
+                ))}
               </p>
             </div>
 
@@ -106,7 +111,7 @@ function HomePage() {
                     fontWeight: 500,
                   }}
                 >
-                  创建钱包
+                  {t.home.createWallet}
                 </Button>
               </Grid.Item>
               <Grid.Item>
@@ -122,7 +127,7 @@ function HomePage() {
                     fontWeight: 500,
                   }}
                 >
-                  导入钱包
+                  {t.home.importWallet}
                 </Button>
               </Grid.Item>
             </Grid>
@@ -139,12 +144,12 @@ function HomePage() {
               }}
             >
               <p style={{ margin: 0, fontWeight: 600, color: '#1d1d1f', marginBottom: '8px' }}>
-                安全提示
+                {t.home.securityTitle}
               </p>
               <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                <li>完全离线，无网络权限</li>
-                <li>私钥永不离开设备</li>
-                <li>签名后立即清除内存</li>
+                <li>{t.home.securityTip1}</li>
+                <li>{t.home.securityTip2}</li>
+                <li>{t.home.securityTip3}</li>
               </ul>
             </div>
           </div>

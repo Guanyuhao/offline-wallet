@@ -13,10 +13,12 @@ import { copyToClipboard } from '../utils';
 import PageLayout from '../components/PageLayout';
 import StandardCard from '../components/StandardCard';
 import AddressDisplay from '../components/AddressDisplay';
+import { useI18n } from '../hooks/useI18n';
 
 function ReceivePage() {
   const navigate = useNavigate();
   const { isUnlocked, mnemonic, currentChain, address } = useWalletStore();
+  const t = useI18n();
 
   useEffect(() => {
     if (!isUnlocked || !mnemonic) {
@@ -35,7 +37,7 @@ function ReceivePage() {
     const success = await copyToClipboard(address);
     if (success) {
       Toast.show({
-        content: '地址已复制',
+        content: t.receive.addressCopied,
         position: 'top',
         icon: 'success',
       });
@@ -43,7 +45,7 @@ function ReceivePage() {
   };
 
   return (
-    <PageLayout title="收款" onBack={() => navigate(-1)}>
+    <PageLayout title={t.receive.title} onBack={() => navigate(-1)}>
       <StandardCard>
         <div
           style={{
@@ -56,7 +58,7 @@ function ReceivePage() {
           <QRCodeCard
             data={qrCodeData}
             size={240}
-            title="收款地址"
+            title={t.receive.receiveTitle}
             description={currentChain.toUpperCase()}
             variant="simple"
           />
@@ -79,7 +81,7 @@ function ReceivePage() {
                 fontWeight: 500,
               }}
             >
-              地址
+              {t.receive.addressLabel}
             </p>
             <AddressDisplay address={address} />
           </div>
@@ -95,7 +97,7 @@ function ReceivePage() {
               fontWeight: 500,
             }}
           >
-            复制地址
+            {t.receive.copyAddress}
           </Button>
         </div>
       </StandardCard>

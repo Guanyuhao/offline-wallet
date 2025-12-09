@@ -7,25 +7,28 @@ mod crypto;
 mod chains;
 mod qr_scanner;
 
-use crypto::{mnemonic, secure_storage};
+use crypto::mnemonic;
 use chains::address_validation::{self, AddressValidationResult};
 // 使用共享库的插件注册函数
 use offline_wallet_shared::plugins::register_all_plugins;
+use std::fs;
+use tauri::Manager;
 
 fn setup_app() {
+    // Stronghold 插件已在 shared 层注册
     let builder = tauri::Builder::default();
     
-    // 注册所有插件（OS 插件 + 移动端插件）
+    // 注册所有插件（Stronghold + OS 插件 + 移动端插件）
     let builder = register_all_plugins(builder);
     
     builder
         .invoke_handler(tauri::generate_handler![
-            // 安全存储相关
-            store_encrypted_mnemonic,
-            retrieve_encrypted_mnemonic,
+            // 性能测试命令（用于诊断 Stronghold 性能问题）
+            test_file_read_performance,
+            monitor_stronghold_operations,
+            // 安全存储相关（文件操作）
             has_encrypted_mnemonic,
             delete_encrypted_mnemonic,
-            verify_mnemonic_password,
             // 助记词相关
             generate_mnemonic,
             validate_mnemonic,
@@ -61,35 +64,117 @@ fn main() {
     setup_app();
 }
 
-// ==================== 安全存储命令 ====================
+// ==================== 性能测试命令 ====================
 
+/// 监控 Stronghold 操作（用于诊断性能问题）
+/// 这个命令会在 Rust 端输出日志，帮助追踪 Stronghold 插件的内部操作
 #[tauri::command]
-fn store_encrypted_mnemonic(mnemonic: String, password: String) -> Result<(), String> {
-    secure_storage::store_encrypted_mnemonic(&mnemonic, &password)
-        .map_err(|e| format!("Failed to store encrypted mnemonic: {}", e))
+fn monitor_stronghold_operations(app: tauri::AppHandle) -> Result<String, String> {
+    use std::time::Instant;
+    
+    eprintln!("[MONITOR] ========== Stronghold 操作监控开始 ==========");
+    eprintln!("[MONITOR] Timestamp: {:?}", std::time::SystemTime::now());
+    
+    let vault_path = get_vault_path(&app)?;
+    eprintln!("[MONITOR] Vault path: {:?}", vault_path);
+    eprintln!("[MONITOR] Vault exists: {}", vault_path.exists());
+    
+    if vault_path.exists() {
+        if let Ok(metadata) = std::fs::metadata(&vault_path) {
+            eprintln!("[MONITOR] Vault file size: {} bytes", metadata.len());
+            eprintln!("[MONITOR] Vault file modified: {:?}", metadata.modified());
+        }
+    }
+    
+    let salt_path = app
+        .path()
+        .app_local_data_dir()
+        .map_err(|e| format!("Failed to get app data dir: {}", e))?
+        .join("salt.txt");
+    eprintln!("[MONITOR] Salt path: {:?}", salt_path);
+    eprintln!("[MONITOR] Salt exists: {}", salt_path.exists());
+    
+    if salt_path.exists() {
+        if let Ok(metadata) = std::fs::metadata(&salt_path) {
+            eprintln!("[MONITOR] Salt file size: {} bytes", metadata.len());
+        }
+    }
+    
+    eprintln!("[MONITOR] ========== Stronghold 操作监控完成 ==========");
+    Ok("Monitoring started. Check Rust console for logs.".to_string())
 }
 
+/// 测试文件读取性能（用于诊断 Stronghold.load 性能问题）
 #[tauri::command]
-fn retrieve_encrypted_mnemonic(password: String) -> Result<String, String> {
-    secure_storage::retrieve_encrypted_mnemonic(&password)
-        .map_err(|e| format!("Failed to retrieve mnemonic: {}", e))
+fn test_file_read_performance(app: tauri::AppHandle) -> Result<String, String> {
+    use std::time::Instant;
+    
+    let vault_path = get_vault_path(&app)?;
+    
+    if !vault_path.exists() {
+        return Err("Vault file does not exist".to_string());
+    }
+    
+    eprintln!("[PERF-TEST] Starting file read performance test...");
+    eprintln!("[PERF-TEST] Vault path: {:?}", vault_path);
+    
+    // 测试1：获取文件元数据
+    let meta_start = Instant::now();
+    let metadata = std::fs::metadata(&vault_path)
+        .map_err(|e| format!("Failed to get metadata: {}", e))?;
+    let meta_elapsed = meta_start.elapsed();
+    eprintln!("[PERF-TEST] File metadata read: {:?}, size: {} bytes", meta_elapsed, metadata.len());
+    
+    // 测试2：读取文件内容
+    let read_start = Instant::now();
+    let file_content = fs::read(&vault_path)
+        .map_err(|e| format!("Failed to read file: {}", e))?;
+    let read_elapsed = read_start.elapsed();
+    eprintln!("[PERF-TEST] File content read: {:?}, size: {} bytes", read_elapsed, file_content.len());
+    
+    // 测试3：解析文件头（PARTI 格式）
+    let parse_start = Instant::now();
+    if file_content.len() >= 4 {
+        let header = &file_content[0..4];
+        eprintln!("[PERF-TEST] File header: {:?}", header);
+    }
+    let parse_elapsed = parse_start.elapsed();
+    eprintln!("[PERF-TEST] File header parse: {:?}", parse_elapsed);
+    
+    Ok(format!(
+        "File read test completed: metadata={:?}, read={:?}, parse={:?}, total_size={} bytes",
+        meta_elapsed, read_elapsed, parse_elapsed, file_content.len()
+    ))
 }
 
-#[tauri::command]
-fn has_encrypted_mnemonic() -> Result<bool, String> {
-    Ok(secure_storage::has_encrypted_mnemonic())
+// ==================== 安全存储命令（文件操作） ====================
+
+/// 获取 vault 文件路径
+fn get_vault_path(app: &tauri::AppHandle) -> Result<std::path::PathBuf, String> {
+    let app_data_dir = app
+        .path()
+        .app_local_data_dir()
+        .map_err(|e| format!("Failed to get app data dir: {}", e))?;
+    
+    Ok(app_data_dir.join("vaultColdWallet.hold"))
 }
 
+/// 检查是否存在加密的助记词（检查 vault 文件是否存在）
 #[tauri::command]
-fn delete_encrypted_mnemonic() -> Result<(), String> {
-    secure_storage::delete_encrypted_mnemonic()
-        .map_err(|e| format!("Failed to delete encrypted mnemonic: {}", e))
+fn has_encrypted_mnemonic(app: tauri::AppHandle) -> Result<bool, String> {
+    let vault_path = get_vault_path(&app)?;
+    Ok(vault_path.exists())
 }
 
+/// 删除加密的助记词（删除 vault 文件）
 #[tauri::command]
-fn verify_mnemonic_password(password: String) -> Result<bool, String> {
-    secure_storage::verify_mnemonic_password(&password)
-        .map_err(|e| format!("Failed to verify password: {}", e))
+fn delete_encrypted_mnemonic(app: tauri::AppHandle) -> Result<(), String> {
+    let vault_path = get_vault_path(&app)?;
+    if vault_path.exists() {
+        fs::remove_file(&vault_path)
+            .map_err(|e| format!("Failed to delete vault: {:?}", e))?;
+    }
+    Ok(())
 }
 
 // ==================== 助记词命令 ====================

@@ -12,7 +12,8 @@
       "core:window:allow-minimize",
       "core:window:allow-maximize",
       "core:window:allow-unmaximize",
-      "core:window:allow-start-dragging"
+      "core:window:allow-start-dragging",
+      "stronghold:default"
     ],
     "platforms": ["macOS", "windows", "linux"]
   },
@@ -38,7 +39,8 @@
       "barcode-scanner:allow-scan",
       "barcode-scanner:allow-cancel",
       "barcode-scanner:allow-check-permissions",
-      "barcode-scanner:allow-request-permissions"
+      "barcode-scanner:allow-request-permissions",
+      "stronghold:default"
     ],
     "platforms": ["iOS", "android"]
   }

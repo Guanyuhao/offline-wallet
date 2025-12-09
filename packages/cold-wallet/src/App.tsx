@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { SplashScreen, AppLayout } from '@offline-wallet/shared/components';
+import { useI18n } from './hooks/useI18n';
 
 // 路由懒加载
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -15,22 +16,26 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const ScanQRPage = lazy(() => import('./pages/ScanQRPage'));
 
 // 加载中组件
-const LoadingFallback = () => (
-  <div
-    style={{
-      height: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: '#f5f5f7',
-    }}
-  >
-    <div style={{ fontSize: '16px', color: '#86868b' }}>加载中...</div>
-  </div>
-);
+const LoadingFallback = () => {
+  const t = useI18n();
+  return (
+    <div
+      style={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#f5f5f7',
+      }}
+    >
+      <div style={{ fontSize: '16px', color: '#86868b' }}>{t.common.loading}</div>
+    </div>
+  );
+};
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
+  const t = useI18n();
 
   useEffect(() => {
     // 确保开屏动画至少显示一段时间
@@ -48,8 +53,8 @@ function App() {
           duration={2000}
           onComplete={() => setShowSplash(false)}
           autoComplete={false}
-          appName="冷钱包"
-          subtitle="COLD WALLET"
+          appName={t.home.title}
+          subtitle={t.home.subtitle}
           iconPath="/icon.png"
         />
       )}

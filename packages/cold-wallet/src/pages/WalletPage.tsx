@@ -13,12 +13,14 @@ import PageLayout from '../components/PageLayout';
 import StandardCard from '../components/StandardCard';
 import AddressDisplay from '../components/AddressDisplay';
 import { ChainType, SUPPORTED_CHAINS, CHAIN_DISPLAY_NAMES } from '../config/chainConfig';
+import { useI18n } from '../hooks/useI18n';
 
 function WalletPage() {
   const navigate = useNavigate();
   const { isUnlocked, mnemonic, currentChain, address, setAddress, setUnlocked, clearMnemonic } =
     useWalletStore();
   const [loading, setLoading] = useState(false);
+  const t = useI18n();
 
   useEffect(() => {
     if (!isUnlocked || !mnemonic) {
@@ -42,7 +44,7 @@ function WalletPage() {
       setAddress(addr);
     } catch (error) {
       Toast.show({
-        content: `获取地址失败: ${error}`,
+        content: `${t.wallet.getAddressFailed} ${error}`,
         position: 'top',
       });
     } finally {
@@ -61,7 +63,7 @@ function WalletPage() {
 
   const handleLock = () => {
     Dialog.confirm({
-      content: '确定要锁定钱包吗？',
+      content: t.wallet.confirmLock,
       onConfirm: () => {
         clearMnemonic();
         setUnlocked(false);
@@ -77,14 +79,14 @@ function WalletPage() {
 
   return (
     <PageLayout
-      title="我的钱包"
+      title={t.wallet.myWallet}
       showBack={false}
       navBarProps={{
         right: (
           <Button size="small" color="warning" onClick={handleLock}>
             <Space>
               <LockOutline fontSize={16} />
-              <span>锁定</span>
+              <span>{t.wallet.lock}</span>
             </Space>
           </Button>
         ),
@@ -110,7 +112,7 @@ function WalletPage() {
               alignItems: 'center',
             }}
           >
-            <span style={{ color: '#666' }}>当前链</span>
+            <span style={{ color: '#666' }}>{t.wallet.currentChain}</span>
             <span style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{currentChain}</span>
           </div>
 
@@ -123,7 +125,7 @@ function WalletPage() {
                   gap: '8px',
                 }}
               >
-                <span style={{ color: '#86868b', fontSize: '15px' }}>地址</span>
+                <span style={{ color: '#86868b', fontSize: '15px' }}>{t.wallet.address}</span>
                 <AddressDisplay address={address} />
               </div>
 
@@ -141,7 +143,7 @@ function WalletPage() {
                   >
                     <Space>
                       <ReceivePaymentOutline />
-                      <span>收款</span>
+                      <span>{t.wallet.receivePayment}</span>
                     </Space>
                   </Button>
                 </Grid.Item>
@@ -158,7 +160,7 @@ function WalletPage() {
                   >
                     <Space>
                       <HandPayCircleOutline />
-                      <span>签名交易</span>
+                      <span>{t.wallet.signTransaction}</span>
                     </Space>
                   </Button>
                 </Grid.Item>
@@ -166,13 +168,13 @@ function WalletPage() {
             </>
           )}
 
-          {loading && <div style={{ textAlign: 'center', color: '#999' }}>加载中...</div>}
+          {loading && <div style={{ textAlign: 'center', color: '#999' }}>{t.wallet.loading}</div>}
         </div>
       </StandardCard>
 
       {/* 链选择 */}
       <StandardCard
-        title="选择链"
+        title={t.wallet.selectChain}
         style={{
           marginTop: '16px',
         }}
@@ -215,7 +217,7 @@ function WalletPage() {
         >
           <Space>
             <SetOutline />
-            <span>设置</span>
+            <span>{t.wallet.settings}</span>
           </Space>
         </Button>
       </StandardCard>

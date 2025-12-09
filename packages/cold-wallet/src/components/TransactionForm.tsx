@@ -14,6 +14,7 @@ import { readFromClipboard } from '../utils';
 import { getChainFormConfig, isEVMChain, type ChainType } from '../config/chainConfig';
 import PrimaryButton from './PrimaryButton';
 import useScanStore, { ScanType } from '../stores/useScanStore';
+import { useI18n } from '../hooks/useI18n';
 
 interface TransactionFormProps {
   /**
@@ -67,6 +68,7 @@ function TransactionForm({
   const location = useLocation();
   const { scanResult, scanSuccess, scanType, setScanConfig, clearScanState } = useScanStore();
   const currentChain = chain;
+  const t = useI18n();
 
   // 处理从扫描页面返回的结果（从 store 中读取）
   useEffect(() => {
@@ -88,7 +90,7 @@ function TransactionForm({
 
       if (!clipboardText) {
         Toast.show({
-          content: '剪贴板为空或无法读取',
+          content: t.transactionForm.clipboardEmpty,
           position: 'top',
         });
         return;
@@ -117,24 +119,17 @@ function TransactionForm({
         );
 
         if (!result.is_valid) {
-          const errorMsg = result.error_message || '剪贴板中的地址格式无效，请检查';
-          console.error('[地址验证失败]', errorMsg, '地址:', address);
+          console.error('[地址验证失败]', result.error_message, '地址:', address);
           Toast.show({
-            content: '地址无效',
+            content: t.transactionForm.addressInvalid,
             position: 'top',
           });
           return;
         }
       } catch (error: any) {
-        console.error(
-          '[地址验证失败]',
-          error?.message || '地址验证失败，请检查地址格式',
-          '地址:',
-          address,
-          error
-        );
+        console.error('[地址验证失败]', error?.message, '地址:', address, error);
         Toast.show({
-          content: '地址无效',
+          content: t.transactionForm.addressInvalid,
           position: 'top',
         });
         return;
@@ -152,14 +147,14 @@ function TransactionForm({
         },
       ]);
       Toast.show({
-        content: '地址已粘贴并验证',
+        content: t.transactionForm.addressPasted,
         position: 'top',
         icon: 'success',
       });
     } catch (error: any) {
       const errorMessage = error?.message || error?.toString() || String(error);
       Toast.show({
-        content: `粘贴失败: ${errorMessage}`,
+        content: `${t.transactionForm.pasteFailed} ${errorMessage}`,
         position: 'top',
       });
     }
@@ -172,7 +167,7 @@ function TransactionForm({
     // 设置扫描配置到 store
     setScanConfig({
       scanType: ScanType.ADDRESS,
-      hint: '请将收款地址二维码对准扫描框',
+      hint: t.transactionForm.scanAddressHint,
       returnPath: location.pathname, // 返回当前页面
       returnMode: returnMode, // 传递返回时需要恢复的 tab 模式
     });
@@ -208,25 +203,17 @@ function TransactionForm({
         );
 
         if (!result.is_valid) {
-          const errorMsg =
-            result.error_message || '扫描的地址格式无效，请检查二维码是否为有效的收款地址';
-          console.error('[地址验证失败]', errorMsg, '地址:', scannedAddress);
+          console.error('[地址验证失败]', result.error_message, '地址:', scannedAddress);
           Toast.show({
-            content: '地址无效',
+            content: t.transactionForm.addressInvalid,
             position: 'top',
           });
           return;
         }
       } catch (error: any) {
-        console.error(
-          '[地址验证失败]',
-          error?.message || '地址验证失败，请检查地址格式',
-          '地址:',
-          scannedAddress,
-          error
-        );
+        console.error('[地址验证失败]', error?.message, '地址:', scannedAddress, error);
         Toast.show({
-          content: '地址无效',
+          content: t.transactionForm.addressInvalid,
           position: 'top',
         });
         return;
@@ -244,7 +231,7 @@ function TransactionForm({
         },
       ]);
       Toast.show({
-        content: '地址已扫描并验证',
+        content: t.transactionForm.addressScanned,
         position: 'top',
         icon: 'success',
       });
@@ -270,7 +257,7 @@ function TransactionForm({
         errorMessage.includes('Failed to resolve')
       ) {
         Toast.show({
-          content: '当前设备不支持扫描功能，请手动输入地址',
+          content: t.transactionForm.scanNotSupportedManual,
           position: 'top',
         });
         return;
@@ -278,7 +265,7 @@ function TransactionForm({
 
       // 其他错误
       Toast.show({
-        content: `扫描失败: ${errorMessage}`,
+        content: `${t.signTransaction.scanFailed} ${errorMessage}`,
         position: 'top',
       });
     }
@@ -296,10 +283,10 @@ function TransactionForm({
               borderRadius: '8px',
             }}
           >
-            开启编辑模式
+            {t.transactionForm.enableEditMode}
           </Button>
           <p style={{ marginTop: '8px', fontSize: '12px', color: '#86868b' }}>
-            进入专业模式后可手动编辑交易信息
+            {t.transactionForm.editModeHint}
           </p>
         </div>
       )}
@@ -311,16 +298,16 @@ function TransactionForm({
         footer={
           showFooter ? (
             <PrimaryButton onClick={onSubmit} style={{ marginTop: '8px' }}>
-              签名交易
+              {t.signTransaction.sign}
             </PrimaryButton>
           ) : null
         }
       >
         <Form.Item
-          label="收款地址"
+          label={t.transactionForm.recipientAddress}
           name="to"
           rules={[
-            { required: true, message: '请输入收款地址' },
+            { required: true, message: t.transactionForm.recipientAddressRequired },
             {
               validator: async (_, value) => {
                 // required 规则已经处理了空值，这里只验证非空值
@@ -347,7 +334,7 @@ function TransactionForm({
 
                   const timeoutPromise = new Promise<never>((_, reject) => {
                     setTimeout(() => {
-                      reject(new Error('地址验证超时'));
+                      reject(new Error(t.transactionForm.addressTimeout));
                     }, 5000); // 5秒超时
                   });
 
@@ -355,19 +342,14 @@ function TransactionForm({
                   console.log('[表单验证器] 地址验证结果:', result);
 
                   if (!result.is_valid) {
-                    const errorMsg =
-                      result.error_message ||
-                      `地址格式无效，请检查是否为有效的${currentChain.toUpperCase()}地址`;
-                    console.error('[地址验证失败]', errorMsg, '地址:', trimmedValue);
-                    return Promise.reject(new Error('地址无效'));
+                    console.error('[地址验证失败]', result.error_message, '地址:', trimmedValue);
+                    return Promise.reject(new Error(t.transactionForm.addressInvalid));
                   }
 
                   console.log('[表单验证器] 地址验证通过');
                 } catch (error: any) {
-                  // 如果调用失败，使用通用错误信息
-                  const errorMsg = error?.message || '地址验证失败，请检查地址格式';
-                  console.error('[地址验证失败]', errorMsg, '地址:', trimmedValue, error);
-                  return Promise.reject(new Error('地址无效'));
+                  console.error('[地址验证失败]', error?.message, '地址:', trimmedValue, error);
+                  return Promise.reject(new Error(t.transactionForm.addressInvalid));
                 }
               },
             },
@@ -382,7 +364,7 @@ function TransactionForm({
           >
             <Form.Item noStyle name="to">
               <Input
-                placeholder="支持手动输入、粘贴或扫描"
+                placeholder={t.transactionForm.inputPlaceholder}
                 style={{ flex: 1 }}
                 readOnly={readOnly}
               />
@@ -424,15 +406,15 @@ function TransactionForm({
         <Form.Item
           label={
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <span>金额</span>
+              <span>{t.transactionForm.amount}</span>
               <span style={{ fontSize: '12px', color: '#86868b', fontWeight: 'normal' }}>
-                单位：{currentChain.toUpperCase()}
+                {t.transactionForm.amountUnit}: {currentChain.toUpperCase()}
               </span>
             </div>
           }
           name="value"
           rules={[
-            { required: true, message: '请输入金额' },
+            { required: true, message: t.transactionForm.amountRequired },
             {
               validator: (_, value) => {
                 console.log('[金额验证器] 开始验证金额:', value);
@@ -445,18 +427,18 @@ function TransactionForm({
                 // 格式验证：必须是数字格式
                 if (!/^\d+(\.\d{1,18})?$/.test(String(value))) {
                   console.log('[金额验证器] 格式验证失败');
-                  return Promise.reject(new Error('请输入有效的数字（最多18位小数）'));
+                  return Promise.reject(new Error(t.transactionForm.amountInvalid));
                 }
 
                 const numValue = parseFloat(value);
                 if (isNaN(numValue)) {
                   console.log('[金额验证器] 数字解析失败');
-                  return Promise.reject(new Error('请输入有效的数字'));
+                  return Promise.reject(new Error(t.transactionForm.amountInvalid));
                 }
 
                 if (numValue <= 0) {
                   console.log('[金额验证器] 金额必须大于0');
-                  return Promise.reject(new Error('金额必须大于 0'));
+                  return Promise.reject(new Error(t.transactionForm.amountMustBePositive));
                 }
 
                 // 检查精度（ETH 最多18位小数）
@@ -464,13 +446,13 @@ function TransactionForm({
                 const parts = valueStr.split('.');
                 if (parts.length === 2 && parts[1].length > 18) {
                   console.log('[金额验证器] 精度超过18位');
-                  return Promise.reject(new Error('金额精度不能超过18位小数'));
+                  return Promise.reject(new Error(t.transactionForm.amountPrecisionError));
                 }
 
                 // 检查是否超出合理范围（防止输入过大）
                 if (numValue > 1e9) {
                   console.log('[金额验证器] 金额过大');
-                  return Promise.reject(new Error('金额过大，请检查输入'));
+                  return Promise.reject(new Error(t.transactionForm.amountTooLarge));
                 }
 
                 console.log('[金额验证器] 验证通过');
@@ -494,15 +476,15 @@ function TransactionForm({
           <Form.Item
             label={
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <span>Gas Price</span>
+                <span>{t.transactionForm.gasPrice}</span>
                 <span style={{ fontSize: '12px', color: '#86868b', fontWeight: 'normal' }}>
-                  单位：Gwei · 建议范围：5 - 100
+                  {t.transactionForm.gasPriceUnit}
                 </span>
               </div>
             }
             name="gasPrice"
             rules={[
-              { required: true, message: '请输入 Gas Price' },
+              { required: true, message: t.transactionForm.gasPriceRequired },
               {
                 validator: (_, value) => {
                   // required 规则已经处理了空值，这里只验证非空值
@@ -514,48 +496,42 @@ function TransactionForm({
 
                   // 格式校验：不能以小数点开头或结尾
                   if (trimmedValue.startsWith('.') || trimmedValue.endsWith('.')) {
-                    return Promise.reject(new Error('Gas Price 格式无效，不能以小数点开头或结尾'));
+                    return Promise.reject(new Error(t.transactionForm.gasPriceFormatError));
                   }
 
                   // 格式校验：不能有多个小数点
                   if ((trimmedValue.match(/\./g) || []).length > 1) {
-                    return Promise.reject(new Error('Gas Price 格式无效，只能有一个小数点'));
+                    return Promise.reject(new Error(t.transactionForm.gasPriceMultipleDecimal));
                   }
 
                   // 格式校验：必须是数字格式（不能以0开头，除非是0或0.xxx）
                   if (!/^(0|[1-9]\d*)(\.\d{1,9})?$/.test(trimmedValue)) {
-                    return Promise.reject(
-                      new Error(
-                        'Gas Price 格式无效，请输入有效的数字（不能以0开头，除非是0或0.xxx）'
-                      )
-                    );
+                    return Promise.reject(new Error(t.transactionForm.gasPriceLeadingZero));
                   }
 
                   const numValue = parseFloat(trimmedValue);
                   if (isNaN(numValue)) {
-                    return Promise.reject(new Error('请输入有效的数字'));
+                    return Promise.reject(new Error(t.transactionForm.gasPriceInvalid));
                   }
 
                   // 最小值检查：必须大于 0.000000001 Gwei（1 Wei）
                   if (numValue <= 0) {
-                    return Promise.reject(new Error('Gas Price 必须大于 0'));
+                    return Promise.reject(new Error(t.transactionForm.gasPriceMustBePositive));
                   }
 
                   if (numValue < 0.000000001) {
-                    return Promise.reject(
-                      new Error('Gas Price 最小值为 0.000000001 Gwei（1 Wei）')
-                    );
+                    return Promise.reject(new Error(t.transactionForm.gasPriceMinimum));
                   }
 
                   // 最大值检查：不超过 10000 Gwei
                   if (numValue > 10000) {
-                    return Promise.reject(new Error('Gas Price 最大值为 10000 Gwei，请检查输入'));
+                    return Promise.reject(new Error(t.transactionForm.gasPriceMaximum));
                   }
 
                   // 精度检查：最多9位小数
                   const parts = trimmedValue.split('.');
                   if (parts.length === 2 && parts[1].length > 9) {
-                    return Promise.reject(new Error('Gas Price 精度不能超过9位小数'));
+                    return Promise.reject(new Error(t.transactionForm.gasPricePrecisionError));
                   }
                 },
               },
@@ -578,15 +554,15 @@ function TransactionForm({
           <Form.Item
             label={
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <span>Gas Limit</span>
+                <span>{t.transactionForm.gasLimit}</span>
                 <span style={{ fontSize: '12px', color: '#86868b', fontWeight: 'normal' }}>
-                  建议范围：21000 - 500000
+                  {t.transactionForm.gasLimitSuggestion}
                 </span>
               </div>
             }
             name="gasLimit"
             rules={[
-              { required: true, message: '请输入 Gas Limit' },
+              { required: true, message: t.transactionForm.gasLimitRequired },
               {
                 validator: (_, value) => {
                   // required 规则已经处理了空值，这里只验证非空值
@@ -598,30 +574,26 @@ function TransactionForm({
 
                   // 格式校验：必须是正整数（不能以0开头，除非是0）
                   if (!/^(0|[1-9]\d*)$/.test(trimmedValue)) {
-                    return Promise.reject(
-                      new Error('Gas Limit 格式无效，请输入有效的正整数（不能以0开头，除非是0）')
-                    );
+                    return Promise.reject(new Error(t.transactionForm.gasLimitInvalid));
                   }
 
                   const intValue = parseInt(trimmedValue, 10);
                   if (isNaN(intValue)) {
-                    return Promise.reject(new Error('请输入有效的整数'));
+                    return Promise.reject(new Error(t.transactionForm.gasLimitInvalid));
                   }
 
                   // 最小值检查：必须至少 21000（普通转账的最低要求）
                   if (intValue <= 0) {
-                    return Promise.reject(new Error('Gas Limit 必须大于 0'));
+                    return Promise.reject(new Error(t.transactionForm.gasLimitMustBePositive));
                   }
 
                   if (intValue < 21000) {
-                    return Promise.reject(
-                      new Error('Gas Limit 最小值为 21000（普通转账的最低要求）')
-                    );
+                    return Promise.reject(new Error(t.transactionForm.gasLimitMustBePositive));
                   }
 
                   // 最大值检查：不超过 30000000
                   if (intValue > 30000000) {
-                    return Promise.reject(new Error('Gas Limit 最大值为 30000000，请检查输入'));
+                    return Promise.reject(new Error(t.transactionForm.gasLimitMaximum));
                   }
                 },
               },
@@ -642,10 +614,10 @@ function TransactionForm({
         {/* Nonce 字段：仅 EVM 链显示 */}
         {isEVMChain(currentChain) && (
           <Form.Item
-            label="Nonce"
+            label={t.transactionForm.nonce}
             name="nonce"
             rules={[
-              { required: true, message: '请输入 Nonce' },
+              { required: true, message: t.transactionForm.nonceRequired },
               {
                 validator: (_, value) => {
                   // required 规则已经处理了空值，这里只验证非空值
@@ -657,21 +629,21 @@ function TransactionForm({
 
                   // 检查是否为非负整数
                   if (!/^\d+$/.test(valueStr)) {
-                    return Promise.reject(new Error('Nonce 必须是非负整数'));
+                    return Promise.reject(new Error(t.transactionForm.nonceMustBeNonNegative));
                   }
 
                   const intValue = parseInt(valueStr, 10);
                   if (isNaN(intValue)) {
-                    return Promise.reject(new Error('请输入有效的整数'));
+                    return Promise.reject(new Error(t.transactionForm.nonceInvalid));
                   }
 
                   if (intValue < 0) {
-                    return Promise.reject(new Error('Nonce 不能为负数'));
+                    return Promise.reject(new Error(t.transactionForm.nonceMustBeNonNegative));
                   }
 
                   // 合理范围检查（通常 0 - 2^64-1，但实际使用中不会这么大）
                   if (intValue > Number.MAX_SAFE_INTEGER) {
-                    return Promise.reject(new Error('Nonce 超出安全范围，请检查输入'));
+                    return Promise.reject(new Error(t.transactionForm.nonceMaximum));
                   }
                 },
               },

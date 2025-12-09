@@ -66,6 +66,7 @@ image = "0.24"
 
 # Base64 编码
 base64 = "0.22"
+tauri-plugin-stronghold = "2"
 
 # 获取系统目录（仅桌面端）
 [target.'cfg(not(any(target_os = "ios", target_os = "android")))'.dependencies]

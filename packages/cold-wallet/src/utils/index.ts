@@ -37,8 +37,3 @@ export async function readFromClipboard(): Promise<string | null> {
     return null;
   }
 }
-
-// 注意：createAddressQRCode, loadBarcodeScanner, ensureCameraPermission, scanQRCode
-// 已迁移到 @offline-wallet/shared/utils
-// 请从 shared 包导入：
-// import { createAddressQRCode, loadBarcodeScanner, ensureCameraPermission, scanQRCode } from '@offline-wallet/shared/utils';
