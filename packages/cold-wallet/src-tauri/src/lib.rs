@@ -55,8 +55,8 @@ pub fn run() {
         .expect("error while running tauri application");
 }
 
-// iOS 入口点
-#[cfg(target_os = "ios")]
+// 移动端入口点（iOS 和 Android）
+#[cfg(mobile)]
 #[tauri::mobile_entry_point]
 fn main() {
     run();

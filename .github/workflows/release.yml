@@ -166,7 +166,10 @@ jobs:
   create-release:
     name: 🚀 Create Release
     needs: [build-windows, build-macos-intel, build-macos-arm]
-    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'
+    if: |
+      always() &&
+      (needs.build-windows.result == 'success' || needs.build-macos-intel.result == 'success' || needs.build-macos-arm.result == 'success') &&
+      (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -182,13 +185,32 @@ jobs:
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Download All Artifacts
+      - name: Download Windows Artifacts
+        if: needs.build-windows.result == 'success'
         uses: actions/download-artifact@v4
         with:
-          path: ./artifacts
+          name: cold-wallet-windows-x64
+          path: ./artifacts/windows
+        continue-on-error: true
+
+      - name: Download macOS Intel Artifacts
+        if: needs.build-macos-intel.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: cold-wallet-macos-x64
+          path: ./artifacts/macos-intel
+        continue-on-error: true
+
+      - name: Download macOS ARM Artifacts
+        if: needs.build-macos-arm.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: cold-wallet-macos-arm64
+          path: ./artifacts/macos-arm
+        continue-on-error: true
 
       - name: List Artifacts
-        run: find ./artifacts -type f | head -20
+        run: find ./artifacts -type f 2>/dev/null | head -20 || echo "No artifacts found"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
