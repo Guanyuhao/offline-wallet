@@ -1,0 +1,167 @@
+name: Release Cold Wallet Desktop
+
+on:
+  push:
+    tags:
+      - 'cold-desktop-v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号（例如：1.0.0）'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: 构建 Windows
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+      
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: 'packages/cold-wallet/src-tauri -> target'
+      
+      - name: Install Dependencies
+        run: |
+          pnpm install --frozen-lockfile
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "Frozen lockfile failed, trying without..."
+            pnpm install
+          }
+      
+      - name: Build Tauri App
+        working-directory: packages/cold-wallet
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_COLD_WALLET }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD_COLD_WALLET }}
+        run: pnpm tauri build --target x86_64-pc-windows-msvc
+      
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cold-wallet-windows-x64
+          path: |
+            packages/cold-wallet/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+            packages/cold-wallet/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+          if-no-files-found: error
+
+  build-macos:
+    name: 构建 macOS
+    runs-on: macos-latest
+    
+    strategy:
+      matrix:
+        target:
+          - arch: x86_64
+            rust_target: x86_64-apple-darwin
+          - arch: aarch64
+            rust_target: aarch64-apple-darwin
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target.rust_target }}
+      
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: 'packages/cold-wallet/src-tauri -> target'
+          key: ${{ matrix.target.rust_target }}
+      
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+      
+      - name: Build Tauri App
+        working-directory: packages/cold-wallet
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY_COLD_WALLET }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD_COLD_WALLET }}
+        run: pnpm tauri build --target ${{ matrix.target.rust_target }}
+      
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cold-wallet-macos-${{ matrix.target.arch }}
+          path: |
+            packages/cold-wallet/src-tauri/target/${{ matrix.target.rust_target }}/release/bundle/dmg/*.dmg
+            packages/cold-wallet/src-tauri/target/${{ matrix.target.rust_target }}/release/bundle/macos/*.app
+          if-no-files-found: error
+
+  create-release:
+    name: 创建 GitHub Release
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    if: always() && (needs.build-windows.result == 'success' || needs.build-macos.result == 'success')
+    
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+      
+      - name: Display structure
+        run: ls -R ./artifacts
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          name: Cold Wallet Desktop ${{ github.ref_name }}
+          body: |
+            ## 🖥️ Cold Wallet 桌面版
+            
+            ### 支持平台
+            - ✅ Windows x64 (.msi, .exe)
+            - ✅ macOS Intel (.dmg, .app)
+            - ✅ macOS Apple Silicon (.dmg, .app)
+            
+            ### 安装说明
+            - **Windows**: 下载 .msi 或 .exe 安装包
+            - **macOS**: 下载 .dmg 文件，拖拽到 Applications
+          files: |
+            artifacts/**/*.msi
+            artifacts/**/*.exe
+            artifacts/**/*.dmg
+            artifacts/**/*.app/**
+

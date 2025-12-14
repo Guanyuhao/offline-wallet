@@ -41,35 +41,30 @@ signing/
 
 ## 🚀 使用方法
 
-### 1. 生成密钥
+### 1. 桌面端签名（Tauri）
+
+#### 生成密钥
 
 ```bash
-# 生成所有应用的密钥
-./scripts/generate-signing-keys.sh
+# Cold Wallet
+cd signing
+tauri signer generate -w cold-wallet.key -p $(openssl rand -base64 24) --force
 
-# 或选择特定应用
-# 选项 1: cold-wallet
-# 选项 2: hot-wallet
-# 选项 3: 全部生成
+# Hot Wallet
+tauri signer generate -w hot-wallet.key -p $(openssl rand -base64 24) --force
 ```
 
-### 2. 查看配置信息
+#### 配置 GitHub Secrets
 
 ```bash
-# 查看所有应用的配置
-./scripts/setup-signing.sh
+# Cold Wallet
+echo "TAURI_PRIVATE_KEY_COLD_WALLET=$(cat cold-wallet.key | base64)"
+echo "TAURI_KEY_PASSWORD_COLD_WALLET=$(cat cold-wallet.password.txt)"
 
-# 或查看特定应用
-./scripts/setup-signing.sh cold-wallet
-./scripts/setup-signing.sh hot-wallet
+# Hot Wallet
+echo "TAURI_PRIVATE_KEY_HOT_WALLET=$(cat hot-wallet.key | base64)"
+echo "TAURI_KEY_PASSWORD_HOT_WALLET=$(cat hot-wallet.password.txt)"
 ```
-
-### 3. 配置 GitHub Secrets
-
-运行 `setup-signing.sh` 后，会输出需要添加到 GitHub Secrets 的内容：
-
-- `TAURI_PRIVATE_KEY_COLD_WALLET`: Base64 编码的私钥
-- `TAURI_KEY_PASSWORD_COLD_WALLET`: 密钥密码（32字符随机生成）
 
 ## 🔒 安全说明
 

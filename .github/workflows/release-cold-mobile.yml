@@ -1,0 +1,216 @@
+name: Release Cold Wallet Mobile
+
+on:
+  push:
+    tags:
+      - 'cold-mobile-v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号（例如：1.0.0）'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    name: 构建 Android
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      
+      - name: Install Android NDK
+        run: |
+          sdkmanager --install "ndk;26.1.10909125"
+          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/26.1.10909125" >> $GITHUB_ENV
+      
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: 'packages/cold-wallet/src-tauri -> target'
+      
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+      
+      - name: Initialize Tauri Android
+        working-directory: packages/cold-wallet
+        run: pnpm tauri android init || echo "Already initialized"
+      
+      - name: Setup Android Signing
+        working-directory: packages/cold-wallet/src-tauri/gen/android
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > app/release.keystore
+          cat > key.properties << EOF
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyPassword=$ANDROID_KEY_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          storeFile=release.keystore
+          EOF
+      
+      - name: Build APK
+        working-directory: packages/cold-wallet
+        run: pnpm tauri android build --apk
+      
+      - name: Upload Android Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cold-wallet-android
+          path: |
+            packages/cold-wallet/src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+            packages/cold-wallet/src-tauri/gen/android/app/build/outputs/bundle/**/*.aab
+          if-no-files-found: warn
+
+  build-ios:
+    name: 构建 iOS
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios,x86_64-apple-ios
+      
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: 'packages/cold-wallet/src-tauri -> target'
+      
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+      
+      - name: Initialize Tauri iOS
+        working-directory: packages/cold-wallet
+        run: pnpm tauri ios init || echo "Already initialized"
+      
+      - name: Setup iOS Signing
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD || 'temp_keychain_password' }}
+        run: |
+          # 创建临时 keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+          
+          # 导入证书
+          echo "$APPLE_CERTIFICATE" | base64 -d > certificate.p12
+          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+          
+          # 安装 provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$APPLE_PROVISIONING_PROFILE" | base64 -d > ~/Library/MobileDevice/Provisioning\ Profiles/cold-wallet.mobileprovision
+          
+          # 清理
+          rm certificate.p12
+      
+      - name: Build iOS
+        working-directory: packages/cold-wallet
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: pnpm tauri ios build --export-method development
+      
+      - name: Upload iOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cold-wallet-ios
+          path: |
+            packages/cold-wallet/src-tauri/gen/apple/build/arm64/*.ipa
+            packages/cold-wallet/src-tauri/gen/apple/build/arm64/*.app
+          if-no-files-found: warn
+      
+      - name: Cleanup Keychain
+        if: always()
+        run: |
+          security delete-keychain build.keychain || true
+
+  create-release:
+    name: 创建 GitHub Release
+    needs: [build-android, build-ios]
+    runs-on: ubuntu-latest
+    if: always() && (needs.build-android.result == 'success' || needs.build-ios.result == 'success')
+    
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+      
+      - name: Display structure
+        run: ls -R ./artifacts
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          name: Cold Wallet Mobile ${{ github.ref_name }}
+          body: |
+            ## 📱 Cold Wallet 移动版
+            
+            ### 支持平台
+            - ✅ Android (.apk)
+            - ✅ iOS (.ipa)
+            
+            ### 安装说明
+            - **Android**: 下载 .apk 文件直接安装
+            - **iOS**: 需要使用 TestFlight 或企业签名分发
+          files: |
+            artifacts/**/*.apk
+            artifacts/**/*.aab
+            artifacts/**/*.ipa
+            artifacts/**/*.app/**
+
