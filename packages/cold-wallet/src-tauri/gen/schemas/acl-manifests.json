@@ -1,108 +1,70 @@
 {
-  "barcode-scanner": {
+  "clipboard-manager": {
     "default_permission": {
       "identifier": "default",
-      "description": "This permission set configures which\nbarcode scanning features are by default exposed.\n\n#### Granted Permissions\n\nIt allows all barcode related features.\n\n",
-      "permissions": [
-        "allow-cancel",
-        "allow-check-permissions",
-        "allow-open-app-settings",
-        "allow-request-permissions",
-        "allow-scan",
-        "allow-vibrate"
-      ]
+      "description": "No features are enabled by default, as we believe\nthe clipboard can be inherently dangerous and it is \napplication specific if read and/or write access is needed.\n\nClipboard interaction needs to be explicitly enabled.\n",
+      "permissions": []
     },
     "permissions": {
-      "allow-cancel": {
-        "identifier": "allow-cancel",
-        "description": "Enables the cancel command without any pre-configured scope.",
-        "commands": { "allow": ["cancel"], "deny": [] }
+      "allow-clear": {
+        "identifier": "allow-clear",
+        "description": "Enables the clear command without any pre-configured scope.",
+        "commands": { "allow": ["clear"], "deny": [] }
       },
-      "allow-check-permissions": {
-        "identifier": "allow-check-permissions",
-        "description": "Enables the check_permissions command without any pre-configured scope.",
-        "commands": { "allow": ["check_permissions"], "deny": [] }
+      "allow-read-image": {
+        "identifier": "allow-read-image",
+        "description": "Enables the read_image command without any pre-configured scope.",
+        "commands": { "allow": ["read_image"], "deny": [] }
       },
-      "allow-open-app-settings": {
-        "identifier": "allow-open-app-settings",
-        "description": "Enables the open_app_settings command without any pre-configured scope.",
-        "commands": { "allow": ["open_app_settings"], "deny": [] }
+      "allow-read-text": {
+        "identifier": "allow-read-text",
+        "description": "Enables the read_text command without any pre-configured scope.",
+        "commands": { "allow": ["read_text"], "deny": [] }
       },
-      "allow-request-permissions": {
-        "identifier": "allow-request-permissions",
-        "description": "Enables the request_permissions command without any pre-configured scope.",
-        "commands": { "allow": ["request_permissions"], "deny": [] }
+      "allow-write-html": {
+        "identifier": "allow-write-html",
+        "description": "Enables the write_html command without any pre-configured scope.",
+        "commands": { "allow": ["write_html"], "deny": [] }
       },
-      "allow-scan": {
-        "identifier": "allow-scan",
-        "description": "Enables the scan command without any pre-configured scope.",
-        "commands": { "allow": ["scan"], "deny": [] }
+      "allow-write-image": {
+        "identifier": "allow-write-image",
+        "description": "Enables the write_image command without any pre-configured scope.",
+        "commands": { "allow": ["write_image"], "deny": [] }
       },
-      "allow-vibrate": {
-        "identifier": "allow-vibrate",
-        "description": "Enables the vibrate command without any pre-configured scope.",
-        "commands": { "allow": ["vibrate"], "deny": [] }
+      "allow-write-text": {
+        "identifier": "allow-write-text",
+        "description": "Enables the write_text command without any pre-configured scope.",
+        "commands": { "allow": ["write_text"], "deny": [] }
       },
-      "deny-cancel": {
-        "identifier": "deny-cancel",
-        "description": "Denies the cancel command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["cancel"] }
+      "deny-clear": {
+        "identifier": "deny-clear",
+        "description": "Denies the clear command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["clear"] }
       },
-      "deny-check-permissions": {
-        "identifier": "deny-check-permissions",
-        "description": "Denies the check_permissions command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["check_permissions"] }
+      "deny-read-image": {
+        "identifier": "deny-read-image",
+        "description": "Denies the read_image command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["read_image"] }
       },
-      "deny-open-app-settings": {
-        "identifier": "deny-open-app-settings",
-        "description": "Denies the open_app_settings command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["open_app_settings"] }
+      "deny-read-text": {
+        "identifier": "deny-read-text",
+        "description": "Denies the read_text command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["read_text"] }
       },
-      "deny-request-permissions": {
-        "identifier": "deny-request-permissions",
-        "description": "Denies the request_permissions command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["request_permissions"] }
+      "deny-write-html": {
+        "identifier": "deny-write-html",
+        "description": "Denies the write_html command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["write_html"] }
       },
-      "deny-scan": {
-        "identifier": "deny-scan",
-        "description": "Denies the scan command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["scan"] }
+      "deny-write-image": {
+        "identifier": "deny-write-image",
+        "description": "Denies the write_image command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["write_image"] }
       },
-      "deny-vibrate": {
-        "identifier": "deny-vibrate",
-        "description": "Denies the vibrate command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["vibrate"] }
-      }
-    },
-    "permission_sets": {},
-    "global_scope_schema": null
-  },
-  "biometric": {
-    "default_permission": {
-      "identifier": "default",
-      "description": "This permission set configures which\nbiometric features are by default exposed.\n\n#### Granted Permissions\n\nIt allows acccess to all biometric commands.\n\n",
-      "permissions": ["allow-authenticate", "allow-status"]
-    },
-    "permissions": {
-      "allow-authenticate": {
-        "identifier": "allow-authenticate",
-        "description": "Enables the authenticate command without any pre-configured scope.",
-        "commands": { "allow": ["authenticate"], "deny": [] }
-      },
-      "allow-status": {
-        "identifier": "allow-status",
-        "description": "Enables the status command without any pre-configured scope.",
-        "commands": { "allow": ["status"], "deny": [] }
-      },
-      "deny-authenticate": {
-        "identifier": "deny-authenticate",
-        "description": "Denies the authenticate command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["authenticate"] }
-      },
-      "deny-status": {
-        "identifier": "deny-status",
-        "description": "Denies the status command without any pre-configured scope.",
-        "commands": { "allow": [], "deny": ["status"] }
+      "deny-write-text": {
+        "identifier": "deny-write-text",
+        "description": "Denies the write_text command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["write_text"] }
       }
     },
     "permission_sets": {},

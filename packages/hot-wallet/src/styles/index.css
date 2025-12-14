@@ -1,22 +1,77 @@
-@import 'antd-mobile/es/global';
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html,
+html {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
 body {
   width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   overflow-x: hidden;
+  overflow-y: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-#app {
+#root {
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
+/* 隐藏数字输入框右侧的上下箭头 */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.adm-input-element[type='number']::-webkit-inner-spin-button,
+.adm-input-element[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.adm-input-element[type='number'] {
+  -moz-appearance: textfield;
+}
+
+/* 
+ * 自定义 CSS 变量（用于页面内联样式）
+ * antd-mobile 组件会自动响应 data-prefers-color-scheme 属性
+ */
+:root {
+  --app-title-color: var(--adm-color-text);
+  --app-subtitle-color: var(--adm-color-text-secondary);
+  --app-page-background: var(--adm-color-fill-content);
+  --app-card-background: var(--adm-color-box);
+  --app-warning-color: #856404;
+  --app-warning-background: #fff3cd;
+  --app-highlight-background: #f0f9ff;
+  --app-success-color: #52c41a;
+  --app-error-color: #ff4d4f;
+}
+
+[data-prefers-color-scheme='dark'] {
+  --app-warning-color: #d4a106;
+  --app-warning-background: #3d3000;
+  --app-highlight-background: #1a3a5c;
+}

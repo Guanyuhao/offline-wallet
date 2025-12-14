@@ -166,6 +166,13 @@ export default {
     qrGenerateFailed: 'QR code generation failed',
     formValidationFailed: 'Form validation failed, please check your input',
     unknownError: 'Unknown error',
+    // Sign confirmation
+    confirmTitle: 'Confirm Signing',
+    securityWarning: 'Please verify the following information carefully',
+    confirmChain: 'Chain',
+    confirmTo: 'To Address',
+    confirmAmount: 'Amount',
+    confirmSign: 'Confirm Sign',
   },
 
   // Sign Success
@@ -186,6 +193,11 @@ export default {
     stepSuccessDesc:
       'Transaction will appear on blockchain after successful broadcast and confirmation',
     resignButton: 'Sign Again',
+    // Validity
+    validFor: 'Valid for',
+    seconds: 'seconds',
+    expired: 'Signature Expired',
+    expiredHint: 'QR code has expired, please sign again',
   },
 
   // Scan QR
@@ -290,5 +302,19 @@ export default {
   language: {
     zhCN: '中文',
     enUS: 'English',
+  },
+
+  // Biometric
+  biometric: {
+    settingTitle: 'Biometric Unlock',
+    settingDesc: 'Use fingerprint or face recognition to quickly unlock wallet',
+    enableReason: 'Authenticate to enable biometric unlock',
+    enableSuccess: 'Biometric unlock enabled',
+    disableSuccess: 'Biometric unlock disabled',
+    unlockReason: 'Unlock wallet with biometric',
+    unlockWithBiometric: 'Unlock with Biometric',
+    authFailed: 'Biometric authentication failed',
+    biometricSuccess: 'Biometric authentication successful',
+    enterPasswordAfterBiometric: 'Please enter password to complete unlock',
   },
 };

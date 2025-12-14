@@ -6,13 +6,14 @@
 import { useEffect } from 'react';
 import { Button, Toast } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
+import {
+  PageLayout,
+  StandardCard,
+  QRCodeCard,
+  AddressDisplay,
+} from '@offline-wallet/shared/components';
+import { createAddressQRCode, copyToClipboard } from '@offline-wallet/shared/utils';
 import useWalletStore from '../stores/useWalletStore';
-import QRCodeCard from '../components/QRCodeCard';
-import { createAddressQRCode } from '@offline-wallet/shared/utils';
-import { copyToClipboard } from '../utils';
-import PageLayout from '../components/PageLayout';
-import StandardCard from '../components/StandardCard';
-import AddressDisplay from '../components/AddressDisplay';
 import { useI18n } from '../hooks/useI18n';
 
 // 计算响应式二维码尺寸（收款地址数据量小，可以稍小）

@@ -11,6 +11,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
 import { QRCodeProtocol, QRCodeType } from '@shared/types/qrcode';
 import { readFromClipboard } from '../utils';
+import {
+  validateAmount,
+  validateGasPrice,
+  validateGasLimit,
+  validateNonce,
+  createFormValidator,
+} from '@offline-wallet/shared/utils';
 import { getChainFormConfig, isEVMChain, type ChainType } from '../config/chainConfig';
 import PrimaryButton from './PrimaryButton';
 import useScanStore, { ScanType } from '../stores/useScanStore';

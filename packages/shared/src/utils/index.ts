@@ -10,3 +10,5 @@ export * from './scanQR';
 export * from './scanner';
 export * from './rust-scanner';
 export * from './platform';
+export * from './clipboard';
+export * from './validators';

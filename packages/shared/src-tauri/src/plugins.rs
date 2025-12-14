@@ -202,7 +202,10 @@ pub fn register_os_plugin<R: tauri::Runtime>(
     builder: tauri::Builder<R>,
 ) -> tauri::Builder<R> {
     // 注册 tauri-plugin-os 插件，提供操作系统相关的 API
-    builder.plugin(tauri_plugin_os::init())
+    // 注册 tauri-plugin-clipboard-manager 插件，提供剪贴板功能
+    builder
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
 }
 
 /// 注册所有移动端插件

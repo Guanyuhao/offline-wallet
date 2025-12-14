@@ -19,14 +19,18 @@
     "clean": "rm -rf dist node_modules/.vite .vite src-tauri/target"
   },
   "dependencies": {
+    "@offline-wallet/shared": "workspace:*",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-barcode-scanner": "~2",
+    "@tauri-apps/plugin-opener": "~2",
+    "@types/react-virtualized": "^9.22.3",
     "antd-mobile": "^5.37.0",
     "antd-mobile-icons": "^0.3.0",
     "jsqr": "^1.4.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
+    "react-virtualized": "^9.22.6",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

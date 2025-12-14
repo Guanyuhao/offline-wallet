@@ -1,35 +1,55 @@
 import { useState, useEffect } from 'react';
-import { Button, Dialog, Toast, List, Picker } from 'antd-mobile';
-import { LockOutline, CloseCircleFill, ExclamationTriangleOutline } from 'antd-mobile-icons';
+import { Button, Dialog, Toast, List, Picker, Switch } from 'antd-mobile';
+import {
+  LockOutline,
+  CloseCircleFill,
+  ExclamationTriangleOutline,
+  FaceRecognitionOutline,
+} from 'antd-mobile-icons';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { PageLayout, StandardCard } from '@offline-wallet/shared/components';
 import { detectPlatform } from '@offline-wallet/shared/utils/platform';
 import useWalletStore from '../stores/useWalletStore';
 import useI18nStore, { Locale } from '../stores/useI18nStore';
 import useThemeStore, { Theme } from '../stores/useThemeStore';
-import PageLayout from '../components/PageLayout';
-import StandardCard from '../components/StandardCard';
 import { deleteMnemonic } from '../utils/stronghold';
+import {
+  isBiometricAvailable,
+  getBiometricTypeName,
+  authenticateWithBiometric,
+} from '../utils/biometric';
 import { useI18n } from '../hooks/useI18n';
 
 function SettingsPage() {
   const navigate = useNavigate();
   const t = useI18n();
-  const { clearMnemonic, setUnlocked, reset } = useWalletStore();
+  const { clearMnemonic, setUnlocked, reset, biometricEnabled, setBiometricEnabled } =
+    useWalletStore();
   const { locale, setLocale } = useI18nStore();
   const { theme, setTheme } = useThemeStore();
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [languageVisible, setLanguageVisible] = useState(false);
   const [themeVisible, setThemeVisible] = useState(false);
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricType, setBiometricType] = useState<
+    'touchId' | 'faceId' | 'iris' | null | undefined
+  >();
 
-  // 检测平台
+  // 检测平台和生物识别
   useEffect(() => {
-    const checkPlatform = async () => {
+    const init = async () => {
+      // 检测平台
       const platform = await detectPlatform();
       setIsMobile(platform === 'ios' || platform === 'android');
+
+      // 检测生物识别
+      const status = await isBiometricAvailable();
+      setBiometricAvailable(status.isAvailable);
+      setBiometricType(status.biometryType);
     };
-    checkPlatform();
+    init();
   }, []);
 
   const handleLock = () => {
@@ -107,6 +127,38 @@ function SettingsPage() {
     { label: t.theme.auto, value: 'auto' },
   ];
 
+  // 生物识别类型名称
+  const biometricName = getBiometricTypeName(biometricType);
+
+  // 切换生物识别
+  const handleBiometricToggle = async (checked: boolean) => {
+    if (checked) {
+      // 启用时需要先验证
+      const success = await authenticateWithBiometric(
+        t.biometric?.enableReason || `启用${biometricName}解锁`
+      );
+      if (success) {
+        setBiometricEnabled(true);
+        Toast.show({
+          content: t.biometric?.enableSuccess || `${biometricName}已启用`,
+          position: 'top',
+          icon: 'success',
+        });
+      } else {
+        Toast.show({
+          content: t.biometric?.authFailed || '验证失败',
+          position: 'top',
+        });
+      }
+    } else {
+      setBiometricEnabled(false);
+      Toast.show({
+        content: t.biometric?.disableSuccess || `${biometricName}已禁用`,
+        position: 'top',
+      });
+    }
+  };
+
   return (
     <PageLayout title={t.settings.title} onBack={() => navigate(-1)}>
       <StandardCard>
@@ -156,6 +208,22 @@ function SettingsPage() {
               setThemeVisible(false);
             }}
           />
+
+          {/* 生物识别设置 - 仅在支持时显示 */}
+          {biometricAvailable && (
+            <List.Item
+              prefix={
+                <FaceRecognitionOutline
+                  fontSize={20}
+                  style={{ color: 'var(--adm-color-primary)' }}
+                />
+              }
+              extra={<Switch checked={biometricEnabled} onChange={handleBiometricToggle} />}
+              description={t.biometric?.settingDesc || `使用${biometricName}快速解锁钱包`}
+            >
+              {t.biometric?.settingTitle || biometricName}
+            </List.Item>
+          )}
 
           <List.Item
             onClick={handleLock}

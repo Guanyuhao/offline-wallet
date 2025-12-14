@@ -46,13 +46,54 @@ pub fn validate_tron_address(address: &str) -> bool {
 
 /// 通用地址验证（根据链类型）
 pub fn validate_address(chain: &str, address: &str) -> bool {
-    match chain {
-        "ETH" | "BNB" => validate_eth_address(address),
-        "BTC" => validate_btc_address(address),
-        "SOL" => validate_sol_address(address),
-        "TRON" => validate_tron_address(address),
+    match chain.to_lowercase().as_str() {
+        "eth" | "bnb" => validate_eth_address(address),
+        "btc" => validate_btc_address(address),
+        "sol" => validate_sol_address(address),
+        "tron" => validate_tron_address(address),
+        "kaspa" => validate_kaspa_address(address),
         _ => false,
     }
+}
+
+/// 验证 Kaspa 地址格式
+pub fn validate_kaspa_address(address: &str) -> bool {
+    // Kaspa 地址以 kaspa: 开头
+    address.starts_with("kaspa:") && address.len() > 10
+}
+
+/// 根据地址格式自动检测链类型
+/// 返回可能匹配的链列表（按优先级排序）
+pub fn detect_chain_from_address(address: &str) -> Vec<String> {
+    let mut chains = Vec::new();
+    
+    // ETH/BNB: 0x 开头，42 字符
+    if validate_eth_address(address) {
+        chains.push("eth".to_string());
+        chains.push("bnb".to_string());
+    }
+    
+    // BTC: 1, 3, bc1 开头
+    if validate_btc_address(address) {
+        chains.push("btc".to_string());
+    }
+    
+    // SOL: Base58 编码，32-44 字符
+    if validate_sol_address(address) && !address.starts_with('T') {
+        chains.push("sol".to_string());
+    }
+    
+    // TRON: T 开头，34 字符
+    if validate_tron_address(address) {
+        chains.push("tron".to_string());
+    }
+    
+    // Kaspa: kaspa: 开头
+    if validate_kaspa_address(address) {
+        chains.push("kaspa".to_string());
+    }
+    
+    chains
 }
 
 #[cfg(test)]

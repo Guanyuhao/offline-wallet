@@ -14,6 +14,9 @@ use std::fs;
 use tauri::Manager;
 
 fn setup_app(builder: tauri::Builder<tauri::Wry>) -> tauri::Builder<tauri::Wry> {
+    // 注册 clipboard-manager 插件
+    let builder = builder.plugin(tauri_plugin_clipboard_manager::init());
+    
     // 注册所有插件（Stronghold + OS 插件 + 移动端插件）
     let builder = register_all_plugins(builder);
     

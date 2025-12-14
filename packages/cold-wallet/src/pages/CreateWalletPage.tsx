@@ -2,12 +2,10 @@ import { useState } from 'react';
 import { Toast, Radio, Checkbox, Button } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
+import { PageLayout, StandardCard, PrimaryButton } from '@offline-wallet/shared/components';
+import { copyToClipboard } from '@offline-wallet/shared/utils';
 import useWalletStore from '../stores/useWalletStore';
-import { copyToClipboard } from '../utils';
 import PasswordInput from '../components/PasswordInput';
-import PageLayout from '../components/PageLayout';
-import StandardCard from '../components/StandardCard';
-import PrimaryButton from '../components/PrimaryButton';
 import { storeMnemonic } from '../utils/stronghold';
 import { useI18n } from '../hooks/useI18n';
 

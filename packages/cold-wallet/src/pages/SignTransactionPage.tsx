@@ -1,20 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Toast, Grid, Form, JumboTabs } from 'antd-mobile';
+import { Button, Toast, Form, JumboTabs, Dialog } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
-import useWalletStore from '../stores/useWalletStore';
-import useScanStore, { ScanType } from '../stores/useScanStore';
+import { PageLayout, StandardCard, PrimaryButton } from '@offline-wallet/shared/components';
 import {
   QRCodeProtocol,
   QRCodeType,
   SignedTransactionQRCode,
   UnsignedTransactionQRCode,
 } from '@shared/types/qrcode';
-import PageLayout from '../components/PageLayout';
+import useWalletStore from '../stores/useWalletStore';
+import useScanStore, { ScanType } from '../stores/useScanStore';
 import { isEVMChain, type ChainType } from '../config/chainConfig';
-import StandardCard from '../components/StandardCard';
 import TransactionForm from '../components/TransactionForm';
-import PrimaryButton from '../components/PrimaryButton';
 import { useI18n } from '../hooks/useI18n';
 
 type SignMode = 'scan' | 'manual';
@@ -27,22 +25,34 @@ function fillFormValuesFromTxData(txData: any, chain: ChainType): Record<string,
 
   if (txData.to) formValues.to = txData.to;
 
-  if (txData.value) {
-    if (isEVMChain(chain)) {
-      // EVM 链：从 Wei 转换为 ETH
-      const valueInWei = BigInt(txData.value);
-      formValues.value = (Number(valueInWei) / 1e18).toString();
+  // 支持 value 和 amount 两种字段名（兼容热钱包和其他格式）
+  const rawValue = txData.value || txData.amount;
+
+  if (rawValue) {
+    if (isEVMChain(chain) && txData.value) {
+      // EVM 链且有 value 字段：从 Wei 转换为 ETH
+      try {
+        const valueInWei = BigInt(rawValue);
+        formValues.value = (Number(valueInWei) / 1e18).toString();
+      } catch {
+        // 如果不是 Wei 格式，直接使用
+        formValues.value = rawValue.toString();
+      }
     } else {
-      // 其他链：直接使用
-      formValues.value = txData.value.toString();
+      // 其他情况：直接使用（已经是人类可读格式）
+      formValues.value = rawValue.toString();
     }
   }
 
   if (isEVMChain(chain)) {
     // EVM 链：gasPrice, gasLimit, nonce
     if (txData.gas_price) {
-      const gasPriceInWei = BigInt(txData.gas_price);
-      formValues.gasPrice = (Number(gasPriceInWei) / 1e9).toString();
+      try {
+        const gasPriceInWei = BigInt(txData.gas_price);
+        formValues.gasPrice = (Number(gasPriceInWei) / 1e9).toString();
+      } catch {
+        formValues.gasPrice = txData.gas_price.toString();
+      }
     }
     if (txData.gas_limit) formValues.gasLimit = txData.gas_limit.toString();
     if (txData.nonce !== undefined) formValues.nonce = txData.nonce.toString();
@@ -290,6 +300,56 @@ function SignTransactionPage() {
     navigate('/scan-qr');
   };
 
+  // 显示签名确认对话框
+  const showSignConfirmDialog = (values: any): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const chainName = currentChain.toUpperCase();
+      const toAddress = values.to || '';
+      const amount = values.value || '0';
+
+      Dialog.confirm({
+        title: t.signTransaction.confirmTitle || '确认签名',
+        content: (
+          <div style={{ fontSize: '14px', lineHeight: '1.8' }}>
+            <div style={{ marginBottom: '8px', color: 'var(--adm-color-danger)', fontWeight: 500 }}>
+              ⚠️ {t.signTransaction.securityWarning || '请仔细核对以下信息'}
+            </div>
+            <div>
+              <strong>{t.signTransaction.confirmChain || '链'}:</strong> {chainName}
+            </div>
+            <div style={{ wordBreak: 'break-all' }}>
+              <strong>{t.signTransaction.confirmTo || '接收地址'}:</strong>
+              <div
+                style={{
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  marginTop: '4px',
+                  padding: '8px',
+                  background: 'var(--adm-color-fill-content)',
+                  borderRadius: '4px',
+                }}
+              >
+                {toAddress}
+              </div>
+            </div>
+            <div>
+              <strong>{t.signTransaction.confirmAmount || '金额'}:</strong> {amount} {chainName}
+            </div>
+            {isEVMChain(currentChain as ChainType) && values.gasPrice && (
+              <div>
+                <strong>Gas Price:</strong> {values.gasPrice} Gwei
+              </div>
+            )}
+          </div>
+        ),
+        confirmText: t.signTransaction.confirmSign || '确认签名',
+        cancelText: t.common?.cancel || '取消',
+        onConfirm: () => resolve(true),
+        onCancel: () => resolve(false),
+      });
+    });
+  };
+
   // 签名交易
   const handleSign = async () => {
     try {
@@ -376,6 +436,14 @@ function SignTransactionPage() {
       }
       console.log('[业务验证通过]');
 
+      // 安全确认对话框
+      const confirmed = await showSignConfirmDialog(values);
+      if (!confirmed) {
+        console.log('[用户取消签名]');
+        return;
+      }
+      console.log('[用户确认签名]');
+
       // 构建交易数据
       const txData = buildTransactionData(values, currentChain as ChainType);
       console.log('[构建交易数据完成] txData length:', txData.length);
@@ -444,11 +512,6 @@ function SignTransactionPage() {
     setScannedData(null);
     setShowScannedInfo(false);
     form.resetFields();
-  };
-
-  const handleEdit = () => {
-    setMode('manual');
-    form.setFieldsValue(scannedData);
   };
 
   return (
@@ -532,23 +595,9 @@ function SignTransactionPage() {
                       </p>
                     </div>
 
-                    <Grid columns={2} gap={8}>
-                      <Grid.Item>
-                        <Button
-                          color="default"
-                          block
-                          onClick={handleEdit}
-                          style={{ borderRadius: '8px' }}
-                        >
-                          {t.signTransaction.edit}
-                        </Button>
-                      </Grid.Item>
-                      <Grid.Item>
-                        <PrimaryButton block onClick={handleSign} style={{ borderRadius: '8px' }}>
-                          {t.signTransaction.sign}
-                        </PrimaryButton>
-                      </Grid.Item>
-                    </Grid>
+                    <PrimaryButton block onClick={handleSign} style={{ borderRadius: '8px' }}>
+                      {t.signTransaction.sign}
+                    </PrimaryButton>
 
                     <div
                       style={{

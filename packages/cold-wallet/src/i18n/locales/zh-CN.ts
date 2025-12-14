@@ -160,6 +160,13 @@ export default {
     qrGenerateFailed: '二维码生成失败',
     formValidationFailed: '表单验证失败，请检查输入',
     unknownError: '未知错误',
+    // 签名确认
+    confirmTitle: '确认签名',
+    securityWarning: '请仔细核对以下信息，确保交易安全',
+    confirmChain: '链',
+    confirmTo: '接收地址',
+    confirmAmount: '金额',
+    confirmSign: '确认签名',
   },
 
   // 签名成功
@@ -177,6 +184,11 @@ export default {
     stepSuccess: '交易成功',
     stepSuccessDesc: '交易被成功广播并确认后，将显示在区块链上',
     resignButton: '重新签名',
+    // 有效期
+    validFor: '有效期',
+    seconds: '秒',
+    expired: '签名已过期',
+    expiredHint: '二维码已过期，请重新签名',
   },
 
   // 交易表单
@@ -272,5 +284,19 @@ export default {
   language: {
     zhCN: '中文',
     enUS: 'English',
+  },
+
+  // 生物识别
+  biometric: {
+    settingTitle: '生物识别解锁',
+    settingDesc: '使用指纹或面容快速解锁钱包',
+    enableReason: '验证以启用生物识别解锁',
+    enableSuccess: '生物识别已启用',
+    disableSuccess: '生物识别已禁用',
+    unlockReason: '使用生物识别解锁钱包',
+    unlockWithBiometric: '使用生物识别解锁',
+    authFailed: '生物识别验证失败',
+    biometricSuccess: '生物识别验证成功',
+    enterPasswordAfterBiometric: '请输入密码完成解锁',
   },
 };

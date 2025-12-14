@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Button, Grid } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
+import { PageLayout, StandardCard } from '@offline-wallet/shared/components';
 import useWalletStore from '../stores/useWalletStore';
-import PageLayout from '../components/PageLayout';
-import StandardCard from '../components/StandardCard';
 import { hasMnemonic } from '../utils/stronghold';
 import { useI18n } from '../hooks/useI18n';
 

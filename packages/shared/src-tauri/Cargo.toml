@@ -37,6 +37,8 @@ tauri-plugin-os = "2"
 tauri = { version = "2", features = [] }
 # Stronghold 插件（所有平台都需要，用于安全存储）
 tauri-plugin-stronghold = "2"
+# 剪贴板插件（所有平台都需要）
+tauri-plugin-clipboard-manager = "2"
 # Argon2 密码哈希（用于自定义密码哈希函数以添加性能日志）
 argon2 = "0.5"
 rand = "0.8"

@@ -3,12 +3,11 @@
  * 签名成功页面
  */
 
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Result, Steps } from 'antd-mobile';
+import { Button, Result, Steps, Toast } from 'antd-mobile';
 import { CloseOutline } from 'antd-mobile-icons';
-import PageLayout from '../components/PageLayout';
-import StandardCard from '../components/StandardCard';
-import QRCodeCard from '../components/QRCodeCard';
+import { PageLayout, StandardCard, QRCodeCard } from '@offline-wallet/shared/components';
 import { useI18n } from '../hooks/useI18n';
 
 // 计算响应式二维码尺寸（签名数据量大，需要更大尺寸）
@@ -19,12 +18,37 @@ function getQRCodeSize() {
   return Math.max(maxSize, 200); // 最小 200px，最大 300px
 }
 
+// 签名有效期（秒）
+const SIGN_EXPIRE_SECONDS = 60;
+
 function SignSuccessPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { signedTx, qrCodeData, currentChain } = (location.state as any) || {};
   const t = useI18n();
   const qrSize = getQRCodeSize();
+
+  // 倒计时状态
+  const [countdown, setCountdown] = useState(SIGN_EXPIRE_SECONDS);
+  const [expired, setExpired] = useState(false);
+
+  // 倒计时逻辑
+  useEffect(() => {
+    if (countdown <= 0) {
+      setExpired(true);
+      return;
+    }
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          setExpired(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   const handleReset = () => {
     navigate('/sign');
@@ -46,18 +70,65 @@ function SignSuccessPage() {
 
       {qrCodeData ? (
         <StandardCard style={{ marginTop: '16px' }}>
-          <QRCodeCard
-            data={qrCodeData}
-            size={qrSize}
-            variant="simple"
-            description={
+          {/* 倒计时提示 */}
+          <div
+            style={{
+              textAlign: 'center',
+              marginBottom: '12px',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              background: expired
+                ? 'var(--adm-color-danger)'
+                : countdown <= 10
+                  ? 'var(--adm-color-warning)'
+                  : 'var(--adm-color-primary)',
+              color: '#fff',
+              fontSize: '14px',
+            }}
+          >
+            {expired ? (
+              <>{t.signSuccess?.expired || '签名已过期，请重新签名'}</>
+            ) : (
               <>
-                {t.signSuccess.scanHint}
-                <br />
-                {t.signSuccess.broadcastHint.replace('{chain}', currentChain?.toUpperCase() || '')}
+                {t.signSuccess?.validFor || '有效期'}: <strong>{countdown}</strong>{' '}
+                {t.signSuccess?.seconds || '秒'}
               </>
-            }
-          />
+            )}
+          </div>
+
+          {!expired ? (
+            <QRCodeCard
+              data={qrCodeData}
+              size={qrSize}
+              variant="simple"
+              description={
+                <>
+                  {t.signSuccess.scanHint}
+                  <br />
+                  {t.signSuccess.broadcastHint.replace(
+                    '{chain}',
+                    currentChain?.toUpperCase() || ''
+                  )}
+                </>
+              }
+            />
+          ) : (
+            <div
+              style={{
+                padding: '40px 20px',
+                textAlign: 'center',
+                color: 'var(--adm-color-danger)',
+              }}
+            >
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏰</div>
+              <p style={{ marginBottom: '16px' }}>
+                {t.signSuccess?.expiredHint || '二维码已过期，请重新签名'}
+              </p>
+              <Button color="primary" onClick={handleReset}>
+                {t.signSuccess.resignButton}
+              </Button>
+            </div>
+          )}
         </StandardCard>
       ) : (
         <StandardCard style={{ marginTop: '16px' }}>

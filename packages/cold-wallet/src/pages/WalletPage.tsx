@@ -8,10 +8,8 @@ import {
 } from 'antd-mobile-icons';
 import { useNavigate } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
+import { PageLayout, StandardCard, AddressDisplay } from '@offline-wallet/shared/components';
 import useWalletStore from '../stores/useWalletStore';
-import PageLayout from '../components/PageLayout';
-import StandardCard from '../components/StandardCard';
-import AddressDisplay from '../components/AddressDisplay';
 import { ChainType, SUPPORTED_CHAINS, CHAIN_DISPLAY_NAMES } from '../config/chainConfig';
 import { useI18n } from '../hooks/useI18n';
 
