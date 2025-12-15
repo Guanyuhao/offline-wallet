@@ -51,7 +51,7 @@ function AddressDetailPage() {
     refetch: refetchTokens,
   } = useTokens(address?.chain || 'eth', address?.address || '');
 
-  const [refreshing, setRefreshing] = useState(false);
+  const [, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (!address) {

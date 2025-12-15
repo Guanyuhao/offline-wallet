@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Toast, Button } from 'antd-mobile';
 import { useNavigate } from 'react-router-dom';
-import { invoke } from '@tauri-apps/api/core';
 import { PageLayout, StandardCard, PrimaryButton } from '@offline-wallet/shared/components';
 import useWalletStore from '../stores/useWalletStore';
 import PasswordInput from '../components/PasswordInput';

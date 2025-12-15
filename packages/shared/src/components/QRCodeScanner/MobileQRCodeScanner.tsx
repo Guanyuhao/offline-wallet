@@ -74,7 +74,10 @@ const MobileQRCodeScanner: React.FC<MobileQRCodeScannerProps> = ({
   useEffect(() => {
     let isMounted = true;
     scanAbortedRef.current = false;
-    setIsCameraReady(false);
+    // 使用 setTimeout 避免同步 setState
+    setTimeout(() => {
+      if (isMounted) setIsCameraReady(false);
+    }, 0);
 
     async function startScan() {
       try {

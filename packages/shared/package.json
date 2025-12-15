@@ -9,21 +9,34 @@
     ".": "./src/index.ts",
     "./components": "./src/components/index.ts",
     "./utils": "./src/utils/index.ts",
-    "./types": "./src/types/index.ts"
+    "./types": "./src/types/index.ts",
+    "./config": "./src/config/chainConfig.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-barcode-scanner": "~2",
+    "@tauri-apps/plugin-clipboard-manager": "~2",
     "antd-mobile": "^5.37.0",
     "antd-mobile-icons": "^0.3.0",
     "jsqr": "^1.4.0",
-    "react": "^18.3.1"
+    "react": "^18.3.1",
+    "zustand": "^5.0.2"
   },
   "peerDependencies": {
     "@tauri-apps/api": "^2"
   },
   "devDependencies": {
+    "@types/node": "^24.10.1",
     "@types/react": "^18.3.12",
-    "typescript": "~5.6.2"
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.3"
   }
 }

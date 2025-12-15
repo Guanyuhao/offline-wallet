@@ -1,21 +1,6 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { createViteConfig } from '../shared/vite.config.base';
 
-export default defineConfig(({ command, mode }) => {
-  const isProduction = mode === 'production' || command === 'build';
-
-  return {
-    plugins: [react()],
-    server: {
-      port: 1421,
-      strictPort: true,
-    },
-    esbuild: {
-      // 生产环境移除 console 和 debugger
-      drop: isProduction ? ['console', 'debugger'] : [],
-    },
-    build: {
-      target: 'es2020',
-    },
-  };
+// Hot Wallet 使用端口 1421
+export default createViteConfig(import.meta.dirname, {
+  port: 1421,
 });

@@ -19,8 +19,10 @@
     "clean": "rm -rf dist node_modules/.vite .vite src-tauri/target"
   },
   "dependencies": {
+    "@offline-wallet/shared": "workspace:*",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-barcode-scanner": "~2",
+    "@tauri-apps/plugin-opener": "^2",
     "antd-mobile": "^5.37.0",
     "antd-mobile-icons": "^0.3.0",
     "jsqr": "^1.4.0",

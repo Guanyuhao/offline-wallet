@@ -45,7 +45,7 @@ export interface ScanQRPageProps {
 const ScanQRPage: React.FC<ScanQRPageProps> = ({
   scanType,
   hint,
-  returnPath,
+  returnPath: _returnPath,
   onScanSuccess,
   onCancel,
   onBack,
@@ -53,6 +53,37 @@ const ScanQRPage: React.FC<ScanQRPageProps> = ({
 }) => {
   const [platform, setPlatform] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  // 初始化平台检测 - 必须在条件返回之前
+  useEffect(() => {
+    detectPlatform()
+      .then((p) => {
+        console.log('[ScanQRPage] 检测到的平台:', p);
+        setPlatform(p);
+        setIsMobile(isMobilePlatform(p));
+      })
+      .catch((error) => {
+        console.error('[ScanQRPage] 平台检测失败:', error);
+        // 默认使用桌面端（降级方案）
+        setPlatform('macOS');
+        setIsMobile(false);
+      });
+  }, []);
+
+  // 扫描成功回调 - 必须在条件返回之前
+  const handleScanSuccess = useCallback(
+    (content: string) => {
+      console.log('[ScanQRPage] 扫描成功，返回结果:', content, '扫描类型:', scanType);
+      onScanSuccess(content);
+    },
+    [scanType, onScanSuccess]
+  );
+
+  // 取消扫描回调 - 必须在条件返回之前
+  const handleCancel = useCallback(() => {
+    console.log('[ScanQRPage] 取消扫描');
+    onCancel();
+  }, [onCancel]);
 
   // 如果没有扫描配置，显示友好提示
   if (!scanType) {
@@ -115,37 +146,6 @@ const ScanQRPage: React.FC<ScanQRPageProps> = ({
       </PageLayout>
     );
   }
-
-  // 初始化平台检测
-  useEffect(() => {
-    detectPlatform()
-      .then((p) => {
-        console.log('[ScanQRPage] 检测到的平台:', p);
-        setPlatform(p);
-        setIsMobile(isMobilePlatform(p));
-      })
-      .catch((error) => {
-        console.error('[ScanQRPage] 平台检测失败:', error);
-        // 默认使用桌面端（降级方案）
-        setPlatform('macOS');
-        setIsMobile(false);
-      });
-  }, []);
-
-  // 扫描成功回调
-  const handleScanSuccess = useCallback(
-    (content: string) => {
-      console.log('[ScanQRPage] 扫描成功，返回结果:', content, '扫描类型:', scanType);
-      onScanSuccess(content);
-    },
-    [scanType, onScanSuccess]
-  );
-
-  // 取消扫描回调
-  const handleCancel = useCallback(() => {
-    console.log('[ScanQRPage] 取消扫描');
-    onCancel();
-  }, [onCancel]);
 
   // 平台未检测完成时，不渲染任何内容
   if (platform === null) {

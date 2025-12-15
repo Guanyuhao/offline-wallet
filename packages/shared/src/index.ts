@@ -14,8 +14,8 @@ export * from './types';
 // Stores
 export { default as useI18nStore } from './stores/useI18nStore';
 export { default as useThemeStore } from './stores/useThemeStore';
-export type { Locale } from './stores/useI18nStore';
-export type { Theme } from './stores/useThemeStore';
+export type { Locale, I18nState } from './stores/useI18nStore';
+export type { Theme, ThemeState } from './stores/useThemeStore';
 
 // Config
 export * from './config/chainConfig';

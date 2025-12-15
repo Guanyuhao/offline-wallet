@@ -34,7 +34,7 @@ function SettingsPage() {
 
   const handleLock = () => {
     Dialog.confirm({
-      content: t.settings.lockWalletDesc + '？' + t.settings.lockWalletConfirm,
+      content: `${t.settings.lockWalletDesc}？${t.settings.lockWalletConfirm}`,
       onConfirm: () => {
         clearMnemonic();
         setUnlocked(false);

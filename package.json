@@ -4,11 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter cold-wallet dev",
     "dev:cold": "pnpm --filter cold-wallet tauri dev",
     "dev:hot": "pnpm --filter hot-wallet tauri dev",
     "dev:all": "pnpm --parallel --filter './packages/*' tauri dev",
-    "build": "pnpm --filter cold-wallet build",
     "build:cold": "pnpm --filter cold-wallet tauri build",
     "build:hot": "pnpm --filter hot-wallet tauri build",
     "build:all": "pnpm --filter './packages/*' tauri build",

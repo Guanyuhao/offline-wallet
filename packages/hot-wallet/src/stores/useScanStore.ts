@@ -31,7 +31,7 @@ interface ScanState {
   /** 返回路径 */
   returnPath: string;
   /** 额外的回调数据 */
-  callbackData: Record<string, any> | null;
+  callbackData: Record<string, unknown> | null;
 
   // Actions
   /** 设置扫描配置（跳转到扫描页面时调用） */
@@ -39,7 +39,7 @@ interface ScanState {
     scanType: ScanType;
     hint?: string;
     returnPath: string;
-    callbackData?: Record<string, any>;
+    callbackData?: Record<string, unknown>;
   }) => void;
   /** 设置扫描结果（扫描成功时调用） */
   setScanResult: (result: string) => void;

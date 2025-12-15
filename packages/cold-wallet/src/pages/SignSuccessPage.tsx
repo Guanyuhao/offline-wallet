@@ -3,9 +3,9 @@
  * 签名成功页面
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Result, Steps, Toast } from 'antd-mobile';
+import { Button, Result, Steps } from 'antd-mobile';
 import { CloseOutline } from 'antd-mobile-icons';
 import { PageLayout, StandardCard, QRCodeCard } from '@offline-wallet/shared/components';
 import { useI18n } from '../hooks/useI18n';
@@ -21,27 +21,41 @@ function getQRCodeSize() {
 // 签名有效期（秒）
 const SIGN_EXPIRE_SECONDS = 60;
 
+interface LocationState {
+  signedTx?: string;
+  qrCodeData?: string;
+  currentChain?: string;
+}
+
 function SignSuccessPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signedTx, qrCodeData, currentChain } = (location.state as any) || {};
+  const { signedTx, qrCodeData, currentChain } = (location.state as LocationState) || {};
   const t = useI18n();
   const qrSize = getQRCodeSize();
 
   // 倒计时状态
   const [countdown, setCountdown] = useState(SIGN_EXPIRE_SECONDS);
   const [expired, setExpired] = useState(false);
+  const expiredRef = useRef(false);
 
   // 倒计时逻辑
   useEffect(() => {
     if (countdown <= 0) {
-      setExpired(true);
+      if (!expiredRef.current) {
+        expiredRef.current = true;
+        // 使用 setTimeout 来避免在 useEffect 中同步调用 setState
+        setTimeout(() => setExpired(true), 0);
+      }
       return;
     }
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          setExpired(true);
+          if (!expiredRef.current) {
+            expiredRef.current = true;
+            setTimeout(() => setExpired(true), 0);
+          }
           return 0;
         }
         return prev - 1;

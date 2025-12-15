@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export type Locale = 'zh-CN' | 'en-US';
 
-interface I18nState {
+export interface I18nState {
   locale: Locale;
   setLocale: (locale: Locale) => void;
 }

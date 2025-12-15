@@ -17,21 +17,21 @@ export class WebScanner implements IScanner {
   /**
    * 检查权限（Web API 通过 getUserMedia 自动处理）
    */
-  async checkPermission(): Promise<boolean> {
-    return isGetUserMediaSupported();
+  checkPermission(): Promise<boolean> {
+    return Promise.resolve(isGetUserMediaSupported());
   }
 
   /**
    * 请求权限（Web API 通过 getUserMedia 自动处理）
    */
-  async requestPermission(): Promise<boolean> {
-    return isGetUserMediaSupported();
+  requestPermission(): Promise<boolean> {
+    return Promise.resolve(isGetUserMediaSupported());
   }
 
   /**
    * 开始扫描
    */
-  async scan(options: ScanOptions = {}): Promise<string> {
+  scan(options: ScanOptions = {}): Promise<string> {
     const { videoElement, canvasElement } = options;
 
     if (!videoElement || !canvasElement) {
@@ -110,8 +110,9 @@ export class WebScanner implements IScanner {
   /**
    * 取消扫描
    */
-  async cancel(): Promise<void> {
+  cancel(): Promise<void> {
     this.cleanup();
+    return Promise.resolve();
   }
 
   /**

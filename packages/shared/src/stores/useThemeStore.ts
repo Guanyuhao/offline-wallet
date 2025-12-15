@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export type Theme = 'light' | 'dark' | 'auto';
 
-interface ThemeState {
+export interface ThemeState {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   getEffectiveTheme: () => 'light' | 'dark'; // 根据 auto 模式计算实际主题

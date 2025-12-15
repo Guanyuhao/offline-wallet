@@ -47,7 +47,7 @@ function ScanSignedPage() {
       }
 
       // 验证链匹配
-      if (parsed.chain !== address!.chain) {
+      if (!address || parsed.chain !== address.chain) {
         Toast.show({ content: t.scanSigned.chainMismatch || '链类型不匹配', icon: 'fail' });
         return;
       }

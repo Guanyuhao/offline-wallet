@@ -1,7 +1,7 @@
 {
   "hot-wallet-capabilities": {
     "identifier": "hot-wallet-capabilities",
-    "description": "Hot wallet capabilities - online transaction helper",
+    "description": "Hot wallet capabilities for desktop - online transaction helper",
     "local": true,
     "windows": ["main"],
     "permissions": [
@@ -18,6 +18,39 @@
       "opener:allow-default-urls",
       "clipboard-manager:allow-read-text",
       "clipboard-manager:allow-write-text"
-    ]
+    ],
+    "platforms": ["macOS", "windows", "linux"]
+  },
+  "hot-wallet-capabilities-mobile": {
+    "identifier": "hot-wallet-capabilities-mobile",
+    "description": "Hot wallet capabilities for mobile (iOS/Android) - includes barcode scanner",
+    "local": true,
+    "windows": ["main"],
+    "permissions": [
+      "core:default",
+      "core:window:default",
+      "core:window:allow-create",
+      "core:window:allow-show",
+      "core:window:allow-hide",
+      "core:window:allow-close",
+      "core:window:allow-set-focus",
+      "core:window:allow-set-always-on-top",
+      "core:window:allow-set-background-color",
+      "core:window:allow-set-size",
+      "core:window:allow-set-position",
+      "core:window:allow-set-decorations",
+      "barcode-scanner:default",
+      "barcode-scanner:allow-scan",
+      "barcode-scanner:allow-cancel",
+      "barcode-scanner:allow-check-permissions",
+      "barcode-scanner:allow-request-permissions",
+      "opener:default",
+      "opener:allow-open-url",
+      "opener:allow-default-urls",
+      "clipboard-manager:default",
+      "clipboard-manager:allow-read-text",
+      "clipboard-manager:allow-write-text"
+    ],
+    "platforms": ["iOS", "android"]
   }
 }

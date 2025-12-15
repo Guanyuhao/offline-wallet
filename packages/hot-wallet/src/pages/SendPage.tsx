@@ -41,7 +41,7 @@ function SendPage() {
   } | null>(null);
 
   // 交易参数（nonce, gasPrice 等）
-  const [txParams, setTxParams] = useState<TxParams | null>(null);
+  const [, setTxParams] = useState<TxParams | null>(null);
   const [paramsLoading, setParamsLoading] = useState(false);
 
   const { balance } = useBalance(address?.chain || 'eth', address?.address || '');
@@ -68,13 +68,15 @@ function SendPage() {
 
   // 处理扫描结果
   const handleScanResult = async (qrData: string) => {
+    if (!address) return;
+
     try {
       // 尝试解析为地址二维码
       try {
         const parsed = QRCodeProtocol.decode(qrData);
         if (parsed.type === QRCodeType.ADDRESS) {
           // 验证链匹配
-          if (parsed.chain === address!.chain) {
+          if (parsed.chain === address.chain) {
             form.setFieldValue('toAddress', parsed.address);
             Toast.show({ content: t.common.success, icon: 'success' });
           } else {
@@ -89,7 +91,7 @@ function SendPage() {
       // 直接作为地址使用
       const trimmedText = qrData.trim();
       const isValid = await invoke<boolean>('validate_address', {
-        chain: address!.chain,
+        chain: address.chain,
         address: trimmedText,
       });
 
@@ -209,7 +211,7 @@ function SendPage() {
       }
 
       // 根据链类型构建不同格式的交易数据
-      let unsignedTx: Record<string, any>;
+      let unsignedTx: Record<string, string>;
       let estimatedFee = '0';
 
       if (isEVM) {
@@ -241,10 +243,12 @@ function SendPage() {
       // 生成二维码数据
       const qrData = QRCodeProtocol.encode({
         type: QRCodeType.UNSIGNED_TRANSACTION,
+        version: '1.0.0',
+        timestamp: Date.now(),
         chain: address.chain,
         unsignedTx: JSON.stringify(unsignedTx),
         description: `${t.send.sendTo} ${values.amount} ${CHAIN_DISPLAY_NAMES[address.chain]}`,
-      } as any);
+      });
 
       setUnsignedTxQR(qrData);
       setTxInfo({

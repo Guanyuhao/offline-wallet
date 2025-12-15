@@ -1,8 +1,9 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "identifier": "hot-wallet-capabilities",
-  "description": "Hot wallet capabilities - online transaction helper",
+  "description": "Hot wallet capabilities for desktop - online transaction helper",
   "windows": ["main"],
+  "platforms": ["macOS", "windows", "linux"],
   "permissions": [
     "core:default",
     "core:window:allow-close",

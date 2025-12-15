@@ -1,8 +1,11 @@
-pub mod ethereum;
-pub mod bitcoin;
-pub mod solana;
-pub mod bnb;
-pub mod tron;
+// 重用 shared 库的链模块（避免代码重复）
+pub use offline_wallet_shared::chains::ethereum;
+pub use offline_wallet_shared::chains::bitcoin;
+pub use offline_wallet_shared::chains::solana;
+pub use offline_wallet_shared::chains::tron;
+// 注：BNB Chain 使用 ethereum 模块（EVM 兼容）
+
+// cold-wallet 独有的模块
 pub mod kaspa;
 pub mod address_validation;
 

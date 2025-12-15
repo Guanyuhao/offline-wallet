@@ -48,7 +48,8 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 'warn',
     
     // General rules
-    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    // 'no-console': ['warn', { allow: ['warn', 'error'] }],
+    'no-console': "off", // 生产环境会移除
     'no-debugger': 'error',
     'prefer-const': 'error',
     'no-var': 'error',

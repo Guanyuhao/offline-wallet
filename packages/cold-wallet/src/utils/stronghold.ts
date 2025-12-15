@@ -290,7 +290,7 @@ export async function retrieveMnemonic(password: string): Promise<string> {
   try {
     // 初始化 Stronghold
     instance = await initStronghold(password);
-    const { stronghold, client } = instance;
+    const { client } = instance;
 
     // 读取助记词
     const store = client.getStore();

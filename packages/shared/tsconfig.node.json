@@ -10,5 +10,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true
-  }
+  },
+  "include": ["vite.config.base.ts"]
 }

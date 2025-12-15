@@ -1,9 +1,9 @@
 [package]
 name = "cold-wallet"
-version = "1.0.0"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
 description = "Cold Wallet - Completely offline cryptocurrency wallet"
-authors = ["you"]
-edition = "2021"
 
 [lib]
 name = "cold_wallet_lib"
@@ -14,80 +14,49 @@ name = "cold-wallet"
 path = "src/main.rs"
 
 [build-dependencies]
-tauri-build = { version = "2", features = [] }
+tauri-build = { workspace = true }
 
 [dependencies]
-tauri = { version = "2", features = [] }
-tauri-plugin-os = "2"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+# 核心序列化
+serde = { workspace = true }
+serde_json = { workspace = true }
 
-# 共享代码库
+# Tauri 核心
+tauri = { workspace = true }
+
+# Tauri 插件
+tauri-plugin-os = { workspace = true }
+tauri-plugin-stronghold = { workspace = true }
+tauri-plugin-clipboard-manager = { workspace = true }
+
+# 共享代码库（包含 qrcode, image, base64, argon2 等）
 offline-wallet-shared = { path = "../../shared/src-tauri" }
 
-# BIP39 助记词和 BIP32 密钥派生
-bip39 = "2.0"
-tiny-hderive = "0.3"
+# 密钥派生
+bip39 = { workspace = true }
+tiny-hderive = { workspace = true }
 
-# 以太坊相关
-ethers = { version = "2.0", features = ["legacy"] }
-tiny-keccak = { version = "2.0", features = ["keccak"] }
-k256 = { version = "0.13", features = ["ecdsa"] }
+# 区块链核心
+bitcoin = { workspace = true }
+ethers = { workspace = true }
+secp256k1 = { workspace = true }
+ed25519-dalek = { workspace = true }
 
-# Bitcoin 相关
-bitcoin = { version = "0.32", features = ["rand", "std"] }
-secp256k1 = { version = "0.29", features = ["rand", "global-context", "recovery"] }
+# 编码/哈希
+hex = { workspace = true }
+bs58 = { workspace = true }
+sha3 = { workspace = true }
+sha2 = { workspace = true }
 
-# Solana 相关
-ed25519-dalek = { version = "2.1", features = ["rand_core"] }
-bs58 = "0.5"
+# Kaspa
+kaspa-addresses = { workspace = true }
 
-# Bech32 编码（用于 Kaspa 地址）
-bech32 = "0.11"
+# 加密/安全
+rand = { workspace = true }
+zeroize = { workspace = true }
 
-# Tron 相关
-sha3 = "0.10"
-
-# Kaspa 相关 - 官方地址生成库
-kaspa-addresses = "0.15"
-
-# 通用加密
-rand = "0.8"
-zeroize = "1.7"
-hex = "0.4"
-sha2 = "0.10"
-
-# AES-256-GCM 加密
-aes-gcm = "0.10"
-
-# Argon2id 密码哈希
-argon2 = "0.5"
-
-# 二维码生成
-qrcode = "0.14"
-image = "0.24"
-
-# Base64 编码
-base64 = "0.22"
-tauri-plugin-stronghold = "2"
-
-# 获取系统目录（仅桌面端）
-[target.'cfg(not(any(target_os = "ios", target_os = "android")))'.dependencies]
-dirs = "5.0"
-# 系统密钥库（Keychain/Keystore）- 仅桌面端
-keyring = "2.0"
-
-# iOS 使用 security-framework（已通过其他依赖间接引入）
-# Android 使用 tauri-plugin-biometric 或其他方式
-
-# 时间戳和定时器
-tokio = { version = "1", features = ["time"] }
-chrono = "0.4"
-
+# 移动端插件
 [target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
-tauri-plugin-biometric = "2"
-tauri-plugin-barcode-scanner = "2"
-
-# iOS 存储：使用文件系统（加密数据已加密，文件系统存储是安全的）
-# 注意：iOS 应用数据存储在应用的 Documents 目录，有沙箱保护
+tauri-plugin-biometric = { workspace = true }
+tauri-plugin-barcode-scanner = { workspace = true }
 

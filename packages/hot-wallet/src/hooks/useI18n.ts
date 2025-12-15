@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useI18nStore } from '@offline-wallet/shared';
+import { useI18nStore, type I18nState } from '@offline-wallet/shared';
 import { getTranslations, Translations } from '../i18n';
 
 /**
@@ -12,7 +12,7 @@ import { getTranslations, Translations } from '../i18n';
  * ```
  */
 export const useI18n = (): Translations => {
-  const locale = useI18nStore((state) => state.locale);
+  const locale = useI18nStore((state: I18nState) => state.locale);
 
   return useMemo(() => getTranslations(locale), [locale]);
 };

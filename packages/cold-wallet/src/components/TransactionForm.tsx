@@ -11,17 +11,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/core';
 import { QRCodeProtocol, QRCodeType } from '@shared/types/qrcode';
 import { readFromClipboard } from '../utils';
-import {
-  validateAmount,
-  validateGasPrice,
-  validateGasLimit,
-  validateNonce,
-  createFormValidator,
-} from '@offline-wallet/shared/utils';
 import { getChainFormConfig, isEVMChain, type ChainType } from '../config/chainConfig';
 import PrimaryButton from './PrimaryButton';
 import useScanStore, { ScanType } from '../stores/useScanStore';
 import { useI18n } from '../hooks/useI18n';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FormInstance = ReturnType<typeof Form.useForm>[0];
 
 interface TransactionFormProps {
   /**
@@ -31,7 +27,7 @@ interface TransactionFormProps {
   /**
    * 表单实例（由外部管理）
    */
-  form: any;
+  form: FormInstance;
   /**
    * 是否只读模式
    */
@@ -133,8 +129,9 @@ function TransactionForm({
           });
           return;
         }
-      } catch (error: any) {
-        console.error('[地址验证失败]', error?.message, '地址:', address, error);
+      } catch (error: unknown) {
+        const err = error as Error;
+        console.error('[地址验证失败]', err?.message, '地址:', address, error);
         Toast.show({
           content: t.transactionForm.addressInvalid,
           position: 'top',
@@ -158,8 +155,9 @@ function TransactionForm({
         position: 'top',
         icon: 'success',
       });
-    } catch (error: any) {
-      const errorMessage = error?.message || error?.toString() || String(error);
+    } catch (error: unknown) {
+      const err = error as Error;
+      const errorMessage = err?.message || String(error);
       Toast.show({
         content: `${t.transactionForm.pasteFailed} ${errorMessage}`,
         position: 'top',
@@ -176,7 +174,7 @@ function TransactionForm({
       scanType: ScanType.ADDRESS,
       hint: t.transactionForm.scanAddressHint,
       returnPath: location.pathname, // 返回当前页面
-      returnMode: returnMode, // 传递返回时需要恢复的 tab 模式
+      returnMode, // 传递返回时需要恢复的 tab 模式
     });
     // 跳转到扫描页面
     navigate('/scan-qr');
@@ -217,8 +215,9 @@ function TransactionForm({
           });
           return;
         }
-      } catch (error: any) {
-        console.error('[地址验证失败]', error?.message, '地址:', scannedAddress, error);
+      } catch (error: unknown) {
+        const err = error as Error;
+        console.error('[地址验证失败]', err?.message, '地址:', scannedAddress, error);
         Toast.show({
           content: t.transactionForm.addressInvalid,
           position: 'top',
@@ -242,8 +241,9 @@ function TransactionForm({
         position: 'top',
         icon: 'success',
       });
-    } catch (error: any) {
-      const errorMessage = error?.message || error?.toString() || String(error);
+    } catch (error: unknown) {
+      const err = error as Error;
+      const errorMessage = err?.message || String(error);
 
       // 如果是用户取消扫描，不显示错误
       if (
@@ -354,8 +354,9 @@ function TransactionForm({
                   }
 
                   console.log('[表单验证器] 地址验证通过');
-                } catch (error: any) {
-                  console.error('[地址验证失败]', error?.message, '地址:', trimmedValue, error);
+                } catch (error: unknown) {
+                  const err = error as Error;
+                  console.error('[地址验证失败]', err?.message, '地址:', trimmedValue, error);
                   return Promise.reject(new Error(t.transactionForm.addressInvalid));
                 }
               },

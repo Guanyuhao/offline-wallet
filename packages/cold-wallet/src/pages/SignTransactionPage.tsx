@@ -17,11 +17,20 @@ import { useI18n } from '../hooks/useI18n';
 
 type SignMode = 'scan' | 'manual';
 
+interface TxData {
+  to?: string;
+  value?: string | number;
+  amount?: string | number;
+  gas_price?: string | number;
+  gas_limit?: string | number;
+  nonce?: string | number;
+}
+
 /**
  * 根据链类型填充表单值（从扫描的二维码数据）
  */
-function fillFormValuesFromTxData(txData: any, chain: ChainType): Record<string, any> {
-  const formValues: Record<string, any> = {};
+function fillFormValuesFromTxData(txData: TxData, chain: ChainType): Record<string, string> {
+  const formValues: Record<string, string> = {};
 
   if (txData.to) formValues.to = txData.to;
 
@@ -93,14 +102,41 @@ function buildTransactionData(
   }
 }
 
+interface FormValues {
+  to?: string;
+  value?: string;
+  gasPrice?: string;
+  gasLimit?: string;
+  nonce?: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FormInstance = ReturnType<typeof Form.useForm>[0];
+
+interface TranslationsType {
+  transactionForm: {
+    recipientAddressRequired: string;
+    addressInvalid: string;
+    amountInvalid: string;
+    gasPriceRequired: string;
+    gasPriceMustBePositive: string;
+    gasLimitRequired: string;
+    gasLimitMustBePositive: string;
+    nonceRequired: string;
+    nonceMustBeNonNegative: string;
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
 /**
  * 验证表单字段值
  */
 async function validateFormValues(
-  values: any,
+  values: FormValues,
   chain: ChainType,
-  form: any,
-  t: any
+  form: FormInstance,
+  t: TranslationsType
 ): Promise<{ valid: boolean; error?: string }> {
   const { to, value, gasPrice, gasLimit, nonce } = values;
 
@@ -121,14 +157,14 @@ async function validateFormValues(
       form.setFields([{ name: 'to', errors: [t.transactionForm.addressInvalid] }]);
       return { valid: false };
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[地址验证失败]', error);
     form.setFields([{ name: 'to', errors: [t.transactionForm.addressInvalid] }]);
     return { valid: false };
   }
 
   // 2. 金额验证
-  const numValue = parseFloat(value);
+  const numValue = parseFloat(value ?? '0');
   if (isNaN(numValue) || numValue <= 0) {
     form.setFields([{ name: 'value', errors: [t.transactionForm.amountInvalid] }]);
     return { valid: false };
@@ -177,18 +213,15 @@ function SignTransactionPage() {
     useScanStore();
   const [form] = Form.useForm();
   const [mode, setMode] = useState<SignMode>(returnMode || 'scan');
-  const [scannedData, setScannedData] = useState<Record<string, any> | null>(null);
+  const [scannedData, setScannedData] = useState<Record<string, unknown> | null>(null);
   const [showScannedInfo, setShowScannedInfo] = useState(false);
   const t = useI18n();
 
-  if (!isUnlocked || !mnemonic) {
-    navigate('/unlock');
-    return null;
-  }
-
   // 处理扫描成功
   const handleScanSuccess = useCallback(
-    async (scannedText: string) => {
+    (scannedText: string) => {
+      if (!currentChain) return;
+
       try {
         const scannedTextTrimmed = scannedText.trim();
         let qrData: UnsignedTransactionQRCode;
@@ -200,7 +233,7 @@ function SignTransactionPage() {
             return;
           }
           qrData = decoded as UnsignedTransactionQRCode;
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('[二维码解析失败]', error);
           Toast.show({
             content: t.signTransaction.qrParseError,
@@ -221,10 +254,10 @@ function SignTransactionPage() {
         }
 
         // 解析未签名交易数据
-        let txData: any;
+        let txData: Record<string, unknown>;
         try {
-          txData = JSON.parse(qrData.unsignedTx);
-        } catch (error: any) {
+          txData = JSON.parse(qrData.unsignedTx) as Record<string, unknown>;
+        } catch (error: unknown) {
           console.error('[交易数据解析失败]', error);
           Toast.show({ content: t.signTransaction.txDataParseError, position: 'top' });
           return;
@@ -240,8 +273,9 @@ function SignTransactionPage() {
           position: 'top',
           icon: 'success',
         });
-      } catch (error: any) {
-        const errorMessage = error?.message || error?.toString();
+      } catch (error: unknown) {
+        const err = error as Error;
+        const errorMessage = err?.message || String(error);
         if (
           errorMessage.includes('cancel') ||
           errorMessage.includes('取消') ||
@@ -269,7 +303,6 @@ function SignTransactionPage() {
   // 恢复 tab 模式（从 store 中恢复）
   useEffect(() => {
     if (returnMode && (returnMode === 'scan' || returnMode === 'manual')) {
-      console.log('[SignTransactionPage] 恢复 tab 模式:', returnMode);
       setMode(returnMode);
     }
   }, [returnMode]);
@@ -277,7 +310,6 @@ function SignTransactionPage() {
   // 处理扫描结果（从 store 中读取）
   useEffect(() => {
     if (scanSuccess && scanResult && scanType === ScanType.UNSIGNED_TRANSACTION) {
-      console.log('[SignTransactionPage] 处理扫描结果');
       // 使用 requestAnimationFrame 确保 mode 先恢复，再处理结果
       requestAnimationFrame(() => {
         handleScanSuccess(scanResult);
@@ -286,6 +318,18 @@ function SignTransactionPage() {
       });
     }
   }, [scanSuccess, scanResult, scanType, handleScanSuccess, clearScanState]);
+
+  // 检查是否需要重定向到解锁页面
+  useEffect(() => {
+    if (!isUnlocked || !mnemonic) {
+      navigate('/unlock');
+    }
+  }, [isUnlocked, mnemonic, navigate]);
+
+  // 如果未解锁，不渲染内容
+  if (!isUnlocked || !mnemonic) {
+    return null;
+  }
 
   // 扫码模式：跳转到扫描页面
   const handleScanUnsignedTransaction = () => {
@@ -301,7 +345,7 @@ function SignTransactionPage() {
   };
 
   // 显示签名确认对话框
-  const showSignConfirmDialog = (values: any): Promise<boolean> => {
+  const showSignConfirmDialog = (values: FormValues): Promise<boolean> => {
     return new Promise((resolve) => {
       const chainName = currentChain.toUpperCase();
       const toAddress = values.to || '';
@@ -377,11 +421,11 @@ function SignTransactionPage() {
 
         // 检查是否有验证错误
         const errors = form.getFieldsError();
-        const hasErrors = errors.some((error: any) => error.errors && error.errors.length > 0);
+        const hasErrors = errors.some((error) => error.errors && error.errors.length > 0);
 
         if (hasErrors) {
           console.error('[表单验证失败] 发现错误:', errors);
-          const firstError = errors.find((error: any) => error.errors && error.errors.length > 0);
+          const firstError = errors.find((error) => error.errors && error.errors.length > 0);
           if (firstError?.errors?.[0]) {
             Toast.show({
               content: firstError.errors[0],
@@ -392,20 +436,19 @@ function SignTransactionPage() {
         }
 
         console.log('[表单验证通过] values:', values);
-      } catch (validationError: any) {
-        console.error('[表单验证失败] 错误类型:', typeof validationError);
+      } catch (validationError: unknown) {
         console.error('[表单验证失败] 错误对象:', validationError);
-        console.error('[表单验证失败] errorFields:', validationError?.errorFields);
-        console.error(
-          '[表单验证失败] 错误字符串:',
-          JSON.stringify(validationError, Object.getOwnPropertyNames(validationError), 2)
-        );
 
         // 尝试多种方式获取错误信息
         let errorMessage = t.signTransaction.formValidationFailed;
 
-        if (validationError?.errorFields && Array.isArray(validationError.errorFields)) {
-          const firstErrorField = validationError.errorFields[0];
+        const err = validationError as {
+          errorFields?: Array<{ errors?: string[] }>;
+          message?: string;
+        };
+
+        if (err?.errorFields && Array.isArray(err.errorFields)) {
+          const firstErrorField = err.errorFields[0];
           if (
             firstErrorField?.errors &&
             Array.isArray(firstErrorField.errors) &&
@@ -413,8 +456,8 @@ function SignTransactionPage() {
           ) {
             errorMessage = firstErrorField.errors[0];
           }
-        } else if (validationError?.message) {
-          errorMessage = validationError.message;
+        } else if (err?.message) {
+          errorMessage = err.message;
         } else if (typeof validationError === 'string') {
           errorMessage = validationError;
         }
@@ -489,17 +532,18 @@ function SignTransactionPage() {
           currentChain,
         },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       // 只有真正的业务错误才会到这里（如签名失败）
+      const err = error as Error;
       console.error('[签名交易错误]', error);
       console.error('[错误详情]', {
-        message: error?.message,
-        stack: error?.stack,
+        message: err?.message,
+        stack: err?.stack,
         error,
       });
 
       // 显示错误提示
-      const errorMessage = error?.message || error?.toString() || t.signTransaction.unknownError;
+      const errorMessage = err?.message || String(error) || t.signTransaction.unknownError;
       Toast.show({
         content: `${t.signTransaction.signError} ${errorMessage}`,
         position: 'top',
