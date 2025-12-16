@@ -88,6 +88,11 @@ export function createBaseConfig(
     resolve: {
       alias: {
         '@shared': sharedPath,
+        // 处理 @offline-wallet/shared 的子路径导出（注意顺序：具体路径在前）
+        '@offline-wallet/shared/config': resolve(sharedPath, 'config/chainConfig.ts'),
+        '@offline-wallet/shared/components': resolve(sharedPath, 'components'),
+        '@offline-wallet/shared/utils': resolve(sharedPath, 'utils'),
+        '@offline-wallet/shared/types': resolve(sharedPath, 'types'),
         '@offline-wallet/shared': sharedPath,
         ...extraAlias,
       },
