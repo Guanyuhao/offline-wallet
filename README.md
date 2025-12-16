@@ -94,6 +94,14 @@ pnpm build:cold:ios    # iOS
 pnpm build:cold:android # Android
 ```
 
+```bash
+# 一次性发布所有 4 个版本
+./scripts/release.sh cold desktop 1.0.0 && \
+./scripts/release.sh cold mobile 1.0.0 && \
+./scripts/release.sh hot desktop 1.0.0 && \
+./scripts/release.sh hot mobile 1.0.0
+```
+
 ### 代码质量
 
 ```bash

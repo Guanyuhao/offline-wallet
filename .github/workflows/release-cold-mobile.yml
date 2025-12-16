@@ -83,7 +83,7 @@ jobs:
       
       - name: Build APK
         working-directory: packages/cold-wallet
-        run: pnpm tauri android build --apk
+        run: pnpm tauri android build
       
       - name: Upload Android Artifacts
         uses: actions/upload-artifact@v4
@@ -160,7 +160,7 @@ jobs:
         working-directory: packages/cold-wallet
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: pnpm tauri ios build --export-method development
+        run: pnpm tauri ios build
       
       - name: Upload iOS Artifacts
         uses: actions/upload-artifact@v4
