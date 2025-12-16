@@ -52,8 +52,8 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-        CFBundleShortVersionString: 0.1.0
-        CFBundleVersion: "0.1.0"
+        CFBundleShortVersionString: 1.0.0
+        CFBundleVersion: "1"
         NSCameraUsageDescription: "需要访问相机以扫描二维码进行地址输入和交易签名"
     entitlements:
       path: cold-wallet_iOS/cold-wallet_iOS.entitlements

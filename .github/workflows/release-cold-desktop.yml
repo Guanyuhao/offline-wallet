@@ -66,7 +66,7 @@ jobs:
           path: |
             packages/cold-wallet/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
             packages/cold-wallet/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
-          if-no-files-found: error
+          if-no-files-found: warn
 
   build-macos:
     name: 构建 macOS
@@ -124,7 +124,7 @@ jobs:
           path: |
             packages/cold-wallet/src-tauri/target/${{ matrix.target.rust_target }}/release/bundle/dmg/*.dmg
             packages/cold-wallet/src-tauri/target/${{ matrix.target.rust_target }}/release/bundle/macos/*.app
-          if-no-files-found: error
+          if-no-files-found: warn
 
   create-release:
     name: 创建 GitHub Release

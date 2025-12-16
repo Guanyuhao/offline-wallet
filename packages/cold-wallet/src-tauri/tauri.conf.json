@@ -34,7 +34,7 @@
   },
   "plugins": {
     "webview": {
-      "additionalBrowserArgs": "--disable-web-security"
+      "additionalBrowserArgs": ""
     }
   },
   "bundle": {

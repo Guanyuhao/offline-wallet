@@ -81,6 +81,11 @@ jobs:
           storeFile=release.keystore
           EOF
       
+      - name: Install OpenSSL for Android
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev pkg-config
+      
       - name: Build APK
         working-directory: packages/hot-wallet
         run: pnpm tauri android build
